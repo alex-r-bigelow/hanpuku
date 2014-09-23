@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<ExtensionList>
+    <Extension Id="com.sci.iD3.extension">
+        <HostList>
+           <Host Name="ILST" Port="8088"/> 
+        </HostList>
+    </Extension>
+</ExtensionList>

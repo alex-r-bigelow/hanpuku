@@ -1,0 +1,26 @@
+div#dom {
+    position:absolute;
+    left:0px;
+    right:0px;
+    top:0px;
+    bottom:35px;
+    overflow:auto;
+    padding:40px;
+}
+div#dom svg {
+    background-color:#ffffff;
+}
+div#controls {
+    position:absolute;
+    left:0px;
+    right:0px;
+    bottom:0px;
+    height:30px;
+    vertical-align: middle;
+    text-align: center;
+}
+#debugButton {
+    position:absolute;
+    right:0px;
+    bottom:0px;
+}

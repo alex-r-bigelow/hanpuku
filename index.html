@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+  <head>
+    <script type="application/javascript">window.module = undefined; // hack to get jQuery to load properly</script>
+    <script type="application/javascript" src="lib/jquery-1.11.0.min.js"></script>
+    <script type="application/javascript" src = "lib/d3.min.js"></script>
+    <script type="application/javascript" src="lib/CSInterface.js"></script>
+    <script type="application/javascript" src="scripts/script.js"></script>
+    <link rel="stylesheet" type="text/css" href="style/style.css"/>
+  </head>
+  <body onload="main();">
+    <div id="dom">
+      <svg id="filename" width="20" height="20"></svg>
+    </div>
+    <div id="controls">
+      <button id="domToDoc" onclick="domToDoc();">Update filename</button>
+      <button onclick="docToDom();">Update DOM</button>
+      <button onclick="save();">Export...</button>
+      <button onclick="load();">Import...</button>
+    </div>
+    
+    <button id="debugButton" onclick="reload();">Reload</button>
+  </body>
+</html>
