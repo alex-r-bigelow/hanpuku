@@ -5,20 +5,31 @@
     <script type="application/javascript" src="lib/jquery-1.11.0.min.js"></script>
     <script type="application/javascript" src = "lib/d3.min.js"></script>
     <script type="application/javascript" src="lib/CSInterface.js"></script>
+    <script type="application/javascript" src="lib/phrogz.js"></script>
     <script type="application/javascript" src="scripts/script.js"></script>
     <link rel="stylesheet" type="text/css" href="style/style.css"/>
   </head>
   <body onload="main();">
     <div id="dom">
-      <svg id="filename" width="20" height="20"></svg>
     </div>
-    <div id="controls">
-      <button id="domToDoc" onclick="domToDoc();">Update filename</button>
-      <button onclick="docToDom();">Update DOM</button>
+    <div id="code">
+      <span>$data (JS, not JSON)</span>
+      <div><textarea id="data"></textarea></div>
+      <span>CSS</span>
+      <div><textarea id="css"></textarea></div>
+      <span>d3.js code (available: &fnof; and I)&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" checked="true"/>Update?</span>
+      <div><textarea id="js"></textarea></div>
+    </div>
+    <div id="docControls"><div>
+      <button onclick="domToDoc();">&lt;</button>
+      <button onclick="docToDom();">&gt;</button>
+    </div></div>
+    <div id="domControls"><div>
       <button onclick="save();">Export...</button>
       <button onclick="load();">Import...</button>
-    </div>
+    </div></div>
     
-    <button id="debugButton" onclick="reload();">Reload</button>
+    <button id="debugButton" onclick="reload();">Reload Extension</button>
   </body>
 </html>

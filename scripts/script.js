@@ -59,10 +59,22 @@ function reload() {
 
 function styleWidget() {
     var i = CSLibrary.getHostEnvironment().appSkinInfo,
-        color = i.panelBackgroundColor.color,
-        style = 'background-color:rgba(' + Math.floor(color.red) + ',' + Math.floor(color.green) + ',' + Math.floor(color.blue) + ',' + (color.alpha/255.0) + ');' +
-                'font-family:"' + i.baseFontFamily + '";font-size:' + i.baseFontSize + 'pt;';
-    jQuery('body').attr('style', style);
+        panelColor = i.panelBackgroundColor.color,
+        panelStyle = 'background-color:rgba(' + Math.floor(panelColor.red) + ',' +
+                                                Math.floor(panelColor.green) + ',' +
+                                                Math.floor(panelColor.blue) + ',' +
+                                                (panelColor.alpha/255.0) + ');' +
+                     'font-family:"' + i.baseFontFamily + '";' +
+                     'font-size:' + i.baseFontSize + 'pt;';
+    /*    barColor = i.appBarBackgroundColor.color,
+          editorStyle = 'background-color:rgba(' + Math.floor(barColor.red) + ',' +
+                                                 Math.floor(barColor.green) + ',' +
+                                                 Math.floor(barColor.blue) + ',' +
+                                                 (barColor.alpha/255.0) + ');' +
+                      'font-size:' + i.baseFontSize + 'pt;';*/
+    jQuery('body').attr('style', panelStyle);
+    //jQuery('#code span').attr('style', editorStyle);
+    //jQuery('textarea').attr('style', editorStyle);
 }
 
 function run() {
@@ -72,14 +84,9 @@ function run() {
 }
 
 function clearDOM() {
-    jQuery('#dom svg')
-        .attr('width','0')
-        .attr('height','0')
-        .attr('id','filename');
-    jQuery('#controls button')
+    document.getElementById('dom').innerHTML = "";
+    jQuery('#docControls div button, #domControls div button, textarea, input')
         .attr('disabled', true);
-    jQuery('#domToDoc')
-        .text('Update (no doc)');
 }
 
 function docToDom () {
@@ -94,10 +101,8 @@ function docToDom () {
                 .attr('width', result.width)
                 .attr('height', result.height)
                 .attr('id', result.name);
-            jQuery('#controls button')
+            jQuery('#docControls div button, #domControls div button, textarea, input')
                 .attr('disabled', false);
-            jQuery('#domToDoc')
-                .text('Update ' + result.name);
             
             // Add the paths
             var svg = d3.select('#' + result.name);
@@ -106,14 +111,18 @@ function docToDom () {
                             .data(result.items);
                         
             var item = items.enter().append('path');
-            item.attr('d',function (d) { return d.d; })
-                .attr('id',function(d) { return d.name; })
-                .attr('fill',function(d) { return d.fill; })
-                .attr('fill-opacity',function(d) { return d.opacity; })
-                .attr('stroke',function(d) { return d.stroke;})
-                .attr('stroke-opacity',function(d) { return d.opacity; });
+            item.attr('d',phrogz('d'))
+                .attr('id',phrogz('name'))
+                .attr('fill',phrogz('fill'))    // TODO: show a warning if there are CMYK colors
+                .attr('fill-opacity',phrogz('opacity'))
+                .attr('stroke',phrogz('stroke'))
+                .attr('stroke-opacity',phrogz('opacity'));
         }
     });
+}
+
+function domToDoc () {
+    
 }
 
 function main() {

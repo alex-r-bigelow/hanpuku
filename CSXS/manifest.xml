@@ -26,8 +26,12 @@
           <Geometry>
             <Size>
               <Height>1000</Height>
-              <Width>500</Width>
+              <Width>1000</Width>
             </Size>
+            <MinSize>
+              <Height>800</Height>
+              <Width>800</Width>
+            </MinSize>
           </Geometry>
           <Icons>
             <Icon Type="Normal">./img/icon.png</Icon>

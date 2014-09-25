@@ -4,6 +4,10 @@ function constructLookup(activeDoc) {
         reservedNames = {   // All IDs in the panel are reserved, and we include the empty
             "" : true,      // string so that elements with no name will be given one
             "dom" : true,
+            "code" : true,
+            "data" : true,
+            "css" : true,
+            "js" : true,
             "controls" : true,
             "domToDoc" : true,
             "debugButton" : true
@@ -49,7 +53,7 @@ function extractPath(e) {
     for (p = 0; p < e.pathPoints.length; p += 1) {
         point = e.pathPoints[p];
         if (p === e.pathPoints.length - 1) {
-            if (point.closed !== true) {
+            if (e.closed !== true) {
                 break;
             }
             nextPoint = e.pathPoints[0];

@@ -1,26 +1,74 @@
+body {
+    overflow: hidden;
+}
 div#dom {
     position:absolute;
     left:0px;
-    right:0px;
-    top:0px;
-    bottom:35px;
+    right:500px;
+    top:35px;
+    bottom:0px;
     overflow:auto;
     padding:40px;
 }
 div#dom svg {
     background-color:#ffffff;
+    border:1px solid black;
 }
-div#controls {
+div#code {
+    position:absolute;
+    width:500px;
+    right:0px;
+    top:0px;
+    bottom:35px;
+}
+div#code span {
+    padding-left: 10px;
+}
+div#code div {
+    width: 100%;
+    height: 30%;
+    padding: 10px;
+    text-align: center;
+}
+textarea {
+    width:90%;
+    height:90%;
+    font-family: 'Consolas', monospace;
+    font-size: 9pt;
+    text-align: left;
+    border: 1px solid black;
+}
+div#docControls {
     position:absolute;
     left:0px;
+    right:500px;
+    top:0px;
+    height:35px;
+    text-align: left;
+}
+div#docControls div {
+    position: relative;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    padding-left:10px;
+}
+div#domControls {
+    position:absolute;
+    width:500px;
     right:0px;
     bottom:0px;
     height:30px;
-    vertical-align: middle;
-    text-align: center;
+    text-align: right;
+}
+div#domControls div {
+    position: relative;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    padding-right:10px;
 }
 #debugButton {
     position:absolute;
-    right:0px;
+    left:0px;
     bottom:0px;
+    vertical-align: middle;
 }
