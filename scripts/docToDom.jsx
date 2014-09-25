@@ -41,20 +41,70 @@ function constructLookup(activeDoc) {
 }
 
 function extractPath(e) {
-    return "";
+    var p,
+        point = e.pathPoints[0],
+        nextPoint,
+        d = "M" + point.anchor[0] + "," + (-point.anchor[1]);
+    
+    for (p = 0; p < e.pathPoints.length; p += 1) {
+        point = e.pathPoints[p];
+        if (p === e.pathPoints.length - 1) {
+            if (point.closed !== true) {
+                break;
+            }
+            nextPoint = e.pathPoints[0];
+        } else {
+            nextPoint = e.pathPoints[p + 1];
+        }
+        
+        d += "C" + point.rightDirection[0] + "," + (-point.rightDirection[1]) + "," +
+                   nextPoint.leftDirection[0] + "," + (-nextPoint.leftDirection[1]) + "," +
+                   nextPoint.anchor[0] + "," + (-nextPoint.anchor[1]);
+    }
+    return d;
 }
 
+function extractColor(e, attr) {
+    // TODO: If the activeDocument is in CMYK mode, add
+    // device-cmyk(c,m,y,k) to the SVG element's style
+    // with an rgb backup. For now, I stupidly convert
+    // everything to RGB
+    if (e[attr].typename === 'RGBColor') {
+        return 'rgb(' + e[attr].red + ',' +
+                        e[attr].green + ',' +
+                        e[attr].blue + ')';
+    } else if (e[attr].typename === 'GrayColor') {
+        return 'rgb(' + e[attr].gray + ',' +
+                        e[attr].gray + ',' +
+                        e[attr].gray + ')';
+    } else if (e[attr].typename === 'CMYKColor') {
+        // TODO: provide an rgb backup in the string
+        return 'device-cmyk(' + e[attr].cyan + ',' +
+                                e[attr].magenta + ',' +
+                                e[attr].yellow + ',' +
+                                e[attr].black + ')';
+    } else {
+        return 'rgb(0,0,0)';
+    }
+}
 
 function describeElement(e) {
     if (e.typename === 'PathItem') {
         return {
+            name : e.name,
             typename : 'path',
-            d : extractPath(e)
-        }
+            d : extractPath(e),
+            fill : extractColor(e, 'fillColor'),
+            stroke : extractColor(e, 'strokeColor'),
+            opacity : e.opacity / 100
+        };
     } else if (e.typename === 'GroupItem') {
         return {
+            name : e.name,
             typename : 'g'
         };
+    } else {
+        throw "Unsupported element type: " + e.typename;
     }
 }
 
@@ -68,7 +118,7 @@ function collectOutput() {
             name : activeDoc.name,
             width : activeDoc.width,
             height : activeDoc.height,
-            pathItems : {}
+            items : [] // TODO: I need to reassemble the hierarchy, not just add paths...
         };
         
         var docElements = constructLookup(activeDoc),
@@ -76,7 +126,7 @@ function collectOutput() {
         
         for (name in docElements) {
             if (docElements.hasOwnProperty(name)) {
-                output.pathItems[name] = describeElement(docElements[name]);
+                output.items.push(describeElement(docElements[name]));
             }
         }
     }

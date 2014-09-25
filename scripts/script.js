@@ -87,7 +87,10 @@ function docToDom () {
         if (result === null) {
             clearDOM();
         } else {
-            jQuery('#dom svg')
+            // Set up the document and the GUI
+            document.getElementById('dom').innerHTML = "";  // nuke the svg so we start fresh
+            d3.select('#dom')
+                .append('svg')
                 .attr('width', result.width)
                 .attr('height', result.height)
                 .attr('id', result.name);
@@ -95,6 +98,20 @@ function docToDom () {
                 .attr('disabled', false);
             jQuery('#domToDoc')
                 .text('Update ' + result.name);
+            
+            // Add the paths
+            var svg = d3.select('#' + result.name);
+            
+            var items = svg.selectAll('path')
+                            .data(result.items);
+                        
+            var item = items.enter().append('path');
+            item.attr('d',function (d) { return d.d; })
+                .attr('id',function(d) { return d.name; })
+                .attr('fill',function(d) { return d.fill; })
+                .attr('fill-opacity',function(d) { return d.opacity; })
+                .attr('stroke',function(d) { return d.stroke;})
+                .attr('stroke-opacity',function(d) { return d.opacity; });
         }
     });
 }
