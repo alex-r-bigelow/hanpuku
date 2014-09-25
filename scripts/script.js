@@ -124,6 +124,15 @@ function docToDom () {
                 .attr('fill-opacity',f('opacity'))
                 .attr('stroke',f('stroke'))
                 .attr('stroke-opacity',f('opacity'));
+            
+            // If the code areas are empty, fill them with some defaults
+            // to give people an idea of what they can / should do
+            if (jQuery('#dataEditor').val() === "") {
+                jQuery('#dataEditor').val('$data = {};');
+            }
+            if (jQuery('#jsEditor').val() === "") {
+                jQuery('#jsEditor').val('var svg = d3.select("#' + result.name + '");');
+            }
         }
     });
 }
