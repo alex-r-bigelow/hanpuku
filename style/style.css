@@ -18,8 +18,8 @@ div#code {
     position:absolute;
     width:500px;
     right:0px;
-    top:0px;
-    bottom:35px;
+    top:35px;
+    bottom:0px;
 }
 div#code span {
     padding-left: 10px;
@@ -56,7 +56,7 @@ div#domControls {
     position:absolute;
     width:500px;
     right:0px;
-    bottom:0px;
+    top:0px;
     height:30px;
     text-align: right;
 }

@@ -1,5 +1,12 @@
+/*jslint evil:true*/
 var CSLibrary = new CSInterface(),
-    loadedJSXlibs= false;
+    loadedJSXlibs= false,
+    $data,
+    exampleFiles = {
+        data : 'data.js',
+        css : 'style.css',
+        js : 'script.js'
+    };
 
 function loadJSXlibs() {
     var jsxLibs = ['lib/json2.js'],
@@ -105,24 +112,70 @@ function docToDom () {
                 .attr('disabled', false);
             
             // Add the paths
-            var svg = d3.select('#' + result.name);
+            var svg = d3.select('#' + result.name).append('g');
             
             var items = svg.selectAll('path')
                             .data(result.items);
                         
             var item = items.enter().append('path');
-            item.attr('d',phrogz('d'))
-                .attr('id',phrogz('name'))
-                .attr('fill',phrogz('fill'))    // TODO: show a warning if there are CMYK colors
-                .attr('fill-opacity',phrogz('opacity'))
-                .attr('stroke',phrogz('stroke'))
-                .attr('stroke-opacity',phrogz('opacity'));
+            item.attr('d',f('d'))
+                .attr('id',f('name'))
+                .attr('fill',f('fill'))    // TODO: show a warning if there are CMYK colors
+                .attr('fill-opacity',f('opacity'))
+                .attr('stroke',f('stroke'))
+                .attr('stroke-opacity',f('opacity'));
         }
     });
 }
 
 function domToDoc () {
     
+}
+
+function updateCSS() {
+    jQuery('#userCSS').remove();
+    var style = document.createElement('style');
+    style.setAttribute('id','userCSS');
+    style.appendChild(document.createTextNode(jQuery('#cssEditor').val()));
+    document.head.appendChild(style);
+}
+
+function updateData() {
+    $data = eval(jQuery('#dataEditor').val());
+}
+
+function runJS() {
+    eval(jQuery('#jsEditor').val());
+}
+
+function runCode() {
+    updateData();
+    updateCSS();
+    runJS();
+}
+
+function loadSample() {
+    var v = jQuery('#sampleMenu').val(),
+        t;
+    
+    if (v !== 'header') {
+        for (t in exampleFiles) {
+            if (exampleFiles.hasOwnProperty(t)) {
+                jQuery.ajax({
+                    url: 'examples/' + v + '/' + exampleFiles[t],
+                    success: function (contents) {
+                        jQuery('#' + t + "Editor").val(contents);
+                    },
+                    error: function () {
+                        jQuery('#' + t + "Editor").val("");
+                    },
+                    cache: false,
+                    async: false
+                });
+            }
+        }
+        jQuery('#sampleMenu').val('header');
+    }
 }
 
 function main() {

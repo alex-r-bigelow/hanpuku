@@ -3,14 +3,16 @@ function constructLookup(activeDoc) {
         name,
         reservedNames = {   // All IDs in the panel are reserved, and we include the empty
             "" : true,      // string so that elements with no name will be given one
+            "userCSS" : true,
             "dom" : true,
             "code" : true,
-            "data" : true,
-            "css" : true,
-            "js" : true,
-            "controls" : true,
-            "domToDoc" : true,
-            "debugButton" : true
+            "dataEditor" : true,
+            "cssEditor" : true,
+            "jsEditor" : true,
+            "docControls" : true,
+            "domControls" : true,
+            "debugButton" : true,
+            "sampleMenu" : true
         },
         nameLookup = {},
         freeId = 1,
