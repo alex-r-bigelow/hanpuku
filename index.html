@@ -13,12 +13,12 @@
   <body onload="main();">
     <div id="dom"></div>
     <div id="code">
-      <span>Override the $data object</span>
-      <div><textarea id="dataEditor"></textarea></div>
+      <span>Store the $data object<button onclick="loadData();">Load Data...</button></span>
+      <div><textarea id="dataEditor" wrap="off"></textarea></div>
       <span>CSS</span>
-      <div><textarea id="cssEditor"></textarea></div>
+      <div><textarea id="cssEditor" wrap="off"></textarea></div>
       <span>d3.js code (available: &fnof; and I)</span>
-      <div><textarea id="jsEditor"></textarea></div>
+      <div><textarea id="jsEditor" wrap="off"></textarea></div>
     </div>
     <div id="docControls"><div>
       <button onclick="domToDoc();">&lt;</button>
@@ -28,8 +28,14 @@
       <button onclick="runCode();">Run</button>
       <select id="sampleMenu" onchange="loadSample();">
         <option value="header">Samples:</option>
-        <option value="force">Force-Directed Graph</option>
-        <option value="buildAGraph">Build Your Own Graph!</option>
+        <optgroup label="Basic Charts">
+          <option value="lineChart">Line Chart</option>
+          <option value="groupedBarChart">Grouped Bar Chart</option>
+          <option value="force">Force-Directed Graph</option>
+        </optgroup>
+        <optgroup label="Techniques">
+          <option value="buildAGraph">Build Your Own Graph!</option>
+        </optgroup>
       </select>
       <button onclick="save();">Export...</button>
       <button onclick="load();">Import...</button>

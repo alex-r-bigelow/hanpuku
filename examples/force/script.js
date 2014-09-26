@@ -1,5 +1,5 @@
-var width = 960,
-    height = 500;
+    width = svg.attr("width"),
+    height = svg.attr("height");
 
 var color = d3.scale.category20();
 
@@ -8,9 +8,8 @@ var force = d3.layout.force()
     .linkDistance(30)
     .size([width, height]);
 
-var svg = d3.select("#dom").select("svg")
-    .attr("width", width)
-    .attr("height", height);
+svg.attr("width", width)
+   .attr("height", height);
 
 force
     .nodes($data.nodes)

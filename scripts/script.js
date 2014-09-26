@@ -1,6 +1,7 @@
 /*jslint evil:true*/
 var CSLibrary = new CSInterface(),
     loadedJSXlibs= false,
+    docIsActive = false,
     $data,
     exampleFiles = {
         data : 'data.js',
@@ -92,15 +93,18 @@ function run() {
 
 function clearDOM() {
     document.getElementById('dom').innerHTML = "";
-    jQuery('#docControls div button, #domControls div button, textarea, input')
+    jQuery('#docControls div button, #domControls div button, textarea, input, select')
         .attr('disabled', true);
 }
 
 function docToDom () {
     runJSX(null, 'scripts/docToDom.jsx', function (result) {
         if (result === null) {
+            docIsActive = false;
             clearDOM();
         } else {
+            docIsActive = true;
+            
             // Set up the document and the GUI
             document.getElementById('dom').innerHTML = "";  // nuke the svg so we start fresh
             d3.select('#dom')
@@ -108,11 +112,11 @@ function docToDom () {
                 .attr('width', result.width)
                 .attr('height', result.height)
                 .attr('id', result.name);
-            jQuery('#docControls div button, #domControls div button, textarea, input')
+            jQuery('#docControls div button, #domControls div button, textarea, input, select')
                 .attr('disabled', false);
             
             // Add the paths
-            var svg = d3.select('#' + result.name).append('g');
+            var svg = d3.select('#' + result.name);
             
             var items = svg.selectAll('path')
                             .data(result.items);
@@ -166,13 +170,20 @@ function runCode() {
 function loadSample() {
     var v = jQuery('#sampleMenu').val(),
         t;
-    
+    if (docIsActive === false) {
+        return;
+    }
     if (v !== 'header') {
         for (t in exampleFiles) {
             if (exampleFiles.hasOwnProperty(t)) {
                 jQuery.ajax({
                     url: 'examples/' + v + '/' + exampleFiles[t],
                     success: function (contents) {
+                        if (t === 'js') {
+                            contents = "var svg = d3.select(\"#" +
+                                        jQuery('#dom svg').attr('id') +
+                                        "\"),\n" + contents;
+                        }
                         jQuery('#' + t + "Editor").val(contents);
                     },
                     error: function () {

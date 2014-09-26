@@ -1,3 +1,6 @@
+var alertedCMYK = false,
+    alertedUnsupported = false;
+
 function constructLookup(activeDoc) {
     var i,
         name,
@@ -67,6 +70,9 @@ function extractPath(e) {
                    nextPoint.leftDirection[0] + "," + (-nextPoint.leftDirection[1]) + "," +
                    nextPoint.anchor[0] + "," + (-nextPoint.anchor[1]);
     }
+    if (e.closed === true) {
+        d += "Z";
+    }
     return d;
 }
 
@@ -85,11 +91,20 @@ function extractColor(e, attr) {
                         e[attr].gray + ')';
     } else if (e[attr].typename === 'CMYKColor') {
         // TODO: provide an rgb backup in the string
+        if (alertedCMYK === false) {
+            alert('iD3 does not yet support CMYK Color Mode.');
+            alertedCMYK = true;
+        }
+        
         return 'device-cmyk(' + e[attr].cyan + ',' +
                                 e[attr].magenta + ',' +
                                 e[attr].yellow + ',' +
                                 e[attr].black + ')';
     } else {
+        if (alertedUnsupported === false) {
+            alert('iD3 does not yet support ' + e[attr].typename);
+            alertedUnsupported = true;
+        }
         return 'rgb(0,0,0)';
     }
 }
@@ -126,6 +141,11 @@ function collectOutput() {
             height : activeDoc.height,
             items : [] // TODO: I need to reassemble the hierarchy, not just add paths...
         };
+        // L = activeDoc.layers[0] or L.layers[0]
+        // G = L.groupItems[0] or G.groupItems[0]
+        // P = L.pathItems[0] or G.pathItems[0]
+        // pt = P.pathPoints[0]
+        // sort each (except pt) by zOrderPosition (ascending)
         
         var docElements = constructLookup(activeDoc),
             name;
