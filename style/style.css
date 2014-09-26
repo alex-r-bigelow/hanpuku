@@ -1,5 +1,6 @@
 body {
     overflow: hidden;
+    font: 9px sans-serif;
 }
 div#dom {
     position:absolute;
@@ -13,6 +14,7 @@ div#dom {
 div#dom svg {
     background-color:#ffffff;
     border:1px solid black;
+    zoom : 100%;
 }
 div#code {
     position:absolute;
@@ -21,30 +23,41 @@ div#code {
     top:35px;
     bottom:0px;
 }
-div#code span {
-    padding-left: 10px;
+div#code fieldset {
+    position:relative;
+    width: 95%;
+    height: 32%;
+    border: 1px solid black;
+    background-color: rgba(255,255,255,0.75);
 }
-div#code div {
-    width: 100%;
-    height: 30%;
-    padding: 10px;
-    text-align: center;
+div#code fieldset legend {
+    background-color: rgba(255,255,255,0.75);
 }
-textarea {
-    width:90%;
-    height:90%;
+div#code fieldset span {
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+    padding: 4px;
+    background-color: rgba(255,255,255,0.75);
+}
+div#code fieldset textarea {
+    position: absolute;
+    top:10px;
+    bottom:0px;
+    left:0px;
+    right:0px;
     font-family: 'Consolas', monospace;
     font-size: 9pt;
     text-align: left;
-    border: 1px solid black;
 }
 div#docControls {
     position:absolute;
     left:0px;
     right:500px;
     top:0px;
-    height:35px;
+    height:30px;
     text-align: left;
+    background-color: rgba(255,255,255,0.75);
 }
 div#docControls div {
     position: relative;
@@ -59,6 +72,7 @@ div#domControls {
     top:0px;
     height:30px;
     text-align: right;
+    background-color: rgba(255,255,255,0.75);
 }
 div#domControls div {
     position: relative;
@@ -66,9 +80,19 @@ div#domControls div {
     -webkit-transform: translateY(-50%);
     padding-right:10px;
 }
+#zoomButtons {
+    position:absolute;
+    right:516px;
+    bottom:16px;
+    padding:4px;
+    background-color: rgba(255,255,255,0.75);
+}
 #debugButton {
     position:absolute;
-    left:0px;
-    bottom:0px;
+    left:16px;
+    bottom:16px;
     vertical-align: middle;
+}
+button, select {
+    border: none;
 }

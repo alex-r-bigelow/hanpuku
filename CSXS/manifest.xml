@@ -25,8 +25,8 @@
           <Menu>iD3</Menu>
           <Geometry>
             <Size>
-              <Height>1000</Height>
-              <Width>1000</Width>
+              <Height>900</Height>
+              <Width>1600</Width>
             </Size>
             <MinSize>
               <Height>800</Height>

@@ -141,6 +141,7 @@ function collectOutput() {
             height : activeDoc.height,
             items : [] // TODO: I need to reassemble the hierarchy, not just add paths...
         };
+        // A = activeDoc.artboards[0] (.artboardRect is a 4-element array)
         // L = activeDoc.layers[0] or L.layers[0]
         // G = L.groupItems[0] or G.groupItems[0]
         // P = L.pathItems[0] or G.pathItems[0]

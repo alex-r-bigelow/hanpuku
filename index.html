@@ -6,26 +6,42 @@
     <script type="application/javascript" src = "lib/d3.min.js"></script>
     <script type="application/javascript" src="lib/CSInterface.js"></script>
     <script type="application/javascript" src="lib/phrogz.js"></script>
-    <script type="application/javascript" src="scripts/script.js"></script>
+    <script type="application/javascript" src="lib/pwnCSS.js"></script>
+    <script type="application/javascript" src="scripts/domToDoc.js"></script>
+    <script type="application/javascript" src="scripts/iD3.js"></script>
     <link type="text/css" rel="stylesheet" href="style/style.css"/>
     <script type="text/css" id="userCSS"></script>
   </head>
   <body onload="main();">
     <div id="dom"></div>
     <div id="code">
-      <span>Store the $data object<button onclick="loadData();">Load Data...</button></span>
-      <div><textarea id="dataEditor" wrap="off"></textarea></div>
-      <span>CSS</span>
-      <div><textarea id="cssEditor" wrap="off"></textarea></div>
-      <span>d3.js code (available: &fnof; and I)</span>
-      <div><textarea id="jsEditor" wrap="off"></textarea></div>
+      <fieldset>
+        <legend>CSS (live)</legend>
+        <textarea id="cssEditor" wrap="off" onchange="updateCSS();" onkeyup="updateCSS();"></textarea>
+      </fieldset>
+      <fieldset>
+        <legend>$data</legend>
+        <textarea id="dataEditor" wrap="off"></textarea>
+        <span style="float:right;">Interpret as:
+          <select>
+            <option disabled="true">CSV</option>
+            <option disabled="true">TSV</option>
+            <option disabled="true">JSON</option>
+            <option>Javascript</option>
+          </select>
+        </span>
+      </fieldset>
+      <fieldset>
+        <legend>Script</legend>
+        <textarea id="jsEditor" wrap="off"></textarea>
+      </fieldset>
     </div>
     <div id="docControls"><div>
       <button onclick="domToDoc();">&lt;</button>
       <button onclick="docToDom();">&gt;</button>
     </div></div>
     <div id="domControls"><div>
-      <button onclick="runCode();">Run</button>
+      <button onclick="runCode();">Load $data, run Script</button>
       <select id="sampleMenu" onchange="loadSample();">
         <option value="header">Samples:</option>
         <optgroup label="Basic Charts">
@@ -40,6 +56,11 @@
       <button onclick="save();">Export...</button>
       <button onclick="load();">Import...</button>
     </div></div>
+    <div id="zoomButtons">
+      <span>100%</span>
+      <button onclick="zoomOut();">-</button>
+      <button onclick="zoomIn();">+</button>
+    </div>
     
     <button id="debugButton" onclick="reload();">Reload Extension</button>
   </body>

@@ -71,9 +71,11 @@ function styleWidget() {
         panelStyle = 'background-color:rgba(' + Math.floor(panelColor.red) + ',' +
                                                 Math.floor(panelColor.green) + ',' +
                                                 Math.floor(panelColor.blue) + ',' +
-                                                (panelColor.alpha/255.0) + ');' +
-                     'font-family:"' + i.baseFontFamily + '";' +
-                     'font-size:' + i.baseFontSize + 'pt;';
+                                                0.9*(panelColor.alpha/255.0) + ');',
+        buttonStyle = 'background-color:rgba(' + Math.floor(panelColor.red) + ',' +
+                                                Math.floor(panelColor.green) + ',' +
+                                                Math.floor(panelColor.blue) + ',' +
+                                                0.5*(panelColor.alpha/255.0) + ');';
     /*    barColor = i.appBarBackgroundColor.color,
           editorStyle = 'background-color:rgba(' + Math.floor(barColor.red) + ',' +
                                                  Math.floor(barColor.green) + ',' +
@@ -81,8 +83,24 @@ function styleWidget() {
                                                  (barColor.alpha/255.0) + ');' +
                       'font-size:' + i.baseFontSize + 'pt;';*/
     jQuery('body').attr('style', panelStyle);
+    jQuery('button, select').attr('style', buttonStyle);
     //jQuery('#code span').attr('style', editorStyle);
     //jQuery('textarea').attr('style', editorStyle);
+}
+
+function zoomIn() {
+    var current = getCSSRule('div#dom svg');
+    current.style.zoom = (current.style.zoom.slice(0,-1) * 2) + "%";
+    jQuery('#zoomButtons span').text(current.style.zoom);
+}
+function zoomOut() {
+    var current = getCSSRule('div#dom svg'),
+        newZoom = current.style.zoom.slice(0,-1) / 2;
+    if (newZoom < 17.5) {
+        newZoom = 17.5;
+    }
+    current.style.zoom = newZoom + "%";
+    jQuery('#zoomButtons span').text(current.style.zoom);
 }
 
 function run() {
@@ -141,10 +159,6 @@ function docToDom () {
     });
 }
 
-function domToDoc () {
-    
-}
-
 function updateCSS() {
     jQuery('#userCSS').remove();
     var style = document.createElement('style');
@@ -163,7 +177,6 @@ function runJS() {
 
 function runCode() {
     updateData();
-    updateCSS();
     runJS();
 }
 
@@ -195,6 +208,7 @@ function loadSample() {
             }
         }
         jQuery('#sampleMenu').val('header');
+        updateCSS();
     }
 }
 
