@@ -19,15 +19,26 @@
         <legend>CSS (live)</legend>
         <textarea id="cssEditor" wrap="off" onchange="updateCSS();" onkeyup="updateCSS();"></textarea>
       </fieldset>
+      <div id="codeControls">
+        <button onclick="runCode();">Load $data, run Script</button>
+        <select id="sampleMenu" onchange="loadSample();">
+          <option value="header">Samples:</option>
+          <optgroup label="Basic Charts">
+            <option value="scatterplot">Scatterplot</option>
+          </optgroup>
+          <optgroup label="Techniques">
+          </optgroup>
+        </select>
+      </div>
       <fieldset>
         <legend>$data</legend>
         <textarea id="dataEditor" wrap="off"></textarea>
         <span style="float:right;">Interpret as:
-          <select>
-            <option disabled="true">CSV</option>
-            <option disabled="true">TSV</option>
-            <option disabled="true">JSON</option>
-            <option>Javascript</option>
+          <select id="dataTypeSelect">
+            <option value="csv">CSV</option>
+            <option value="tsv">TSV</option>
+            <option value="json">JSON</option>
+            <option value="js">Javascript</option>
           </select>
         </span>
       </fieldset>
@@ -36,26 +47,10 @@
         <textarea id="jsEditor" wrap="off"></textarea>
       </fieldset>
     </div>
-    <div id="docControls"><div>
-      <button onclick="domToDoc();">&lt;</button>
-      <button onclick="docToDom();">&gt;</button>
-    </div></div>
-    <div id="domControls"><div>
-      <button onclick="runCode();">Load $data, run Script</button>
-      <select id="sampleMenu" onchange="loadSample();">
-        <option value="header">Samples:</option>
-        <optgroup label="Basic Charts">
-          <option value="lineChart">Line Chart</option>
-          <option value="groupedBarChart">Grouped Bar Chart</option>
-          <option value="force">Force-Directed Graph</option>
-        </optgroup>
-        <optgroup label="Techniques">
-          <option value="buildAGraph">Build Your Own Graph!</option>
-        </optgroup>
-      </select>
-      <button onclick="save();">Export...</button>
-      <button onclick="load();">Import...</button>
-    </div></div>
+    <div id="docControls">
+      <button onclick="domToDoc();">Apply</button>
+      <button onclick="docToDom();">Reset</button>
+    </div>
     <div id="zoomButtons">
       <span>100%</span>
       <button onclick="zoomOut();">-</button>

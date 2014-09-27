@@ -1,15 +1,15 @@
 body {
     overflow: hidden;
-    font: 9px sans-serif;
+    font: 10px sans-serif;
 }
 div#dom {
     position:absolute;
     left:0px;
     right:500px;
-    top:35px;
+    top:0px;
     bottom:0px;
     overflow:auto;
-    padding:40px;
+    padding:60px;
 }
 div#dom svg {
     zoom : 100%;
@@ -24,15 +24,18 @@ div#code {
     position:absolute;
     width:500px;
     right:0px;
-    top:35px;
+    top:0px;
     bottom:0px;
+    padding-right:14px;
 }
 div#code fieldset {
     position:relative;
-    width: 95%;
-    height: 32%;
+    float: right;
+    width: 90%;
+    height: 30%;
     border: 1px solid black;
     background-color: rgba(255,255,255,0.75);
+    margin-bottom: 4px;
 }
 div#code fieldset legend {
     background-color: rgba(255,255,255,0.75);
@@ -54,40 +57,24 @@ div#code fieldset textarea {
     font-size: 9pt;
     text-align: left;
 }
-div#docControls {
-    position:absolute;
-    left:0px;
-    right:500px;
-    top:0px;
-    height:30px;
-    text-align: left;
+#codeControls {
+    position:relative;
+    float:right;
+    padding:4px;
+    margin-right: 3px;
     background-color: rgba(255,255,255,0.75);
-}
-div#docControls div {
-    position: relative;
-    top: 50%;
-    -webkit-transform: translateY(-50%);
-    padding-left:10px;
-}
-div#domControls {
-    position:absolute;
-    width:500px;
-    right:0px;
-    top:0px;
-    height:30px;
-    text-align: right;
-    background-color: rgba(255,255,255,0.75);
-}
-div#domControls div {
-    position: relative;
-    top: 50%;
-    -webkit-transform: translateY(-50%);
-    padding-right:10px;
 }
 #zoomButtons {
     position:absolute;
     right:516px;
     bottom:16px;
+    padding:4px;
+    background-color: rgba(255,255,255,0.75);
+}
+#docControls {
+    position:absolute;
+    left:16px;
+    top:16px;
     padding:4px;
     background-color: rgba(255,255,255,0.75);
 }

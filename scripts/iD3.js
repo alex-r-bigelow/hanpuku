@@ -3,12 +3,40 @@ var CSLibrary = new CSInterface(),
     loadedJSXlibs= false,
     docIsActive = false,
     $data,
-    exampleFiles = {
-        data : 'data.js',
-        css : 'style.css',
-        js : 'script.js'
+    sampleDataFiles = {
+        scatterplot : 'data.tsv'    // *********** START HERE: modify scatterplot to use clones, fix other samples
     };
 
+/* Monkey patch appendClone to d3.selection */
+d3.selection.prototype.appendClone = function (idToClone) {
+    var e = document.getElementById(idToClone),
+        newElement,
+        aIndex,
+        copyId,
+        copyNumber = 1;
+    if (e === null) {
+        throw "No element of ID " + idToClone + " exists.";
+    }
+    newElement = document.createElement(e.tagName);
+    for (aIndex in e.attributes) {
+        if (e.attributes.hasOwnProperty(aIndex) && aIndex !== 'length') {
+            a = e.attributes[a];
+            if (a === 'id') {
+                copyId = newElement.getAttribute(a) + " copy " + copyNumber;
+                while (document.getElementById(copyId) !== null) {
+                    copyNumber += 1;
+                    copyId = newElement.getAttribute(a) + " copy " + copyNumber;
+                }
+                newElement.setAttribute('id', copyId);
+            } else {
+                newElement.setAttribute(a, e.getAttribute(a));
+            }
+        }
+    }
+    return d3.select('#' + newElement.getAttribute('id'));
+};
+
+/* Tools to interact with extendScript */
 function loadJSXlibs() {
     var jsxLibs = ['lib/json2.js'],
         i = 0,
@@ -61,10 +89,12 @@ function runJSX(input, path, callback) {
     }
 }
 
+/* Function for debugging the extension in Illustrator */
 function reload() {
     location.reload();
 }
 
+/* Attempt to fit in with Illustrator's current UI settings*/
 function styleWidget() {
     var i = CSLibrary.getHostEnvironment().appSkinInfo,
         panelColor = i.panelBackgroundColor.color,
@@ -76,18 +106,11 @@ function styleWidget() {
                                                 Math.floor(panelColor.green) + ',' +
                                                 Math.floor(panelColor.blue) + ',' +
                                                 0.5*(panelColor.alpha/255.0) + ');';
-    /*    barColor = i.appBarBackgroundColor.color,
-          editorStyle = 'background-color:rgba(' + Math.floor(barColor.red) + ',' +
-                                                 Math.floor(barColor.green) + ',' +
-                                                 Math.floor(barColor.blue) + ',' +
-                                                 (barColor.alpha/255.0) + ');' +
-                      'font-size:' + i.baseFontSize + 'pt;';*/
     jQuery('body').attr('style', panelStyle);
     jQuery('button, select').attr('style', buttonStyle);
-    //jQuery('#code span').attr('style', editorStyle);
-    //jQuery('textarea').attr('style', editorStyle);
 }
 
+/* DOM Preview helper functions */
 function zoomIn() {
     var current = getCSSRule('div#dom svg');
     current.style.zoom = (current.style.zoom.slice(0,-1) * 2) + "%";
@@ -103,18 +126,11 @@ function zoomOut() {
     jQuery('#zoomButtons span').text(current.style.zoom);
 }
 
-function run() {
-    runJSX(null, 'scripts/illustratorToDOM.jsx', function (result) {
-        console.log(result);
-    });
-}
-
 function clearDOM() {
     document.getElementById('dom').innerHTML = "";
-    jQuery('#docControls div button, #domControls div button, textarea, input, select')
+    jQuery('div button, textarea, input, select')
         .attr('disabled', true);
 }
-
 
 function extractPathString(path) {
     var p,
@@ -168,6 +184,7 @@ function addChildGroups (parent, group) {
     }
 }
 
+/* Copies the current Illustrator document to the DOM Preview */
 function docToDom () {
     runJSX(null, 'scripts/docToDom.jsx', function (result) {
         if (result === null) {
@@ -183,7 +200,7 @@ function docToDom () {
                 .attr('width', result.width)
                 .attr('height', result.height)
                 .attr('id', result.name);
-            jQuery('#docControls div button, #domControls div button, textarea, input, select')
+            jQuery('div button, textarea, input, select')
                 .attr('disabled', false);
             
             // Add the artboards
@@ -218,6 +235,7 @@ function docToDom () {
     });
 }
 
+/* Code helper functions */
 function updateCSS() {
     jQuery('#userCSS').remove();
     var style = document.createElement('style');
@@ -226,12 +244,74 @@ function updateCSS() {
     document.head.appendChild(style);
 }
 
+function loadCSS(path) {
+    jQuery.ajax({
+        url: path,
+        success: function (contents) {
+            jQuery('#cssEditor').val(contents);
+            updateCSS();
+        },
+        error: function () {
+            jQuery('#jsEditor').val("");
+            updateCSS();
+        },
+        cache: false,
+        async: false
+    });
+}
+
 function updateData() {
-    $data = eval(jQuery('#dataEditor').val());
+    var ext = jQuery('#dataTypeSelect').val(),
+        dataText = jQuery('#dataEditor').val();
+    
+    if (ext === 'js') {
+        $data = eval(dataText);
+    } else if (ext === 'json') {
+        $data = JSON.parse(dataText);
+    } else if (ext === 'csv') {
+        $data = d3.csv.parse(dataText);
+    } else if (ext === 'tsv') {
+        $data = d3.tsv.parse(dataText);
+    }
+}
+
+function loadData(path) {
+    var ext = path.split('.');
+    ext = ext[ext.length-1];
+    
+    jQuery.ajax({
+        url: path,
+        success: function (contents) {
+            jQuery('#dataEditor').val(contents);
+            jQuery('#dataTypeSelect').val(ext);
+        },
+        error: function () {
+            jQuery('#dataEditor').val("");
+        },
+        cache: false,
+        async: false
+    });
 }
 
 function runJS() {
     eval(jQuery('#jsEditor').val());
+}
+
+function loadJS(path) {
+    jQuery.ajax({
+        url: path,
+        success: function (contents) {
+            contents = "var doc = d3.select(\"#" +
+                        jQuery('#dom svg').attr('id') +
+                        "\"),\n" + contents;
+            jQuery('#jsEditor').val(contents);
+        },
+        error: function () {
+            jQuery('#jsEditor').val("");
+        },
+        cache: false,
+        async: false
+    });
 }
 
 function runCode() {
@@ -240,37 +320,20 @@ function runCode() {
 }
 
 function loadSample() {
-    var v = jQuery('#sampleMenu').val(),
-        t;
+    var v = jQuery('#sampleMenu').val();
+    
     if (docIsActive === false) {
         return;
     }
     if (v !== 'header') {
-        for (t in exampleFiles) {
-            if (exampleFiles.hasOwnProperty(t)) {
-                jQuery.ajax({
-                    url: 'examples/' + v + '/' + exampleFiles[t],
-                    success: function (contents) {
-                        if (t === 'js') {
-                            contents = "var svg = d3.select(\"#" +
-                                        jQuery('#dom svg').attr('id') +
-                                        "\"),\n" + contents;
-                        }
-                        jQuery('#' + t + "Editor").val(contents);
-                    },
-                    error: function () {
-                        jQuery('#' + t + "Editor").val("");
-                    },
-                    cache: false,
-                    async: false
-                });
-            }
-        }
+        loadCSS('examples/' + v + '/style.css');
+        loadData('examples/' + v + '/' + sampleDataFiles[v]);
+        loadJS('examples/' + v + '/script.js');
         jQuery('#sampleMenu').val('header');
-        updateCSS();
     }
 }
 
+/* Where execution begins when the extension is loaded */
 function main() {
     styleWidget();
     docToDom();
