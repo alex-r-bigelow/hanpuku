@@ -12,10 +12,14 @@ div#dom {
     padding:40px;
 }
 div#dom svg {
-    background-color:#ffffff;
-    border:1px solid black;
     zoom : 100%;
 }
+.artboard {
+    fill:#ffffff !important;
+    stroke-width:1px !important;
+    stroke:#000000 !important;
+}
+
 div#code {
     position:absolute;
     width:500px;

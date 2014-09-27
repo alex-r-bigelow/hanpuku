@@ -1,6 +1,13 @@
 var alertedCMYK = false,
     alertedUnsupported = false;
 
+function phrogz(name){ 
+  var v,params=Array.prototype.slice.call(arguments,1);
+  return function(o){
+    return (typeof (v=o[name])==='function' ? v.apply(o,params) : v );
+  };
+}
+
 function constructLookup(activeDoc) {
     var i,
         name,
@@ -21,6 +28,22 @@ function constructLookup(activeDoc) {
         freeId = 1,
         nameless = [];
     
+    for (i = 0; i < activeDoc.artboards.length; i += 1) {
+        name = activeDoc.artboards[i].name;
+        if (reservedNames.hasOwnProperty(name) || nameLookup.hasOwnProperty(name)) {
+            nameless.push(activeDoc.artboards[i]);
+        } else {
+            nameLookup[name] = activeDoc.artboards[i];
+        }
+    }
+    for (i = 0; i < activeDoc.layers.length; i += 1) {
+        name = activeDoc.layers[i].name;
+        if (reservedNames.hasOwnProperty(name) || nameLookup.hasOwnProperty(name)) {
+            nameless.push(activeDoc.layers[i]);
+        } else {
+            nameLookup[name] = activeDoc.layers[i];
+        }
+    }
     for (i = 0; i < activeDoc.pathItems.length; i += 1) {
         name = activeDoc.pathItems[i].name;
         if (reservedNames.hasOwnProperty(name) || nameLookup.hasOwnProperty(name)) {
@@ -47,33 +70,6 @@ function constructLookup(activeDoc) {
         nameLookup[name] = nameless[i];
     }
     return nameLookup;
-}
-
-function extractPath(e) {
-    var p,
-        point = e.pathPoints[0],
-        nextPoint,
-        d = "M" + point.anchor[0] + "," + (-point.anchor[1]);
-    
-    for (p = 0; p < e.pathPoints.length; p += 1) {
-        point = e.pathPoints[p];
-        if (p === e.pathPoints.length - 1) {
-            if (e.closed !== true) {
-                break;
-            }
-            nextPoint = e.pathPoints[0];
-        } else {
-            nextPoint = e.pathPoints[p + 1];
-        }
-        
-        d += "C" + point.rightDirection[0] + "," + (-point.rightDirection[1]) + "," +
-                   nextPoint.leftDirection[0] + "," + (-nextPoint.leftDirection[1]) + "," +
-                   nextPoint.anchor[0] + "," + (-nextPoint.anchor[1]);
-    }
-    if (e.closed === true) {
-        d += "Z";
-    }
-    return d;
 }
 
 function extractColor(e, attr) {
@@ -109,51 +105,29 @@ function extractColor(e, attr) {
     }
 }
 
-function describeElement(e) {
-    if (e.typename === 'PathItem') {
-        return {
-            name : e.name,
-            typename : 'path',
-            d : extractPath(e),
-            fill : extractColor(e, 'fillColor'),
-            stroke : extractColor(e, 'strokeColor'),
-            opacity : e.opacity / 100
-        };
-    } else if (e.typename === 'GroupItem') {
-        return {
-            name : e.name,
-            typename : 'g'
-        };
-    } else {
-        throw "Unsupported element type: " + e.typename;
-    }
-}
-
-function collectOutput() {
-    var output = null;
-
-    if (app.documents.length > 0) {
-        var activeDoc = app.activeDocument;
-        
-        output = {
-            name : activeDoc.name,
-            width : activeDoc.width,
-            height : activeDoc.height,
-            items : [] // TODO: I need to reassemble the hierarchy, not just add paths...
-        };
-        // A = activeDoc.artboards[0] (.artboardRect is a 4-element array)
-        // L = activeDoc.layers[0] or L.layers[0]
-        // G = L.groupItems[0] or G.groupItems[0]
-        // P = L.pathItems[0] or G.pathItems[0]
-        // pt = P.pathPoints[0]
-        // sort each (except pt) by zOrderPosition (ascending)
-        
-        var docElements = constructLookup(activeDoc),
-            name;
-        
-        for (name in docElements) {
-            if (docElements.hasOwnProperty(name)) {
-                output.items.push(describeElement(docElements[name]));
+function extractPath (p) {
+    var output = {
+        name : p.name,
+        zIndex : p.zOrderPosition,
+        fill : extractColor(p, 'fillColor'),
+        stroke : extractColor(p, 'strokeColor'),
+        opacity : p.opacity / 100,
+        closed : p.closed,
+        points : []
+    },
+        pt,
+        controlPoint;
+    
+    for (pt = 0; pt < p.pathPoints.length; pt += 1) {
+        output.points.push({
+            anchor : p.pathPoints[pt].anchor,
+            leftDirection : p.pathPoints[pt].leftDirection,
+            rightDirection : p.pathPoints[pt].rightDirection
+        });
+        for (controlPoint in output.points[pt]) {
+            if (output.points[pt].hasOwnProperty(controlPoint)) {
+                // Illustrator has inverted Y coordinates
+                output.points[pt][controlPoint][1] = -output.points[pt][controlPoint][1];
             }
         }
     }
@@ -161,5 +135,58 @@ function collectOutput() {
     return output;
 }
 
+function extractGroup(g) {
+    var output = {
+        name : g.name,
+        zIndex : g.zOrderPosition,
+        groups : [],
+        paths : []
+    },
+        s,
+        p;
+    
+    for (s = 0; s < g.groupItems.length; s += 1) {
+        output.groups.push(extractGroup(g.groupItems[s]));
+    }
+    for (p = 0; p < g.pathItems.length; p += 1) {
+        output.paths.push(extractPath(g.pathItems[p]));
+    }
+    return output;
+}
 
-JSON.stringify(collectOutput());
+function extractDocument() {
+    var output = null;
+
+    if (app.documents.length > 0) {
+        var activeDoc = app.activeDocument,
+            idLookup = constructLookup(activeDoc),
+            a,
+            l;
+        
+        output = {
+            name : activeDoc.name,
+            width : activeDoc.width,
+            height : activeDoc.height,
+            artboards : [],
+            groups : []
+        };
+        
+        for (a = 0; a < activeDoc.artboards.length; a += 1) {
+            output.artboards.push({
+                name: activeDoc.artboards[a].name,
+                rect: activeDoc.artboards[a].artboardRect
+            });
+            // Illustrator has inverted Y coordinates
+            output.artboards[a].rect[1] = -output.artboards[a].rect[1];
+            output.artboards[a].rect[3] = -output.artboards[a].rect[3];
+        }
+        for (l = 0; l < activeDoc.layers.length; l += 1) {
+            output.groups.push(extractGroup(activeDoc.layers[l]));
+        }
+    }
+    
+    return output;
+}
+
+
+JSON.stringify(extractDocument());
