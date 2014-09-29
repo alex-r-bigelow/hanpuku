@@ -1,6 +1,6 @@
     margin = {top: 20, right: 20, bottom: 30, left: 40},
-    width = svg.attr("width") - margin.left - margin.right,
-    height = svg.attr("height") - margin.top - margin.bottom;
+    width = doc.attr("width") - margin.left - margin.right,
+    height = doc.attr("height") - margin.top - margin.bottom;
 
 var x0 = d3.scale.ordinal()
     .rangeRoundBands([0, width], .1);
@@ -22,14 +22,13 @@ var yAxis = d3.svg.axis()
     .orient("left")
     .tickFormat(d3.format(".2s"));
 
-// This is a little odd, but in Mike Bostock's examples, the svg variable often refers
-// to a group instead of the actual svg element. From this point on, svg refers to
-// a generic container, not the page itself.
-svg = svg.append("g")
-  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+var svg = doc.append("g")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-var data = d3.csv.parse($data);
-
+var data = $data;
   var ageNames = d3.keys(data[0]).filter(function(key) { return key !== "State"; });
 
   data.forEach(function(d) {

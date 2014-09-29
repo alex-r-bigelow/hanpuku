@@ -4,6 +4,9 @@ var CSLibrary = new CSInterface(),
     docIsActive = false,
     $data,
     sampleDataFiles = {
+        buildAGraph : null,
+        force : 'data.json',
+        groupedBarChart : 'data.csv',
         lineChart : 'data.tsv',
         scatterClones : 'data.tsv',
         scatterplot : 'data.tsv'    // TODO: fix other samples
@@ -361,7 +364,9 @@ function loadSample() {
     }
     if (v !== 'header') {
         loadCSS('examples/' + v + '/style.css');
-        loadData('examples/' + v + '/' + sampleDataFiles[v]);
+        if (sampleDataFiles[v] !== null) {
+            loadData('examples/' + v + '/' + sampleDataFiles[v]);
+        }
         loadJS('examples/' + v + '/script.js');
         jQuery('#sampleMenu').val('header');
     }

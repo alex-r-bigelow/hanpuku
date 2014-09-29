@@ -1,5 +1,5 @@
-    width = svg.attr("width"),
-    height = svg.attr("height");
+    width = doc.attr("width"),
+    height = doc.attr("height");
 
 var fill = d3.scale.category20();
 
@@ -10,8 +10,11 @@ var force = d3.layout.force()
     .charge(-60)
     .on("tick", tick);
 
-svg.on("mousemove", mousemove)
-   .on("mousedown", mousedown);
+var svg = doc.append("g")
+    .attr("width", width)
+    .attr("height", height)
+    .on("mousemove", mousemove)
+    .on("mousedown", mousedown);
 
 svg.append("rect")
     .attr("width", width)
