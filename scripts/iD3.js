@@ -4,37 +4,54 @@ var CSLibrary = new CSInterface(),
     docIsActive = false,
     $data,
     sampleDataFiles = {
-        scatterplot : 'data.tsv'    // *********** START HERE: modify scatterplot to use clones, fix other samples
+        scatterClones : 'data.tsv',
+        scatterplot : 'data.tsv'    // TODO: fix other samples
     };
 
-/* Monkey patch appendClone to d3.selection */
+/* Monkey patch appendClone to d3.selection and d3.selection.enter */
 d3.selection.prototype.appendClone = function (idToClone) {
-    var e = document.getElementById(idToClone),
-        newElement,
+    var self = this,
+        proto = document.getElementById(idToClone),
+        newIdsList = "",
         aIndex,
+        a,
         copyId,
         copyNumber = 1;
-    if (e === null) {
+    
+    if (proto === null) {
         throw "No element of ID " + idToClone + " exists.";
     }
-    newElement = document.createElement(e.tagName);
-    for (aIndex in e.attributes) {
-        if (e.attributes.hasOwnProperty(aIndex) && aIndex !== 'length') {
-            a = e.attributes[a];
-            if (a === 'id') {
-                copyId = newElement.getAttribute(a) + " copy " + copyNumber;
-                while (document.getElementById(copyId) !== null) {
-                    copyNumber += 1;
-                    copyId = newElement.getAttribute(a) + " copy " + copyNumber;
+    for (e = 0; e < self[0].length; e += 1) {
+        newElement = document.createElementNS(proto.namespaceURI, proto.tagName);
+        for (aIndex in proto.attributes) {
+            if (proto.attributes.hasOwnProperty(aIndex) && aIndex !== 'length') {
+                a = proto.attributes[aIndex].name;
+                if (a === 'id') {
+                    copyId = proto.getAttribute(a) + "Copy" + copyNumber;
+                    while (document.getElementById(copyId) !== null) {
+                        copyNumber += 1;
+                        copyId = proto.getAttribute(a) + "Copy" + copyNumber;
+                    }
+                    newElement.setAttribute('id', copyId);
+                    if (e > 0) {
+                        newIdsList += ", ";
+                    }
+                    newIdsList += "#" + copyId;
+                } else {
+                    newElement.setAttribute(a, proto.getAttribute(a));
                 }
-                newElement.setAttribute('id', copyId);
-            } else {
-                newElement.setAttribute(a, e.getAttribute(a));
             }
         }
+        newElement.__data__ = self[0][e].__data__;
+        if (self[0][e].hasOwnProperty('appendChild')) {
+            self[0][e].appendChild(newElement);
+        } else {
+            self[0].parentNode.appendChild(newElement);
+        }
     }
-    return d3.select('#' + newElement.getAttribute('id'));
+    return d3.selectAll(newIdsList);
 };
+d3.selection.enter.prototype.appendClone = d3.selection.prototype.appendClone;
 
 /* Tools to interact with extendScript */
 function loadJSXlibs() {
