@@ -4,50 +4,66 @@ var CSLibrary = new CSInterface(),
     docIsActive = false,
     $data,
     sampleDataFiles = {
+        lineChart : 'data.tsv',
         scatterClones : 'data.tsv',
         scatterplot : 'data.tsv'    // TODO: fix other samples
     };
 
 /* Monkey patch appendClone to d3.selection and d3.selection.enter */
+var copyNumber = 1;
+
+function getClone (proto, appendTarget) {
+    var aIndex,
+        a,
+        e,
+        copyId,
+        newElement = document.createElementNS(proto.namespaceURI, proto.tagName);
+    
+    for (aIndex in proto.attributes) {
+        if (proto.attributes.hasOwnProperty(aIndex) && aIndex !== 'length') {
+            a = proto.attributes[aIndex].name;
+            if (a === 'id') {
+                copyId = proto.getAttribute(a) + "Copy" + copyNumber;
+                while (document.getElementById(copyId) !== null) {
+                    copyNumber += 1;
+                    copyId = proto.getAttribute(a) + "Copy" + copyNumber;
+                }
+                newElement.setAttribute('id', copyId);
+            } else {
+                newElement.setAttribute(a, proto.getAttribute(a));
+            }
+        }
+    }
+    
+    for (e = 0; e < proto.childNodes.length; e += 1) {
+        getClone(proto.childNodes[e], newElement);
+    }
+    
+    appendTarget.appendChild(newElement);
+    
+    return newElement;
+}
+
 d3.selection.prototype.appendClone = function (idToClone) {
     var self = this,
         proto = document.getElementById(idToClone),
         newIdsList = "",
-        aIndex,
-        a,
-        copyId,
-        copyNumber = 1;
+        e;
     
     if (proto === null) {
         throw "No element of ID " + idToClone + " exists.";
     }
     for (e = 0; e < self[0].length; e += 1) {
-        newElement = document.createElementNS(proto.namespaceURI, proto.tagName);
-        for (aIndex in proto.attributes) {
-            if (proto.attributes.hasOwnProperty(aIndex) && aIndex !== 'length') {
-                a = proto.attributes[aIndex].name;
-                if (a === 'id') {
-                    copyId = proto.getAttribute(a) + "Copy" + copyNumber;
-                    while (document.getElementById(copyId) !== null) {
-                        copyNumber += 1;
-                        copyId = proto.getAttribute(a) + "Copy" + copyNumber;
-                    }
-                    newElement.setAttribute('id', copyId);
-                    if (e > 0) {
-                        newIdsList += ", ";
-                    }
-                    newIdsList += "#" + copyId;
-                } else {
-                    newElement.setAttribute(a, proto.getAttribute(a));
-                }
-            }
-        }
-        newElement.__data__ = self[0][e].__data__;
-        if (self[0][e].hasOwnProperty('appendChild')) {
-            self[0][e].appendChild(newElement);
+        if (self[0][e].appendChild) {
+            newElement = getClone(proto, self[0][e]);
         } else {
-            self[0].parentNode.appendChild(newElement);
+            newElement = getClone(proto, self[0].parentNode);
+        }        
+        newElement.__data__ = self[0][e].__data__;
+        if (e > 0) {
+            newIdsList += ", ";
         }
+        newIdsList += "#" + newElement.getAttribute('id');
     }
     return d3.selectAll(newIdsList);
 };
@@ -182,6 +198,7 @@ function addPath (parent, path) {
         .attr('d', extractPathString(path))
         .style('fill', path.fill)
         .style('stroke', path.stroke)
+        .style('stroke-width', path.strokeWidth)
         .style('opacity', path.opacity);
 }
 

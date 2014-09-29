@@ -1,6 +1,6 @@
     margin = {top: 20, right: 20, bottom: 30, left: 50},
-    width = svg.attr("width") - margin.left - margin.right,
-    height = svg.attr("height") - margin.top - margin.bottom;
+    width = doc.attr("width") - margin.left - margin.right,
+    height = doc.attr("height") - margin.top - margin.bottom;
 
 var parseDate = d3.time.format("%d-%b-%y").parse;
 
@@ -22,13 +22,13 @@ var line = d3.svg.line()
     .x(function(d) { return x(d.date); })
     .y(function(d) { return y(d.close); });
 
-// This is a little odd, but in Mike Bostock's examples, the svg variable often refers
-// to a group instead of the actual svg element. From this point on, svg refers to
-// a generic container, not the page itself.
-svg = svg.append("g")
-  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+var svg = doc.append("g")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-data = d3.tsv.parse($data);
+var data = $data;
   data.forEach(function(d) {
     d.date = parseDate(d.date);
     d.close = +d.close;

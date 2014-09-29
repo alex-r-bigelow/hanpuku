@@ -96,7 +96,9 @@ function extractColor(e, attr) {
                                 e[attr].magenta + ',' +
                                 e[attr].yellow + ',' +
                                 e[attr].black + ')';
-    } else {
+    } else if (e[attr].typename === 'NoColor') {
+        return 'none';
+    }else {
         if (alertedUnsupported === false) {
             alert('iD3 does not yet support ' + e[attr].typename);
             alertedUnsupported = true;
@@ -111,6 +113,7 @@ function extractPath (p) {
         zIndex : p.zOrderPosition,
         fill : extractColor(p, 'fillColor'),
         stroke : extractColor(p, 'strokeColor'),
+        strokeWidth : p.strokeWidth,
         opacity : p.opacity / 100,
         closed : p.closed,
         points : []

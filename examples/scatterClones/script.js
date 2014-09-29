@@ -66,10 +66,8 @@ var data = $data;
       .attr("class", "legend")
       .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
-  legend.append("rect")
-      .attr("x", width - 18)
-      .attr("width", 18)
-      .attr("height", 18)
+  legend.appendClone("entity1")
+      .attr("transform", "translate(" + (width - 8) + ",10)")
       .style("fill", color);
 
   legend.append("text")
