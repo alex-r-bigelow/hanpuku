@@ -8,7 +8,9 @@ var force = d3.layout.force()
     .linkDistance(30)
     .size([width, height]);
 
-var svg = doc.append("g");
+var svg = doc.selectAll('#svgContainer').data(['dummy'])
+  .enter().append("g")
+    .attr('id','svgContainer');
 
 var graph = $data;
   force
@@ -17,10 +19,11 @@ var graph = $data;
       .start();
 
   var link = svg.selectAll(".link")
-      .data(graph.links)
-    .enter().append("line")
+      .data(graph.links);
+  link.enter().append("line")
       .attr("class", "link")
       .style("stroke-width", function(d) { return Math.sqrt(d.value); });
+  link.exit().remove();
 
   var node = svg.selectAll(".node")
       .data(graph.nodes)

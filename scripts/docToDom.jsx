@@ -1,74 +1,92 @@
 var alertedCMYK = false,
-    alertedUnsupported = false;
+    alertedUnsupported = false,
+    reservedNames = {   // All IDs in the panel are reserved, and we include the empty
+        "" : true,      // string so that elements with no name will be given one
+        "userCSS" : true,
+        "dom" : true,
+        "code" : true,
+        "cssEditor" : true,
+        "codeControls" : true,
+        "sampleMenu" : true,
+        "dataEditor" : true,
+        "dataTypeSelect" : true,
+        "jsEditor" : true,
+        "docControls" : true,
+        "zoomButtons" : true,
+        "debugButton" : true
+    },
+    spaceSwapper = new RegExp(' ', 'g');
 
-function phrogz(name){ 
-  var v,params=Array.prototype.slice.call(arguments,1);
-  return function(o){
-    return (typeof (v=o[name])==='function' ? v.apply(o,params) : v );
-  };
-}
-
-function constructLookup(activeDoc) {
-    var i,
-        name,
-        reservedNames = {   // All IDs in the panel are reserved, and we include the empty
-            "" : true,      // string so that elements with no name will be given one
-            "userCSS" : true,
-            "dom" : true,
-            "code" : true,
-            "dataEditor" : true,
-            "cssEditor" : true,
-            "jsEditor" : true,
-            "docControls" : true,
-            "domControls" : true,
-            "debugButton" : true,
-            "sampleMenu" : true
-        },
-        nameLookup = {},
-        freeId = 1,
-        nameless = [];
+function standardize(activeDoc) {
+    var nameLookup = {},
+        docTags;
     
-    for (i = 0; i < activeDoc.artboards.length; i += 1) {
-        name = activeDoc.artboards[i].name;
-        if (reservedNames.hasOwnProperty(name) || nameLookup.hasOwnProperty(name)) {
-            nameless.push(activeDoc.artboards[i]);
-        } else {
-            nameLookup[name] = activeDoc.artboards[i];
+    try {
+        docTags = JSON.parse(activeDoc.tags.getByName('id3_data').value);
+    } catch (e) {
+        docTags = {
+            document : null,
+            artboards : {},
+            layers : {}
+        };
+    }
+    
+    function standardizeItems(items, tagType) {
+        var i,
+            oldName,
+            name,
+            newName,
+            freeId = 1,
+            tag;
+        
+        for (i = 0; i < items.length; i += 1) {
+            // Make sure item names have no spaces (DOM restriction) and are unique
+            oldName = items[i].name;
+            name = oldName.replace(spaceSwapper, '_');
+            
+            newName = name;
+            while (reservedNames.hasOwnProperty(newName) || nameLookup.hasOwnProperty(newName)) {
+                newName = name + freeId;
+                freeId += 1;
+            }
+            items[i].name = newName;
+            nameLookup[newName] = items[i];
+            
+            // Create the id3_data tag if it doesn't exist
+            if (tagType === 'native') {
+                try {
+                    items[i].tags.getByName('id3_data');
+                } catch (e) {
+                    tag = items[i].tags.add();
+                    tag.name = 'id3_data';
+                    tag.value = 'null';
+                }
+            } else {
+                if (oldName !== newName && docTags[tagType].hasOwnProperty(oldName)) {
+                    docTags[tagType][newName] = docTags[tagType][oldName];
+                    delete docTags[tagType][oldName];
+                } else if (docTags[tagType].hasOwnProperty(newName) === false) {
+                    docTags[tagType][newName] = null;
+                }
+            }
         }
     }
-    for (i = 0; i < activeDoc.layers.length; i += 1) {
-        name = activeDoc.layers[i].name;
-        if (reservedNames.hasOwnProperty(name) || nameLookup.hasOwnProperty(name)) {
-            nameless.push(activeDoc.layers[i]);
-        } else {
-            nameLookup[name] = activeDoc.layers[i];
-        }
+    
+    // Illustrator doesn't have tags on layers or artboards,
+    // so I cheat and embed both inside the document's tag
+    standardizeItems(activeDoc.artboards, 'artboards');
+    standardizeItems(activeDoc.layers, 'layers');
+    try {
+        tag = activeDoc.tags.getByName('id3_data');
+        tag.value = JSON.stringify(docTags);
+    } catch (e) {
+        tag = activeDoc.tags.add();
+        tag.name = 'id3_data';
+        tag.value = JSON.stringify(docTags);
     }
-    for (i = 0; i < activeDoc.pathItems.length; i += 1) {
-        name = activeDoc.pathItems[i].name;
-        if (reservedNames.hasOwnProperty(name) || nameLookup.hasOwnProperty(name)) {
-            nameless.push(activeDoc.pathItems[i]);
-        } else {
-            nameLookup[name] = activeDoc.pathItems[i];
-        }
-    }
-    for (i = 0; i < activeDoc.groupItems.length; i += 1) {
-        name = activeDoc.groupItems[i].name;
-        if (reservedNames.hasOwnProperty(name) || nameLookup.hasOwnProperty(name)) {
-            nameless.push(activeDoc.groupItems[i]);
-        } else {
-            nameLookup[name] = activeDoc.groupItems[i];
-        }
-    }
-    for (i = 0; i < nameless.length; i += 1) {
-        name = "";
-        while (reservedNames.hasOwnProperty(name) || nameLookup.hasOwnProperty(name)) {
-            name = "entity" + freeId;
-            freeId += 1;
-        }
-        nameless[i].name = name;
-        nameLookup[name] = nameless[i];
-    }
+    standardizeItems(activeDoc.pathItems, 'native');
+    standardizeItems(activeDoc.groupItems, 'native');
+    
     return nameLookup;
 }
 
@@ -116,7 +134,8 @@ function extractPath (p) {
         strokeWidth : p.strokeWidth,
         opacity : p.opacity / 100,
         closed : p.closed,
-        points : []
+        points : [],
+        data : JSON.parse(p.tags.getByName('id3_data').value)
     },
         pt,
         controlPoint;
@@ -143,7 +162,8 @@ function extractGroup(g) {
         name : g.name,
         zIndex : g.zOrderPosition,
         groups : [],
-        paths : []
+        paths : [],
+        data : JSON.parse(g.tags.getByName('id3_data').value)
     },
         s,
         p;
@@ -162,29 +182,53 @@ function extractDocument() {
 
     if (app.documents.length > 0) {
         var activeDoc = app.activeDocument,
-            idLookup = constructLookup(activeDoc),
             a,
-            l;
+            l,
+            g,
+            s,
+            p,
+            docTags;
+        
+        standardize(activeDoc);
+        
+        docTags = JSON.parse(activeDoc.tags.getByName('id3_data').value);
         
         output = {
             name : activeDoc.name,
             width : activeDoc.width,
             height : activeDoc.height,
             artboards : [],
-            groups : []
+            groups : [],
+            data : docTags.document
         };
         
         for (a = 0; a < activeDoc.artboards.length; a += 1) {
             output.artboards.push({
                 name: activeDoc.artboards[a].name,
-                rect: activeDoc.artboards[a].artboardRect
+                rect: activeDoc.artboards[a].artboardRect,
+                data: docTags.artboards[activeDoc.artboards[a].name]
             });
             // Illustrator has inverted Y coordinates
             output.artboards[a].rect[1] = -output.artboards[a].rect[1];
             output.artboards[a].rect[3] = -output.artboards[a].rect[3];
         }
         for (l = 0; l < activeDoc.layers.length; l += 1) {
-            output.groups.push(extractGroup(activeDoc.layers[l]));
+            g = activeDoc.layers[l];
+            
+            output.groups.push({
+                name : g.name,
+                zIndex : g.zOrderPosition,
+                groups : [],
+                paths : [],
+                data : docTags.layers[g.name]
+            });
+            
+            for (s = 0; s < g.groupItems.length; s += 1) {
+                output.groups.push(extractGroup(g.groupItems[s]));
+            }
+            for (p = 0; p < g.pathItems.length; p += 1) {
+                output.paths.push(extractPath(g.pathItems[p]));
+            }
         }
     }
     

@@ -22,10 +22,9 @@ var line = d3.svg.line()
     .x(function(d) { return x(d.date); })
     .y(function(d) { return y(d.close); });
 
-var svg = doc.append("g")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-  .append("g")
+var svg = doc.selectAll('#svgContainer').data(['dummy'])
+  .enter().append("g")
+    .attr('id','svgContainer')
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 var data = $data;
