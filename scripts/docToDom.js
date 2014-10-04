@@ -33,6 +33,7 @@ function addPath (parent, path) {
         .style('stroke', path.stroke)
         .style('stroke-width', path.strokeWidth)
         .style('opacity', path.opacity);
+    d3.select('#' + path.name).datum(path.data);
 }
 
 function addChildGroups (parent, group) {
@@ -43,11 +44,28 @@ function addChildGroups (parent, group) {
     for (g = 0; g < group.groups.length; g += 1) {
         newGroup = parent.append('g')
             .attr('id', group.groups[g].name);
+        d3.select('#' + group.groups[g].name).datum(group.groups[g].data);
         addChildGroups(newGroup, group.groups[g]);
     }
     group.paths = group.paths.sort(phrogz('zIndex'));
     for (p = 0; p < group.paths.length; p += 1) {
         addPath(parent, group.paths[p]);
+    }
+}
+
+function addChildLayers (parent, layer) {
+    var l,
+        newGroup,
+        p;
+    layer.groups = layer.groups.sort(phrogz('zIndex'));
+    for (l = 0; l < layer.groups.length; l += 1) {
+        newGroup = parent.append('g')
+            .attr('id', layer.groups[l].name);
+        addChildGroups(newGroup, layer.groups[l]);
+    }
+    layer.paths = layer.paths.sort(phrogz('zIndex'));
+    for (p = 0; p < layer.paths.length; p += 1) {
+        addPath(parent, layer.paths[p]);
     }
 }
 
@@ -79,14 +97,17 @@ function docToDom () {
                 .attr('width',function (d) { return d.rect[2] - d.rect[0]; })
                 .attr('height',function (d) { return d.rect[3] - d.rect[1]; });
             
-            // Add the layers (really just groups)
-            var g, newLayer;
-            result.groups = result.groups.sort(phrogz('zIndex'));
-            for (g = 0; g < result.groups.length; g += 1) {
+            // Add the layers
+            var l, newLayer;
+            result.layers = result.layers.sort(phrogz('zIndex'));
+            for (l = 0; l < result.layers.length; l += 1) {
                 newLayer = svg.append('g')
-                    .attr('id', result.groups[g].name);
-                addChildGroups(newLayer, result.groups[g]);
+                    .attr('id', result.layers[l].name);
+                addChildLayers(newLayer, result.layers[l]);
             }
+            
+            // Update the current selection
+            selectedIDs = result.selection;
             
             // If the code areas are empty, fill them with some defaults
             // to give people an idea of what they can / should do

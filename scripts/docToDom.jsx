@@ -15,21 +15,11 @@ var alertedCMYK = false,
         "zoomButtons" : true,
         "debugButton" : true
     },
-    spaceSwapper = new RegExp(' ', 'g');
+    alphabetic = new RegExp('[A-Za-z]', 'g'),
+    invalid = new RegExp('[^A-Za-z0-9-_]','g');
 
 function standardize(activeDoc) {
-    var nameLookup = {},
-        docTags;
-    
-    try {
-        docTags = JSON.parse(activeDoc.tags.getByName('id3_data').value);
-    } catch (e) {
-        docTags = {
-            document : null,
-            artboards : {},
-            layers : {}
-        };
-    }
+    var nameLookup = {};
     
     function standardizeItems(items, tagType) {
         var i,
@@ -40,9 +30,13 @@ function standardize(activeDoc) {
             tag;
         
         for (i = 0; i < items.length; i += 1) {
-            // Make sure item names have no spaces (DOM restriction) and are unique
+            // Make sure item names begin with [A-Za-z] and contain only [A-Za-z0-9\-\_]
+            // (jQuery / old DOM restrictions), and are unique (case-insensitive)
             oldName = items[i].name;
-            name = oldName.replace(spaceSwapper, '_');
+            name = oldName.replace(invalid, '_');
+            if (name.length === 0 || alphabetic.test(name[0]) !== true) {
+                name = 'entity_' + name;
+            }
             
             newName = name;
             while (reservedNames.hasOwnProperty(newName) || nameLookup.hasOwnProperty(newName)) {
@@ -61,29 +55,13 @@ function standardize(activeDoc) {
                     tag.name = 'id3_data';
                     tag.value = 'null';
                 }
-            } else {
-                if (oldName !== newName && docTags[tagType].hasOwnProperty(oldName)) {
-                    docTags[tagType][newName] = docTags[tagType][oldName];
-                    delete docTags[tagType][oldName];
-                } else if (docTags[tagType].hasOwnProperty(newName) === false) {
-                    docTags[tagType][newName] = null;
-                }
             }
         }
     }
     
-    // Illustrator doesn't have tags on layers or artboards,
-    // so I cheat and embed both inside the document's tag
     standardizeItems(activeDoc.artboards, 'artboards');
     standardizeItems(activeDoc.layers, 'layers');
-    try {
-        tag = activeDoc.tags.getByName('id3_data');
-        tag.value = JSON.stringify(docTags);
-    } catch (e) {
-        tag = activeDoc.tags.add();
-        tag.name = 'id3_data';
-        tag.value = JSON.stringify(docTags);
-    }
+    
     standardizeItems(activeDoc.pathItems, 'native');
     standardizeItems(activeDoc.groupItems, 'native');
     
@@ -177,6 +155,25 @@ function extractGroup(g) {
     return output;
 }
 
+function extractLayer(l) {
+    var output = {
+        name : l.name,
+        zIndex : l.zOrderPosition,
+        groups : [],
+        paths : []
+    },
+        s,
+        p;
+    
+    for (s = 0; s < l.groupItems.length; s += 1) {
+        output.groups.push(extractGroup(l.groupItems[s]));
+    }
+    for (p = 0; p < l.pathItems.length; p += 1) {
+        output.paths.push(extractPath(l.pathItems[p]));
+    }
+    return output;
+}
+
 function extractDocument() {
     var output = null;
 
@@ -184,51 +181,33 @@ function extractDocument() {
         var activeDoc = app.activeDocument,
             a,
             l,
-            g,
-            s,
-            p,
-            docTags;
+            s;
         
         standardize(activeDoc);
-        
-        docTags = JSON.parse(activeDoc.tags.getByName('id3_data').value);
         
         output = {
             name : activeDoc.name,
             width : activeDoc.width,
             height : activeDoc.height,
             artboards : [],
-            groups : [],
-            data : docTags.document
+            layers : [],
+            selection : []
         };
         
         for (a = 0; a < activeDoc.artboards.length; a += 1) {
             output.artboards.push({
                 name: activeDoc.artboards[a].name,
-                rect: activeDoc.artboards[a].artboardRect,
-                data: docTags.artboards[activeDoc.artboards[a].name]
+                rect: activeDoc.artboards[a].artboardRect
             });
             // Illustrator has inverted Y coordinates
             output.artboards[a].rect[1] = -output.artboards[a].rect[1];
             output.artboards[a].rect[3] = -output.artboards[a].rect[3];
         }
         for (l = 0; l < activeDoc.layers.length; l += 1) {
-            g = activeDoc.layers[l];
-            
-            output.groups.push({
-                name : g.name,
-                zIndex : g.zOrderPosition,
-                groups : [],
-                paths : [],
-                data : docTags.layers[g.name]
-            });
-            
-            for (s = 0; s < g.groupItems.length; s += 1) {
-                output.groups.push(extractGroup(g.groupItems[s]));
-            }
-            for (p = 0; p < g.pathItems.length; p += 1) {
-                output.paths.push(extractPath(g.pathItems[p]));
-            }
+            output.layers.push(extractLayer(activeDoc.layers[l]));
+        }
+        for (s = 0; s < activeDoc.selection.length; s += 1) {
+            output.selection.push(activeDoc.selection[s].name);
         }
     }
     

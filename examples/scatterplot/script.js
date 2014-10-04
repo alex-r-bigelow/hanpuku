@@ -5,8 +5,7 @@
 // Select container
 var svg = doc.selectAll('#Layer_1').data([1]);
 // Init container
-svg.enter().append('g')
-  .attr('id','Layer_1');
+svg.enter().append('g');
 // Update container
 svg.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
