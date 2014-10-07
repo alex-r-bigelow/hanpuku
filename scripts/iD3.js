@@ -82,7 +82,7 @@ function pathToCubicPath(d, m) {
     
     for (i = 0; i < pointTypes.length; i += 1) {
         if (pointTypes[i].toUpperCase() !== pointTypes[i]) {
-            throw 'no support for relative points yet';
+            throw 'no support for relative point ' + pointTypes[i] + ' yet';
         }
         
         if (i === 0) {
@@ -253,7 +253,7 @@ function loadJSXlibs() {
                 // this way to make sure everything is loaded
                 // before we run stuff
                 if (r.isOk === false) {
-                    console.log(r);
+                    console.warn(r);
                 }
                 i += 1;
                 if (i < jsxLibs.length) {
@@ -279,14 +279,19 @@ function runJSX(input, path, callback) {
         jQuery.ajax({
             url: path,
             success: function (script) {
-                script = "var input='" + JSON.stringify(input) + "';\n" + script;
+                script = "var input=" + JSON.stringify(input) + ";\n" + script;
                 CSLibrary.evalScript(script, function (r) {
                     var result;
                     if (r.search("Error") === 0 || r.isOk === false) {
                         console.warn(r);
                         result = null;
                     } else {
-                        result = JSON.parse(r);
+                        try {
+                            result = JSON.parse(r);
+                        } catch (e) {
+                            console.warn("Couldn't parse:\n" + r);
+                            throw e;
+                        }
                     }
                     callback(result);
                 });
@@ -442,7 +447,7 @@ function loadSample() {
 /* Where execution begins when the extension is loaded */
 function main() {
     styleWidget();
+    loadJSXlibs();
     docToDom();
     // TODO: fire docToDom on documentAfterActivate (and documentAfterDeactivate?)
-    loadJSXlibs();
 }

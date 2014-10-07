@@ -105,6 +105,7 @@ function extractColor(e, attr) {
 
 function extractPath (p) {
     var output = {
+        itemType : 'path',
         name : p.name,
         zIndex : p.zOrderPosition,
         fill : extractColor(p, 'fillColor'),
@@ -113,10 +114,18 @@ function extractPath (p) {
         opacity : p.opacity / 100,
         closed : p.closed,
         points : [],
-        data : JSON.parse(p.tags.getByName('id3_data').value)
+        data : JSON.parse(p.tags.getByName('id3_data').value),
+        classNames : p.tags.getByName('id3_classNames').value
     },
         pt,
         controlPoint;
+    
+    if (p.filled === false) {
+        output.fill = 'none';
+    }
+    if (p.stroked === false) {
+        output.stroke = 'none';
+    }
     
     for (pt = 0; pt < p.pathPoints.length; pt += 1) {
         output.points.push({
@@ -135,41 +144,27 @@ function extractPath (p) {
     return output;
 }
 
-function extractGroup(g) {
+function extractGroup(g, iType) {
     var output = {
+        itemType : iType,
         name : g.name,
         zIndex : g.zOrderPosition,
-        groups : [],
-        paths : [],
-        data : JSON.parse(g.tags.getByName('id3_data').value)
-    },
-        s,
-        p;
-    
-    for (s = 0; s < g.groupItems.length; s += 1) {
-        output.groups.push(extractGroup(g.groupItems[s]));
-    }
-    for (p = 0; p < g.pathItems.length; p += 1) {
-        output.paths.push(extractPath(g.pathItems[p]));
-    }
-    return output;
-}
-
-function extractLayer(l) {
-    var output = {
-        name : l.name,
-        zIndex : l.zOrderPosition,
         groups : [],
         paths : []
     },
         s,
         p;
     
-    for (s = 0; s < l.groupItems.length; s += 1) {
-        output.groups.push(extractGroup(l.groupItems[s]));
+    if (iType === 'group') {
+        output.data = JSON.parse(g.tags.getByName('id3_data').value);
+        output.classNames = g.tags.getByName('id3_classNames').value;
     }
-    for (p = 0; p < l.pathItems.length; p += 1) {
-        output.paths.push(extractPath(l.pathItems[p]));
+    
+    for (s = 0; s < g.groupItems.length; s += 1) {
+        output.groups.push(extractGroup(g.groupItems[s], 'group'));
+    }
+    for (p = 0; p < g.pathItems.length; p += 1) {
+        output.paths.push(extractPath(g.pathItems[p]));
     }
     return output;
 }
@@ -186,6 +181,7 @@ function extractDocument() {
         standardize(activeDoc);
         
         output = {
+            itemType : 'document',
             name : activeDoc.name,
             width : activeDoc.width,
             height : activeDoc.height,
@@ -204,7 +200,7 @@ function extractDocument() {
             output.artboards[a].rect[3] = -output.artboards[a].rect[3];
         }
         for (l = 0; l < activeDoc.layers.length; l += 1) {
-            output.layers.push(extractLayer(activeDoc.layers[l]));
+            output.layers.push(extractGroup(activeDoc.layers[l], 'layer'));
         }
         for (s = 0; s < activeDoc.selection.length; s += 1) {
             output.selection.push(activeDoc.selection[s].name);

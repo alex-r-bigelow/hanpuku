@@ -10,7 +10,9 @@ Adding limited support for using d3.js commands directly in Illustrator. Cooler 
 - Need to support transforms (only from SVG to Illustrator - positions are native, at least at the group level)
 
 ### Odd rules for writing d3 code:
-- Don't put any data on top-level groups (I interpret top-level groups as layers)
-- All transforms are applied immediately - these tags will NOT remain on DOM elements
+- Any data or class strings on top-level groups will be lost each cycle (I interpret top-level groups as Illustrator layers)
+- All transforms are applied each cycle - these tags will NOT remain on DOM elements
 - All shapes should be cubic-interpolated paths. You definitely CAN use other primitives, but they will be converted
-- You can use .appendClone(id)
+- You can use .appendClone(id), .appendCircle(), .appendRect(), and .appendPath() - these will convert to cubic-interpolated paths immediately (before cycling)
+- Colors are all converted to rgb(r,g,b) format each cycle
+- Opacity is general across an entire shape; 

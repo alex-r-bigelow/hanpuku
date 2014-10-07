@@ -28,6 +28,7 @@ function extractPathString(path) {
 function addPath (parent, path) {
     parent.append('path')
         .attr('id', path.name)
+        .attr('class', path.classNames)
         .attr('d', extractPathString(path))
         .style('fill', path.fill)
         .style('stroke', path.stroke)
@@ -43,7 +44,8 @@ function addChildGroups (parent, group) {
     group.groups = group.groups.sort(phrogz('zIndex'));
     for (g = 0; g < group.groups.length; g += 1) {
         newGroup = parent.append('g')
-            .attr('id', group.groups[g].name);
+            .attr('id', group.groups[g].name)
+            .attr('class', group.groups[g].classNames);
         d3.select('#' + group.groups[g].name).datum(group.groups[g].data);
         addChildGroups(newGroup, group.groups[g]);
     }
@@ -79,6 +81,7 @@ function docToDom () {
             
             // Set up the document and the GUI
             document.getElementById('dom').innerHTML = "";  // nuke the svg so we start fresh
+            
             var svg = d3.select('#dom')
                 .append('svg')
                 .attr('width', result.width)

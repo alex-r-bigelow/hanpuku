@@ -14,6 +14,26 @@ var reservedNames = {   // All IDs in the panel are reserved, and we include the
         "debugButton" : true
     };
 
+function standardizeColor(s) {
+    if (s[0] === '#') {
+        // Stolen from http://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
+        // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+        var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+        s = s.replace(shorthandRegex, function(m, r, g, b) {
+            s = r + r + g + g + b + b;
+        });
+        
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(s);
+        s = 'rgb(' + parseInt(result[1], 16) + ', ' +
+                     parseInt(result[2], 16) + ', ' +
+                     parseInt(result[3], 16) + ')';
+    }
+    if (s !== 'none' && s.substring(0,4) !== 'rgb(') {
+        throw "Unsupported color: " + s;
+    }
+    return s;
+}
+
 function standardize() {
     var nameLookup = {};
     function standardizeElement(e, m) {
@@ -21,7 +41,7 @@ function standardize() {
             stringMode,
             params,
             i,
-            d,
+            d = null,
             replaceNodeAttrs = null,
             newNode,
             a,
@@ -124,40 +144,150 @@ function standardize() {
                     }
                 }
             }
-            newNode.setAttribute('d', d);
+            
             data = d3.select('#' + newId).data();
             e.parentNode.replaceChild(newNode,e);
             d3.select('#' + newId).data(data);
-            nameLookup[newId] = e;
+            nameLookup[newId] = newNode;
+            e = newNode;
+        }
+        
+        if (d !== null) {
+            e.setAttribute('d', d);
         }
     }
     
     standardizeElement(jQuery('#dom svg')[0]);
 }
 
+function extractPath(g, z) {
+    var d = g.getAttribute('d');
+    if (d === null) {
+        console.log(g);
+    }
+    var coordList = d.split(pathSplitter).splice(1),
+        output = {
+            itemType : 'path',
+            name : g.getAttribute('id'),
+            zIndex : z,
+            fill : standardizeColor(window.getComputedStyle(g).fill),
+            stroke : standardizeColor(window.getComputedStyle(g).stroke),
+            strokeWidth : parseFloat(window.getComputedStyle(g).strokeWidth),
+            opacity : parseFloat(window.getComputedStyle(g).opacity),
+            points : [],
+            closed : d.substr(-1) === 'Z',
+            data : d3.select('#' + g.getAttribute('id')).data(),
+            classNames : g.getAttribute('class') === null ? "" : g.getAttribute('class')
+        },
+        i,
+        j;
+    
+    // Convert everything except the first entry
+    // to a list of lists of point pairs
+    // Also invert the y-coordinates
+    if (output.closed === true) {
+        coordList = coordList.splice(0,coordList.length-1); // throw away Z coordinate entries
+    }
+    // The first point only has one coordinate pair
+    coordList[0] = coordList[0].split(',');
+    coordList[0][0] = Number(coordList[0][0]);
+    coordList[0][1] = -Number(coordList[0][1]);
+    // The rest have three
+    for (i = 1; i < coordList.length; i += 1) {
+        coordList[i] = coordList[i].split(',');
+        temp = [];
+        for (j = 0; j < coordList[i].length; j += 2) {
+            temp.push([Number(coordList[i][j]), -Number(coordList[i][j+1])]);
+        }
+        coordList[i] = temp;
+    }
+    
+    // First point ##,##
+    output.points.push({
+        anchor : coordList[0],
+        leftDirection : coordList[coordList.length-1][2],
+        rightDirection : coordList[1][0]
+    });
+    // Middle points [[##,##],[##,##],[##,##]]
+    for (i = 1; i < coordList.length - 1; i += 1) {
+        output.points.push({
+            anchor : coordList[i][2],
+            leftDirection : coordList[i][1],
+            rightDirection : coordList[i+1][0]
+        });
+    }
+    // Last point
+    output.points.push({
+        anchor : coordList[coordList.length-1][2],
+        leftDirection : coordList[coordList.length-1][1],
+        rightDirection : coordList[0]
+    });
+    
+    return output;
+}
+
+function extractGroup(g, z, iType) {
+    var output = {
+        itemType : iType,
+        name : g.getAttribute('id'),
+        zIndex : z,
+        groups : [],
+        paths : []
+    },
+        s,
+        z2 = 1;
+    
+    if (iType === 'group') {
+        output.data = d3.select('#' + g.getAttribute('id')).data();
+        output.classNames = g.getAttribute('class') === null ? "" : g.getAttribute('class');
+    }
+    
+    for (s = 0; s < g.childNodes.length; s += 1) {
+        if (g.childNodes[s].tagName === 'g') {
+            output.groups.push(extractGroup(g.childNodes[s], z2, 'group'));
+        } else if (g.childNodes[s].tagName === 'path') {
+            output.paths.push(extractPath(g.childNodes[s], z2));
+        } else if (g.childNodes[s].tagName === 'text') {
+            // TODO
+        } else {
+            throw g.childNodes[s].tagName + " is not supported.";
+        }
+        z2 += 1;
+    }
+    return output;
+}
+
 function extractDocument () {
     standardize();
     
     var output = {
-        artboards : [],
-        layers : [],
-        selection : []
-    };
+            itemType : 'document',
+            artboards : [],
+            layers : [],
+            selection : selectedIDs
+        },
+        s,
+        z = 1,
+        temp;
     
-    for (a = 0; a < activeDoc.artboards.length; a += 1) {
-        output.artboards.push({
-            name: activeDoc.artboards[a].name,
-            rect: activeDoc.artboards[a].artboardRect
-        });
-        // Illustrator has inverted Y coordinates
-        output.artboards[a].rect[1] = -output.artboards[a].rect[1];
-        output.artboards[a].rect[3] = -output.artboards[a].rect[3];
-    }
-    for (l = 0; l < activeDoc.layers.length; l += 1) {
-        output.layers.push(extractLayer(activeDoc.layers[l]));
-    }
-    for (s = 0; s < activeDoc.selection.length; s += 1) {
-        output.selection.push(activeDoc.selection[s].name);
+    s = jQuery('#dom svg')[0].childNodes;
+    for (a = 0; a < s.length; a += 1) {
+        temp = s[a].getAttribute('class');
+        if (temp !== null && temp.search('artboard') !== -1) {
+            temp = s[a].getBBox();  // local coordinates; we want to ignore padding in the widget
+            output.artboards.push({
+                name: s[a].getAttribute('id'),
+                rect: [temp.x, temp.y, temp.x + temp.width, temp.y + temp.height]
+            });
+            
+            // Illustrator has inverted Y coordinates
+            temp = output.artboards.length - 1;
+            output.artboards[temp].rect[1] = -output.artboards[temp].rect[1];
+            output.artboards[temp].rect[3] = -output.artboards[temp].rect[3];
+        } else {
+            output.layers.push(extractGroup(s[a], z, 'layer'));
+            z += 1;
+        }
     }
     
     return output;
@@ -165,7 +295,7 @@ function extractDocument () {
 
 function domToDoc () {
     standardize();
-    /*runJSX(JSON.stringify(extractDocument()), 'scripts/domToDoc.jsx', function (result) {
-        
-    });*/
+    runJSX(JSON.stringify(extractDocument()), 'scripts/domToDoc.jsx', function (result) {
+        console.log(result);
+    });
 }
