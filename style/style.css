@@ -2,6 +2,38 @@ body {
     overflow: hidden;
     font: 10px sans-serif;
 }
+#tabControls {
+    position:absolute;
+    left:0px;
+    top:0px;
+    padding:4px;
+}
+#tabControls button.active {
+    color:#fff;
+}
+
+#codePanel, #selectionManipulator {
+    position:absolute;
+    left:0px;
+    top:30px;
+    width:100%;
+    bottom:0px;
+}
+
+#selectionManipulator {
+    overflow: scroll;
+    padding: 14px;
+}
+
+#selectionManipulator tr {
+    padding: 0px;
+}
+
+#selectionManipulator td {
+    padding: 14px;
+    background-color: rgba(255,255,255,0.75);
+}
+
 div#dom {
     position:absolute;
     left:0px;

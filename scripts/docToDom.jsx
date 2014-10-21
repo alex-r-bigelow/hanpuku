@@ -16,7 +16,13 @@ var alertedCMYK = false,
         "debugButton" : true
     },
     alphabetic = new RegExp('[A-Za-z]', 'g'),
-    invalid = new RegExp('[^A-Za-z0-9-_]','g');
+    invalid = new RegExp('[^A-Za-z0-9-_]','g'),
+    tagList = [
+        "id3_data",
+        "id3_classNames",
+        "id3_reverseTransform"
+    ],
+    memo = "";
 
 function standardize(activeDoc) {
     var nameLookup = {};
@@ -27,7 +33,8 @@ function standardize(activeDoc) {
             name,
             newName,
             freeId = 1,
-            tag;
+            tag,
+            t;
         
         for (i = 0; i < items.length; i += 1) {
             // Make sure item names begin with [A-Za-z] and contain only [A-Za-z0-9\-\_]
@@ -46,14 +53,16 @@ function standardize(activeDoc) {
             items[i].name = newName;
             nameLookup[newName] = items[i];
             
-            // Create the id3_data tag if it doesn't exist
+            // Create the needed tags if they don't exist
             if (tagType === 'native') {
-                try {
-                    items[i].tags.getByName('id3_data');
-                } catch (e) {
-                    tag = items[i].tags.add();
-                    tag.name = 'id3_data';
-                    tag.value = 'null';
+                for (t = 0; t < tagList.length; t += 1) {
+                    try {
+                        items[i].tags.getByName(tagList[t]);
+                    } catch (e) {
+                        tag = items[i].tags.add();
+                        tag.name = tagList[t];
+                        tag.value = 'null';
+                    }
                 }
             }
         }
@@ -104,10 +113,10 @@ function extractColor(e, attr) {
 }
 
 function extractPath (p) {
+    memo = p.name;
     var output = {
         itemType : 'path',
         name : p.name,
-        zIndex : p.zOrderPosition,
         fill : extractColor(p, 'fillColor'),
         stroke : extractColor(p, 'strokeColor'),
         strokeWidth : p.strokeWidth,
@@ -115,10 +124,19 @@ function extractPath (p) {
         closed : p.closed,
         points : [],
         data : JSON.parse(p.tags.getByName('id3_data').value),
-        classNames : p.tags.getByName('id3_classNames').value
+        classNames : p.tags.getByName('id3_classNames').value,
+        reverseTransform : p.tags.getByName('id3_reverseTransform').value
     },
         pt,
         controlPoint;
+    
+    try {
+        output.zIndex = p.zOrderPosition;
+    } catch(e) {
+        // TODO: there's a bug in Illustrator that causes an Internal error
+        // if you attempt to get the zOrderPosition of an object inside a group
+        output.zIndex = 100;
+    }
     
     if (p.filled === false) {
         output.fill = 'none';
@@ -148,16 +166,24 @@ function extractGroup(g, iType) {
     var output = {
         itemType : iType,
         name : g.name,
-        zIndex : g.zOrderPosition,
         groups : [],
         paths : []
     },
         s,
         p;
     
+    try {
+        output.zIndex = g.zOrderPosition;
+    } catch(e) {
+        // TODO: there's a bug in Illustrator that causes an Internal error
+        // if you attempt to get the zOrderPosition of an object inside a group
+        output.zIndex = 100;
+    }
+    
     if (iType === 'group') {
         output.data = JSON.parse(g.tags.getByName('id3_data').value);
         output.classNames = g.tags.getByName('id3_classNames').value;
+        output.reverseTransform = g.tags.getByName('id3_reverseTransform').value;
     }
     
     for (s = 0; s < g.groupItems.length; s += 1) {
@@ -182,7 +208,7 @@ function extractDocument() {
         
         output = {
             itemType : 'document',
-            name : activeDoc.name,
+            name : activeDoc.name.split('.')[0],
             width : activeDoc.width,
             height : activeDoc.height,
             artboards : [],
@@ -210,5 +236,8 @@ function extractDocument() {
     return output;
 }
 
-
-JSON.stringify(extractDocument());
+try {
+    JSON.stringify(extractDocument());
+} catch(e) {
+    'Error: ' + e.message + '\nLine ' + e.line + ': ' + e.source.split('\n')[e.line-1] + '\n\nmemo:' + memo;
+}

@@ -34,129 +34,151 @@ function standardizeColor(s) {
     return s;
 }
 
-function standardize() {
-    var nameLookup = {};
-    function standardizeElement(e, m) {
-        var transform,
-            stringMode,
-            params,
-            i,
-            d = null,
-            replaceNodeAttrs = null,
-            newNode,
-            a,
-            data,
-            id,
-            newId,
-            copyNumber = 1;
-        
-        // Ensure a unique ID
+function standardizeElement(e, m) {
+    var transform,
+        reverseTransform,
+        stringMode,
+        params,
+        i,
+        d = null,
+        replaceNodeAttrs = null,
+        newNode,
+        a,
+        data,
         id = e.getAttribute('id');
-        if (id === null) {
-            id = 'entity';
-        }
-        newId = id;
-        
-        while (reservedNames.hasOwnProperty(newId) || nameLookup.hasOwnProperty(newId)) {
-            newId = id + copyNumber;
-            copyNumber += 1;
-        }
-        e.setAttribute('id', newId);
-        nameLookup[newId] = e;
-        
-        // Apply all transformations
-        if (m === undefined) {
-            m = [1,0,0,1,0,0];
-        }
-        transform = e.getAttribute('transform');
-        
-        if (transform !== null) {
-            transform = transform.split('(');
-            stringMode = transform[0].trim().toLowerCase();
-            params = transform[1].substring(0, transform[1].length - 1).split(',');
-                        
-            if (stringMode === 'translate') {
-                m = matMultiply(m, [1,0,0,1,Number(params[0]),Number(params[1])]);
-            } else if (stringMode === 'matrix') {
-                m = matMultiply(m, params);
-            } else if (stringMode === 'rotate') {
-                params[0] = params[0]*Math.PI / 180;    // convert to radians
-                m = matMultiply(m, [Math.cos(params[0]),
-                                    Math.sin(params[0]),
-                                    -Math.sin(params[0]),
-                                    Math.cos(params[0]),
-                                    0,
-                                    0]);
-            } else {
-                throw stringMode + ' transforms are not yet supported.';
-            }
-            
-            e.removeAttribute('transform');
-        }
-        
-        // Convert all elements to cubic-interpolated path, or recurse if a group
-        if (e.tagName === 'rect') {
-            // Convert rect to cubic-interpolated path
-            d = rectToCubicPath(Number(e.getAttribute('x')),
-                                Number(e.getAttribute('y')),
-                                Number(e.getAttribute('width')),
-                                Number(e.getAttribute('height')),
-                                m);
-            replaceNodeAttrs = ['x','y','width','height'];
-        } else if (e.tagName === 'circle') {
-            // Convert circle to cubic-interpolated path
-            d = circleToCubicPath(Number(e.getAttribute('cx')),
-                                  Number(e.getAttribute('cy')),
-                                  Number(e.getAttribute('r')),
-                                  m);
-            replaceNodeAttrs = ['cx','cy','r'];
-        } else if (e.tagName === 'line') {
-            d = lineToCubicPath(Number(e.getAttribute('x1')),
-                                Number(e.getAttribute('y1')),
-                                Number(e.getAttribute('x2')),
-                                Number(e.getAttribute('y2')),
-                                m);
-            replaceNodeAttrs = ['x1','y1','x2','y2'];
-        } else if (e.tagName === 'path') {
-            e.setAttribute('d', pathToCubicPath(e.getAttribute('d'), m));
-        } else if (e.tagName === 'g' || e.tagName === 'svg') {
-            for (i = 0; i < e.childNodes.length; i += 1) {
-                standardizeElement(e.childNodes[i], m);
-            }
-        } else if (e.tagName === 'text') {
-            // I'll need to hack the transformation matrices
-            // for text when I actually convert
-            e.setAttribute('transform','matrix(' + m.join(',') + ')');
+    
+    // Apply all transformations
+    if (m === undefined) {
+        m = [1,0,0,1,0,0];
+    }
+    transform = e.getAttribute('transform');
+    
+    if (transform && transform !== "null") {
+        transform = transform.split('(');
+        stringMode = transform[0].trim().toLowerCase();
+        params = transform[1].substring(0, transform[1].length - 1).split(',');
+                    
+        if (stringMode === 'translate') {
+            reverseTransform = 'translate(' + (-params[0]) + ',' + (-params[1]) + ')';
+            m = matMultiply(m, [1,0,0,1,Number(params[0]),Number(params[1])]);
+        } else if (stringMode === 'matrix') {
+            reverseTransform = 'matrix(' + matInvert(params).join(',') + ')';
+            m = matMultiply(m, params);
+        } else if (stringMode === 'rotate') {
+            reverseTransform = 'rotate(' + (-params[0]) + ')';
+            params[0] = params[0]*Math.PI / 180;    // convert to radians
+            m = matMultiply(m, [Math.cos(params[0]),
+                                Math.sin(params[0]),
+                                -Math.sin(params[0]),
+                                Math.cos(params[0]),
+                                0,
+                                0]);
         } else {
-            throw 'standardize doesn\'t yet support tag ' + e.tagName;
+            throw stringMode + ' transforms are not yet supported.';
         }
         
-        // Convert the existing element, with all its attributes and d3-assigned
-        // data, to a path element. Don't copy attributes that are being replaced
-        // by the path d attribute
-        if (replaceNodeAttrs !== null) {
-            newNode = document.createElementNS(e.namespaceURI,'path');
-            for (a in e.attributes) {
-                if (e.attributes.hasOwnProperty(a) &&
-                        a !== 'length') {
-                    if (replaceNodeAttrs.indexOf(e.attributes[a].nodeName) === -1) {
-                        newNode.setAttribute(e.attributes[a].nodeName, e.attributes[a].value);
-                    }
-                }
-            }
-            
-            data = d3.select('#' + newId).data();
-            e.parentNode.replaceChild(newNode,e);
-            d3.select('#' + newId).data(data);
-            nameLookup[newId] = newNode;
-            e = newNode;
-        }
-        
-        if (d !== null) {
-            e.setAttribute('d', d);
-        }
+        e.removeAttribute('transform');
+        e.setAttribute('id3_reverseTransform', reverseTransform);
     }
     
+    // Convert all elements to cubic-interpolated path, or recurse if a group
+    if (e.tagName === 'rect') {
+        // Convert rect to cubic-interpolated path
+        d = rectToCubicPath(Number(e.getAttribute('x')),
+                            Number(e.getAttribute('y')),
+                            Number(e.getAttribute('width')),
+                            Number(e.getAttribute('height')),
+                            m);
+        replaceNodeAttrs = ['x','y','width','height'];
+    } else if (e.tagName === 'circle') {
+        // Convert circle to cubic-interpolated path
+        d = circleToCubicPath(Number(e.getAttribute('cx')),
+                              Number(e.getAttribute('cy')),
+                              Number(e.getAttribute('r')),
+                              m);
+        replaceNodeAttrs = ['cx','cy','r'];
+    } else if (e.tagName === 'line') {
+        d = lineToCubicPath(Number(e.getAttribute('x1')),
+                            Number(e.getAttribute('y1')),
+                            Number(e.getAttribute('x2')),
+                            Number(e.getAttribute('y2')),
+                            m);
+        replaceNodeAttrs = ['x1','y1','x2','y2'];
+    } else if (e.tagName === 'path') {
+        e.setAttribute('d', pathToCubicPath(e.getAttribute('d'), m));
+    } else if (e.tagName === 'g' || e.tagName === 'svg') {
+        for (i = 0; i < e.childNodes.length; i += 1) {
+            standardizeElement(e.childNodes[i], m);
+        }
+    } else if (e.tagName === 'text') {
+        // I'll need to hack the transformation matrices
+        // for text when I actually convert
+        e.setAttribute('transform','matrix(' + m.join(',') + ')');
+    } else {
+        throw 'standardize doesn\'t yet support tag ' + e.tagName;
+    }
+    
+    // Convert the existing element, with all its attributes and d3-assigned
+    // data, to a path element. Don't copy attributes that are being replaced
+    // by the path d attribute
+    if (replaceNodeAttrs !== null) {
+        newNode = document.createElementNS(e.namespaceURI,'path');
+        for (a in e.attributes) {
+            if (e.attributes.hasOwnProperty(a) &&
+                    a !== 'length') {
+                if (replaceNodeAttrs.indexOf(e.attributes[a].nodeName) === -1) {
+                    newNode.setAttribute(e.attributes[a].nodeName, e.attributes[a].value);
+                }
+            }
+        }
+        
+        data = d3.select('#' + id).data();
+        e.parentNode.replaceChild(newNode,e);
+        d3.select('#' + id).data(data);
+        nameLookup[id] = newNode;
+        e = newNode;
+    }
+    
+    if (d !== null) {
+        e.setAttribute('d', d);
+    }
+}
+
+var nameLookup,
+    copyNumber = 1,
+    count = 1;
+
+function enforceUniqueIds(e) {
+    var id,
+        newId,
+        children,
+        i;
+    
+    id = e.getAttribute('id');
+    if (id === null) {
+        id = 'entity';
+    }
+    newId = id;
+    
+    while (reservedNames.hasOwnProperty(newId) || nameLookup.hasOwnProperty(newId)) {
+        newId = id + copyNumber;
+        copyNumber += 1;
+    }
+    e.setAttribute('id', newId);
+    nameLookup[newId] = e;
+    
+    if (e.tagName === 'g' || e.tagName === 'svg') {
+        children = e.childNodes;
+        for (i = 0; i < children.length; i += 1) {
+            enforceUniqueIds(children[i]);
+        }
+    }
+}
+
+function standardize() {
+    nameLookup = {};
+    
+    enforceUniqueIds(jQuery('#dom svg')[0]);
     standardizeElement(jQuery('#dom svg')[0]);
 }
 
@@ -177,7 +199,8 @@ function extractPath(g, z) {
             points : [],
             closed : d.substr(-1) === 'Z',
             data : d3.select('#' + g.getAttribute('id')).data(),
-            classNames : g.getAttribute('class') === null ? "" : g.getAttribute('class')
+            classNames : g.getAttribute('class') === null ? "" : g.getAttribute('class'),
+            reverseTransform : g.getAttribute('id3_reverseTransform') === null ? "" : g.getAttribute('id3_reverseTransform')
         },
         i,
         j;
@@ -240,6 +263,7 @@ function extractGroup(g, z, iType) {
     if (iType === 'group') {
         output.data = d3.select('#' + g.getAttribute('id')).data();
         output.classNames = g.getAttribute('class') === null ? "" : g.getAttribute('class');
+        output.reverseTransform = g.getAttribute('id3_reverseTransform') === null ? "" : g.getAttribute('id3_reverseTransform');
     }
     
     for (s = 0; s < g.childNodes.length; s += 1) {
@@ -294,7 +318,6 @@ function extractDocument () {
 }
 
 function domToDoc () {
-    standardize();
     runJSX(JSON.stringify(extractDocument()), 'scripts/domToDoc.jsx', function (result) {
         console.log(result);
     });

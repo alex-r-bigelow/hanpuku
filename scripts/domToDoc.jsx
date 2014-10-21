@@ -2,6 +2,14 @@ var doc = JSON.parse(input),
     console = '"success"',
     activeDoc;
 
+// Shim - ExtendScript doesn't have indexOf
+if (typeof Array.prototype.indexOf != "function") {  
+    Array.prototype.indexOf = function (el) {  
+        for(var i = 0; i < this.length; i++) if(el === this[i]) return i;  
+        return -1;  
+        }  
+}  
+
 function phrogz(name)
 {
     var v, params = Array.prototype.slice.call(arguments, 1);
@@ -26,6 +34,9 @@ function applyColor(iC,dC) {
 
 function applyPath(iPath, dPath) {
     iPath.name = dPath.name;
+    /*if (doc.selection.indexOf(dPath.name) !== -1) {
+        iPath.selected = true;
+    }*/
     if (dPath.fill === 'none') {
         iPath.filled = false;
     } else {
@@ -47,6 +58,10 @@ function applyPath(iPath, dPath) {
     i = iPath.tags.add();
     i.name = 'id3_classNames';
     i.value = dPath.classNames;
+    
+    i = iPath.tags.add();
+    i.name = 'id3_reverseTransform';
+    i.value = dPath.reverseTransform;
     
     for (i = 0; i < dPath.points.length; i += 1) {
         anchorList.push(dPath.points[i].anchor);
@@ -73,14 +88,21 @@ function applyGroup(iGroup, dGroup)
         i = iGroup.tags.add();
         i.name = 'id3_classNames';
         i.value = dGroup.classNames;
+        
+        i = iGroup.tags.add();
+        i.name = 'id3_reverseTransform';
+        i.value = dGroup.reverseTransform;
     }
+    /*if (doc.selection.indexOf(dGroup.name) !== -1) {
+        iGroup.selected = true;
+    }*/
     
     for (i = 0; i < itemOrder.length; i += 1) {
         if (itemOrder[i].itemType === 'group') {
-            newItem = activeDoc.groupItems.add();
+            newItem = iGroup.groupItems.add();
             applyGroup(newItem, itemOrder[i]);
         } else if (itemOrder[i].itemType === 'path') {
-            newItem = activeDoc.pathItems.add();
+            newItem = iGroup.pathItems.add();
             applyPath(newItem, itemOrder[i]);
         } else if (itemOrder[i].itemType === 'text') {
             //TODO
@@ -96,8 +118,8 @@ function applyDocument()
         app.documents.add();
     }
     activeDoc = app.activeDocument;
-    var a, artboard, l, layer;
-
+    var a, artboard, l, layer, s, selectedItems = [];
+    
     for (a = 0; a < doc.artboards.length; a += 1)
     {
         if (activeDoc.artboards.length === a)
@@ -124,8 +146,7 @@ function applyDocument()
         layer.zOrder(ZOrderMethod.BRINGTOFRONT);
         applyGroup(layer, doc.layers[l]);
     }
-    
-    // TODO: apply the selection
 }
 applyDocument();
+app.redraw();
 console;

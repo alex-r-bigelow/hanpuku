@@ -15,49 +15,62 @@
     <script type="text/css" id="userCSS"></script>
   </head>
   <body onload="main();">
-    <div id="dom"></div>
-    <div id="code">
-      <fieldset>
-        <legend>CSS (live)</legend>
-        <textarea id="cssEditor" wrap="off" onchange="updateCSS();" onkeyup="updateCSS();"></textarea>
-      </fieldset>
-      <div id="codeControls">
-        <button onclick="runCode();">Load $data, run Script</button>
-        <select id="sampleMenu" onchange="loadSample();">
-          <option value="header">Samples:</option>
-          <optgroup label="d3.js Examples">
-            <option value="scatterplot">Scatterplot</option>
-          </optgroup>
-          <optgroup label="Illustrator + d3 Techniques">
-            <option value="scatterClones">Scatterplot Clones</option>
-          </optgroup>
-        </select>
-      </div>
-      <fieldset>
-        <legend>$data</legend>
-        <textarea id="dataEditor" wrap="off"></textarea>
-        <span style="float:right;">Interpret as:
-          <select id="dataTypeSelect">
-            <option value="csv">CSV</option>
-            <option value="tsv">TSV</option>
-            <option value="json">JSON</option>
-            <option value="js">Javascript</option>
+    <div id="tabControls">
+      <button id="codePanelButton" onclick="switchTab('codePanel');">d3.js</button>
+      <button id="selectionManipulatorButton" onclick="switchTab('selectionManipulator');">Selection Manipulator</button>
+    </div>
+    <div id="codePanel">
+      <div id="dom"></div>
+      <div id="code">
+        <fieldset>
+          <legend>CSS (live)</legend>
+          <textarea id="cssEditor" wrap="off" onchange="updateCSS();" onkeyup="updateCSS();"></textarea>
+        </fieldset>
+        <div id="codeControls">
+          <button onclick="runCode();">Load $data, run Script</button>
+          <select id="sampleMenu" onchange="loadSample();">
+            <option value="header">Samples:</option>
+            <optgroup label="Scatterplot">
+              <option value="scatterplot/style.css,scatterplot/enter.js,scatterplot/data.tsv">Create Scatterplot</option>
+              <option value="scatterplot/style.css,scatterplot/enterClone.js,scatterplot/data.tsv">Create w/Selected Glyph</option>
+              <option value="scatterplot/style.css,scatterplot/update.js,scatterplot/data.tsv">Update Scatterplot</option>
+              <option value="scatterplot/style.css,scatterplot/updateClone.js,scatterplot/data.tsv">Update w/Selected Glyph</option>
+            </optgroup>
+            <optgroup label="Selection">
+              <option value=",selection/selection.js,">sepalLength &gt; 6.9</option>
+            </optgroup>
           </select>
-        </span>
-      </fieldset>
-      <fieldset>
-        <legend>Script</legend>
-        <textarea id="jsEditor" wrap="off"></textarea>
-      </fieldset>
+        </div>
+        <fieldset>
+          <legend>$data</legend>
+          <textarea id="dataEditor" wrap="off"></textarea>
+          <span style="float:right;">Interpret as:
+            <select id="dataTypeSelect">
+              <option value="csv">CSV</option>
+              <option value="tsv">TSV</option>
+              <option value="json">JSON</option>
+              <option value="js">Javascript</option>
+            </select>
+          </span>
+        </fieldset>
+        <fieldset>
+          <legend>Script</legend>
+          <textarea id="jsEditor" wrap="off"></textarea>
+        </fieldset>
+      </div>
+      <div id="docControls">
+        <button onclick="domToDoc(); docToDom();">Apply</button>
+        <button onclick="docToDom();">Reset</button>
+      </div>
+      <div id="zoomButtons">
+        <span>100%</span>
+        <button onclick="zoomOut();">-</button>
+        <button onclick="zoomIn();">+</button>
+      </div>
     </div>
-    <div id="docControls">
-      <button onclick="domToDoc();">Apply</button>
-      <button onclick="docToDom();">Reset</button>
-    </div>
-    <div id="zoomButtons">
-      <span>100%</span>
-      <button onclick="zoomOut();">-</button>
-      <button onclick="zoomIn();">+</button>
+    
+    <div id="selectionManipulator">
+      
     </div>
     
     <button id="debugButton" onclick="reload();">Reload Extension</button>

@@ -3,14 +3,6 @@ var CSLibrary = new CSInterface(),
     loadedJSXlibs= false,
     docIsActive = false,
     $data,
-    sampleDataFiles = {
-        buildAGraph : null,
-        force : 'data.json',
-        groupedBarChart : 'data.csv',
-        lineChart : 'data.tsv',
-        scatterClones : 'data.tsv',
-        scatterplot : 'data.tsv'    // TODO: fix other samples
-    },
     selectedIDs = [],
     pathSplitter = new RegExp('[MmZzLlHhVvCcSsQqTtAa]', 'g');
 
@@ -32,6 +24,25 @@ function matMultiply(left, right) {
         left[1]*right[2] + left[3]*right[3],    // + left[5]*0
         left[0]*right[4] + left[2]*right[5] + left[4],  //*1
         left[1]*right[4] + left[3]*right[5] + left[5]   //*1
+    ];
+}
+
+function matInvert(m) {
+    // Inverse of SVG matrix (per WolframAlpha, because I'm lazy)
+    
+    // d/(ad-bc)    c/(bc-ad)   (de-cf)/(bc-ad)
+    // b/(bc-ad)    a/(ad-bc)   (be-af)/(ad-bc)
+    //     0            0              1
+    
+    var adbc = m[0]*m[3]-m[1]*m[2],
+        bcad = -adbc;
+    return [
+        m[3]/adbc,
+        m[1]/bcad,
+        m[2]/bcad,
+        m[0]/adbc,
+        (m[3]*m[4] - m[2]*m[5])/bcad,
+        (m[1]*m[5] - m[0]*m[4])/adbc
     ];
 }
 
@@ -157,7 +168,7 @@ function circleToCubicPath(cx, cy, r, m) {
 
 /* Monkey patch .appendClone(), .appendCircle(), .appendRect(),
    and .appendPath() to d3.selection and d3.selection.enter,
-   as well as .transform() to d3.selection */
+   as well as .setPosition() to d3.selection */
 /* These are important to allow d3 to work with a DOM that has
    gone through Illustrator; Illustrator applies all transforms
    immediately instead of as an attribute, and every shape is
@@ -228,10 +239,6 @@ d3.selection.prototype.appendPath = function (d) {
 };
 d3.selection.enter.prototype.appendPath = d3.selection.prototype.appendPath;
 
-d3.selection.prototype.transform = function (transformString) {
-    // TODO
-};
-
 /*d3.selection.prototype.iter_d3 = function (callback) {
     // Iterates d3 selections of elements
     this.each(function (e) {
@@ -254,6 +261,7 @@ function loadJSXlibs() {
                 // before we run stuff
                 if (r.isOk === false) {
                     console.warn(r);
+                    throw "Error Loading JSX";
                 }
                 i += 1;
                 if (i < jsxLibs.length) {
@@ -283,8 +291,7 @@ function runJSX(input, path, callback) {
                 CSLibrary.evalScript(script, function (r) {
                     var result;
                     if (r.search("Error") === 0 || r.isOk === false) {
-                        console.warn(r);
-                        result = null;
+                        throw r;
                     } else {
                         try {
                             result = JSON.parse(r);
@@ -429,25 +436,49 @@ function runCode() {
 }
 
 function loadSample() {
-    var v = jQuery('#sampleMenu').val();
+    var v = jQuery('#sampleMenu').val().split(',');
     
     if (docIsActive === false) {
         return;
     }
     if (v !== 'header') {
-        loadCSS('examples/' + v + '/style.css');
-        if (sampleDataFiles[v] !== null) {
-            loadData('examples/' + v + '/' + sampleDataFiles[v]);
+        if (v[0].length > 0) {
+            loadCSS('examples/' + v[0]);
         }
-        loadJS('examples/' + v + '/script.js');
+        if (v[1].length > 0) {
+            loadJS('examples/' + v[1]);
+        }
+        if (v[2].length > 0) {
+            loadData('examples/' + v[2]);
+        }
         jQuery('#sampleMenu').val('header');
     }
 }
 
+function setupTabs() {
+    var startingTab = 'codePanel';
+    jQuery('body > div').hide();
+    jQuery('#tabControls').show();
+    jQuery('#' + startingTab).show();
+    jQuery('#' + startingTab + 'Button').attr('class', 'active');
+}
+
+function switchTab(tabId) {
+    var oldTab = jQuery('#tabControls button.active').attr('id');
+    oldTab = oldTab.substring(0,oldTab.length-6);
+    jQuery('#' + oldTab).hide();
+    jQuery('#' + tabId).show();
+    
+    jQuery('#' + oldTab + "Button").attr('class', null);
+    jQuery('#' + tabId + "Button").attr('class', 'active');
+}
+
 /* Where execution begins when the extension is loaded */
 function main() {
+    setupTabs();
     styleWidget();
     loadJSXlibs();
     docToDom();
+    window.onfocus = docToDom;
     // TODO: fire docToDom on documentAfterActivate (and documentAfterDeactivate?)
 }

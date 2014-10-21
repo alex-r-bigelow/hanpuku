@@ -5,6 +5,6 @@
   shape-rendering: crispEdges;
 }
 
-.dot {
+.dot, .glyph {
   stroke: #000;
 }

@@ -26,14 +26,19 @@ function extractPathString(path) {
 }
 
 function addPath (parent, path) {
-    parent.append('path')
+    var p = parent.append('path')
         .attr('id', path.name)
-        .attr('class', path.classNames)
         .attr('d', extractPathString(path))
         .style('fill', path.fill)
         .style('stroke', path.stroke)
         .style('stroke-width', path.strokeWidth)
         .style('opacity', path.opacity);
+    if (path.classNames !== null) {
+        p.attr('class', path.classNames);
+    }
+    if (p.reverseTransform !== null) {
+        p.attr('transform', path.reverseTransform);
+    }
     d3.select('#' + path.name).datum(path.data);
 }
 
@@ -44,8 +49,13 @@ function addChildGroups (parent, group) {
     group.groups = group.groups.sort(phrogz('zIndex'));
     for (g = 0; g < group.groups.length; g += 1) {
         newGroup = parent.append('g')
-            .attr('id', group.groups[g].name)
-            .attr('class', group.groups[g].classNames);
+            .attr('id', group.groups[g].name);
+        if (group.groups[g].classNames !== null) {
+            newGroup.attr('class', group.groups[g].classNames);
+        }
+        if (group.groups[g].reverseTransform !== null) {
+            newGroup.attr('transform', group.groups[g].reverseTransform);
+        }
         d3.select('#' + group.groups[g].name).datum(group.groups[g].data);
         addChildGroups(newGroup, group.groups[g]);
     }
@@ -69,6 +79,31 @@ function addChildLayers (parent, layer) {
     for (p = 0; p < layer.paths.length; p += 1) {
         addPath(parent, layer.paths[p]);
     }
+}
+
+function populateSelectedData() {
+    document.getElementById('selectionManipulator').innerHTML = "";
+    
+    var table = d3.select('#selectionManipulator').append('table'),
+        thead = table.append('thead').append('tr'),
+        tbody = table.append('tbody');
+    
+    table.attr('cellspacing','0');
+    
+    thead.append('td').text('Selected Object IDs');
+    thead.append('td').text('Bound Data');
+    
+    var tr = tbody.selectAll('tr').data(selectedIDs).enter().append('tr');
+    
+    tr.append('td').text(function (d) { return d; });
+    tr.append('td').text(function (d) {
+        var data = d3.select('#' + d).datum();
+        if (data && data.length === 1) {
+            return JSON.stringify(data[0]);
+        } else {
+            return "(no data)";
+        }
+    });
 }
 
 function docToDom () {
@@ -109,8 +144,23 @@ function docToDom () {
                 addChildLayers(newLayer, result.layers[l]);
             }
             
+            // Sneaky hack: calling standardize will apply all the reverse transforms
+            // so that elements will have their native coordinates - and then we can
+            // set the new, double-reversed transforms as the regular transformation.
+            // This way, everything in d3-land looks like nothing happened to the
+            // transform tags, even if the native Illustrator positions were previously
+            // baked in.
+            standardize();
+            jQuery('#dom g, #dom path').each(function () {
+                if (this.hasAttribute('id3_reverseTransform')) {
+                    this.setAttribute('transform',this.getAttribute('id3_reverseTransform'));
+                    this.removeAttribute('id3_reverseTransform');
+                }
+            });
+            
             // Update the current selection
             selectedIDs = result.selection;
+            populateSelectedData();
             
             // If the code areas are empty, fill them with some defaults
             // to give people an idea of what they can / should do
