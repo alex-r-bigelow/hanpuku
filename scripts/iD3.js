@@ -349,6 +349,7 @@ function clearDOM() {
     document.getElementById('dom').innerHTML = "";
     jQuery('div button, textarea, input, select')
         .attr('disabled', true);
+    jQuery('#debugButton button').attr('disabled', false);
 }
 
 /* Code helper functions */
@@ -419,7 +420,7 @@ function loadJS(path) {
         success: function (contents) {
             contents = "var doc = d3.select(\"#" +
                         jQuery('#dom svg').attr('id') +
-                        "\"),\n" + contents;
+                        "\");\n" + contents;
             jQuery('#jsEditor').val(contents);
         },
         error: function () {
@@ -433,6 +434,7 @@ function loadJS(path) {
 function runCode() {
     updateData();
     runJS();
+    renderSelection();
 }
 
 function loadSample() {
@@ -455,10 +457,59 @@ function loadSample() {
     }
 }
 
+function renderSelection() {
+    document.getElementById('selectionManipulator').innerHTML = "";
+    
+    var table = d3.select('#selectionManipulator').append('table'),
+        thead = table.append('thead').append('tr'),
+        tbody = table.append('tbody');
+    
+    table.attr('cellspacing','0');
+    
+    thead.append('td').text('Selected Object IDs');
+    thead.append('td').text('Bound Data');
+    
+    var tr = tbody.selectAll('tr').data(selectedIDs).enter().append('tr');
+    
+    tr.append('td').text(function (d) { return d; });
+    tr.append('td').text(function (d) {
+        var data = d3.select('#' + d).datum();
+        if (data && data.length === 1) {
+            return JSON.stringify(data[0]);
+        } else {
+            return "(no data)";
+        }
+    });
+    
+    var selectionRects = d3.select('#dom svg').selectAll('path.selection').data(selectedIDs);
+    selectionRects.enter().append('path').attr('class','selection');
+    selectionRects.exit().remove();
+    var svgBounds = jQuery('#dom svg')[0].getBoundingClientRect();
+    selectionRects.attr('d', function (d) {
+        var bounds = document.getElementById(d).getBoundingClientRect();
+        // I don't use getBBox() because we might be overlaying something inside a group
+        // and the overlay paths need to be at the root level so we can add/remove them
+        // easily. That said, we need to account for the padding on the svg element in
+        // the preview
+        return "M" + (bounds.left - svgBounds.left) + "," + (bounds.top - svgBounds.top) +
+               "L" + (bounds.right - svgBounds.left) + "," + (bounds.top - svgBounds.top) +
+               "L" + (bounds.right - svgBounds.left) + "," + (bounds.bottom - svgBounds.top) +
+               "L" + (bounds.left - svgBounds.left) + "," + (bounds.bottom - svgBounds.top) +
+               "Z";
+    });
+}
+
+function updateSelection() {
+    runJSX(null, 'scripts/getSelection.jsx', function (result) {
+        selectedIDs = result;
+        renderSelection();
+    })
+}
+
 function setupTabs() {
     var startingTab = 'codePanel';
     jQuery('body > div').hide();
-    jQuery('#tabControls').show();
+    jQuery('#widgetControls').show();
     jQuery('#' + startingTab).show();
     jQuery('#' + startingTab + 'Button').attr('class', 'active');
 }
@@ -479,6 +530,8 @@ function main() {
     styleWidget();
     loadJSXlibs();
     docToDom();
-    window.onfocus = docToDom;
+    //window.onfocus = updateSelection;
+    CSLibrary.addEventListener('documentAfterActivate', docToDom);
+    CSLibrary.addEventListener('documentAfterDeactivate', docToDom);
     // TODO: fire docToDom on documentAfterActivate (and documentAfterDeactivate?)
 }

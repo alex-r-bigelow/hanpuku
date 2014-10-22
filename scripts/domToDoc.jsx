@@ -7,7 +7,7 @@ if (typeof Array.prototype.indexOf != "function") {
     Array.prototype.indexOf = function (el) {  
         for(var i = 0; i < this.length; i++) if(el === this[i]) return i;  
         return -1;  
-        }  
+    }  
 }  
 
 function phrogz(name)
@@ -34,9 +34,7 @@ function applyColor(iC,dC) {
 
 function applyPath(iPath, dPath) {
     iPath.name = dPath.name;
-    /*if (doc.selection.indexOf(dPath.name) !== -1) {
-        iPath.selected = true;
-    }*/
+    
     if (dPath.fill === 'none') {
         iPath.filled = false;
     } else {
@@ -71,6 +69,10 @@ function applyPath(iPath, dPath) {
         iPath.pathPoints[i].leftDirection = dPath.points[i].leftDirection;
         iPath.pathPoints[i].rightDirection = dPath.points[i].rightDirection;
     }
+    
+    if (doc.selection.indexOf(dPath.name) !== -1) {
+        iPath.selected = true;
+    }
 }
 
 function applyGroup(iGroup, dGroup)
@@ -93,9 +95,6 @@ function applyGroup(iGroup, dGroup)
         i.name = 'id3_reverseTransform';
         i.value = dGroup.reverseTransform;
     }
-    /*if (doc.selection.indexOf(dGroup.name) !== -1) {
-        iGroup.selected = true;
-    }*/
     
     for (i = 0; i < itemOrder.length; i += 1) {
         if (itemOrder[i].itemType === 'group') {
@@ -108,6 +107,10 @@ function applyGroup(iGroup, dGroup)
             //TODO
         }
         newItem.zOrder(ZOrderMethod.BRINGTOFRONT);
+    }
+    
+    if (doc.selection.indexOf(dGroup.name) !== -1) {
+        iGroup.selected = true;
     }
 }
 

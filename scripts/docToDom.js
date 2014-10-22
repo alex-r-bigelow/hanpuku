@@ -81,31 +81,6 @@ function addChildLayers (parent, layer) {
     }
 }
 
-function populateSelectedData() {
-    document.getElementById('selectionManipulator').innerHTML = "";
-    
-    var table = d3.select('#selectionManipulator').append('table'),
-        thead = table.append('thead').append('tr'),
-        tbody = table.append('tbody');
-    
-    table.attr('cellspacing','0');
-    
-    thead.append('td').text('Selected Object IDs');
-    thead.append('td').text('Bound Data');
-    
-    var tr = tbody.selectAll('tr').data(selectedIDs).enter().append('tr');
-    
-    tr.append('td').text(function (d) { return d; });
-    tr.append('td').text(function (d) {
-        var data = d3.select('#' + d).datum();
-        if (data && data.length === 1) {
-            return JSON.stringify(data[0]);
-        } else {
-            return "(no data)";
-        }
-    });
-}
-
 function docToDom () {
     runJSX(null, 'scripts/docToDom.jsx', function (result) {
         if (result === null) {
@@ -160,7 +135,7 @@ function docToDom () {
             
             // Update the current selection
             selectedIDs = result.selection;
-            populateSelectedData();
+            updateSelection();
             
             // If the code areas are empty, fill them with some defaults
             // to give people an idea of what they can / should do

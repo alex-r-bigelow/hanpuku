@@ -198,13 +198,15 @@ function extractPath(g, z) {
             opacity : parseFloat(window.getComputedStyle(g).opacity),
             points : [],
             closed : d.substr(-1) === 'Z',
-            data : d3.select('#' + g.getAttribute('id')).data(),
+            data : d3.select('#' + g.getAttribute('id')).data()[0],
             classNames : g.getAttribute('class') === null ? "" : g.getAttribute('class'),
             reverseTransform : g.getAttribute('id3_reverseTransform') === null ? "" : g.getAttribute('id3_reverseTransform')
         },
         i,
         j;
-    
+    if (output.data === undefined) {
+        output.data = null;
+    }
     // Convert everything except the first entry
     // to a list of lists of point pairs
     // Also invert the y-coordinates
@@ -261,11 +263,13 @@ function extractGroup(g, z, iType) {
         z2 = 1;
     
     if (iType === 'group') {
-        output.data = d3.select('#' + g.getAttribute('id')).data();
+        output.data = d3.select('#' + g.getAttribute('id')).data()[0];
+        if (output.data === undefined) {
+            output.data = null;
+        }
         output.classNames = g.getAttribute('class') === null ? "" : g.getAttribute('class');
         output.reverseTransform = g.getAttribute('id3_reverseTransform') === null ? "" : g.getAttribute('id3_reverseTransform');
     }
-    
     for (s = 0; s < g.childNodes.length; s += 1) {
         if (g.childNodes[s].tagName === 'g') {
             output.groups.push(extractGroup(g.childNodes[s], z2, 'group'));
@@ -318,7 +322,8 @@ function extractDocument () {
 }
 
 function domToDoc () {
-    runJSX(JSON.stringify(extractDocument()), 'scripts/domToDoc.jsx', function (result) {
-        console.log(result);
-    });
+    // Throw away all the selection rectangles
+    jQuery('path.selection').remove();
+    
+    runJSX(JSON.stringify(extractDocument()), 'scripts/domToDoc.jsx', function (result) {});
 }

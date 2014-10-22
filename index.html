@@ -15,12 +15,24 @@
     <script type="text/css" id="userCSS"></script>
   </head>
   <body onload="main();">
-    <div id="tabControls">
-      <button id="codePanelButton" onclick="switchTab('codePanel');">d3.js</button>
-      <button id="selectionManipulatorButton" onclick="switchTab('selectionManipulator');">Selection Manipulator</button>
+    <div id="widgetControls">
+      <div id="tabControls">
+        <button id="codePanelButton" onclick="switchTab('codePanel');">DOM</button>
+        <button id="selectionManipulatorButton" onclick="switchTab('selectionManipulator');">Selection</button>
+      </div>
+      <div id="docControls">
+        <button onclick="domToDoc(); docToDom();">Apply</button>
+      </div>
+      <div id="debugButton">
+        Debugging:
+        <button onclick="reload();">Reload Extension</button>
+        <button onclick="docToDom();">Refresh DOM</button>
+        <button onclick="updateSelection();">Refresh Selection</button>
+      </div>
     </div>
     <div id="codePanel">
       <div id="dom"></div>
+      <div id="selectionLayer"></div>
       <div id="code">
         <fieldset>
           <legend>CSS (live)</legend>
@@ -58,12 +70,8 @@
           <textarea id="jsEditor" wrap="off"></textarea>
         </fieldset>
       </div>
-      <div id="docControls">
-        <button onclick="domToDoc(); docToDom();">Apply</button>
-        <button onclick="docToDom();">Reset</button>
-      </div>
       <div id="zoomButtons">
-        <span>100%</span>
+        <span>50%</span>
         <button onclick="zoomOut();">-</button>
         <button onclick="zoomIn();">+</button>
       </div>
@@ -72,7 +80,5 @@
     <div id="selectionManipulator">
       
     </div>
-    
-    <button id="debugButton" onclick="reload();">Reload Extension</button>
   </body>
 </html>

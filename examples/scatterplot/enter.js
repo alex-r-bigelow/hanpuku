@@ -1,4 +1,4 @@
-  margin = {top: 20, right: 20, bottom: 30, left: 40},
+var margin = {top: 20, right: 20, bottom: 30, left: 40},
   width = doc.attr("width") - margin.left - margin.right,
   height = doc.attr("height") - margin.top - margin.bottom;
 
