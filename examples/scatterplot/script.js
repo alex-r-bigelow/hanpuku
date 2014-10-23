@@ -24,7 +24,7 @@ y.domain(d3.extent(data, function(d) { return d.sepalLength; })).nice();
 
 var color = d3.scale.category10();
 
-// Reconstruct x axis
+// Init or reconstruct x axis
 svg.select('#x_axis').remove();
 var xAxis = svg.append("g")
     .attr("id", "x_axis")
@@ -40,7 +40,7 @@ xAxis.call(d3.svg.axis()
             .scale(x)
             .orient("bottom"));
 
-// Reconstruct y axis
+// Init or reconstruct y axis
 svg.select('#y_axis').remove();
 var yAxis = svg.append("g")
     .attr("id", "y_axis")
@@ -56,33 +56,22 @@ yAxis.call(d3.svg.axis()
             .scale(y)
             .orient("left"));
 
-
-// Select dots, store old data, apply new data
+// Select dots
 var dots = svg.selectAll(".dot")
-    .property("__oldData__", function(d){ return d; })
-    .data(data);
-// Init new dots
-dots.enter().appendClone(selectedIDs[0])
-    .attr("class", "dot");
-// Remove old dots
+    .data(data, phrogz('rowNumber'));
+// Create new dots
+dots.enter().append("circle")
+    .attr("class", "dot")
+    .attr("r", 3.5);
+// Throw away old ones
 dots.exit().remove();
-// Update remaining (and new) dots
-dots.attr("transform", function (d) {
-    if (this.__oldData__ && this.getAttribute('transform') === null) {
-      // iD3 will have applied old transformations, so updates need to be relative
-      return "translate(" + (x(d.sepalWidth) - x(this.__oldData__[0].sepalWidth)) + "," +
-                            (y(d.sepalLength) - y(this.__oldData__[0].sepalLength)) + ")";
-    } else {
-      return "translate(" + x(d.sepalWidth) + "," + y(d.sepalLength) + ")";
-    }
-  })
+// Update existing ones
+dots.attr("transform", function (d) { return "translate(" + x(d.sepalWidth) + "," + y(d.sepalLength) + ")"; })
     .style("fill", function(d) { return color(d.species); });
-// Clear out any old data
-dots.property("__oldData__", null);
 
 // Select legend entries
 var legend = svg.selectAll(".legend")
-    .data(color.domain());
+    .data(color.domain(), function(d) { return d; });
 // Init legend entries
 var initLegend = legend.enter().append("g")
     .attr("class", "legend");
@@ -90,7 +79,7 @@ initLegend.append("circle")
     .attr("class", "glyph")
     .attr("r", 3.5);
 initLegend.append("text");
-// Remove legend entries
+// Remove old legend entries
 legend.exit().remove();
 // Update legend entries
 legend.select(".glyph")

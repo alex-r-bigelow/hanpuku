@@ -4,6 +4,7 @@
 }
 
 .link {
+  fill: none;
   stroke: #999;
   stroke-opacity: .6;
 }

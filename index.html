@@ -42,14 +42,13 @@
           <button onclick="runCode();">Load $data, run Script</button>
           <select id="sampleMenu" onchange="loadSample();">
             <option value="header">Samples:</option>
-            <optgroup label="Scatterplot">
-              <option value="scatterplot/style.css,scatterplot/enter.js,scatterplot/data.tsv">Create Scatterplot</option>
-              <option value="scatterplot/style.css,scatterplot/enterClone.js,scatterplot/data.tsv">Create w/Selected Glyph</option>
-              <option value="scatterplot/style.css,scatterplot/update.js,scatterplot/data.tsv">Update Scatterplot</option>
-              <option value="scatterplot/style.css,scatterplot/updateClone.js,scatterplot/data.tsv">Update w/Selected Glyph</option>
+            <optgroup label="Scatterplot Demo">
+              <option value="scatterplot/style.css,scatterplot/script.js,scatterplot/data.tsv">Create Scatterplot</option>
+              <option value=",scatterplot/script.js,">Update Scatterplot</option>
+              <option value=",scatterplot/selection.js,">Select sepalLength &gt; 6.9</option>
             </optgroup>
-            <optgroup label="Selection">
-              <option value=",selection/selection.js,">sepalLength &gt; 6.9</option>
+            <optgroup label="Force-Directed Graph Demo">
+              <option value="force/style.css,force/script.js,force/data.json">Create / Update Graph</option>
             </optgroup>
           </select>
         </div>
@@ -61,7 +60,7 @@
               <option value="csv">CSV</option>
               <option value="tsv">TSV</option>
               <option value="json">JSON</option>
-              <option value="js">Javascript</option>
+              <option value="js" selected>Javascript</option>
             </select>
           </span>
         </fieldset>

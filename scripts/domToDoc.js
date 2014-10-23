@@ -184,9 +184,6 @@ function standardize() {
 
 function extractPath(g, z) {
     var d = g.getAttribute('d');
-    if (d === null) {
-        console.log(g);
-    }
     var coordList = d.split(pathSplitter).splice(1),
         output = {
             itemType : 'path',

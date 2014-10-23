@@ -167,8 +167,8 @@ function circleToCubicPath(cx, cy, r, m) {
 }
 
 /* Monkey patch .appendClone(), .appendCircle(), .appendRect(),
-   and .appendPath() to d3.selection and d3.selection.enter,
-   as well as .setPosition() to d3.selection */
+   .appendPath() to d3.selection and d3.selection.enter,
+   as well as .keyFunction() to d3.selection */
 /* These are important to allow d3 to work with a DOM that has
    gone through Illustrator; Illustrator applies all transforms
    immediately instead of as an attribute, and every shape is
@@ -220,25 +220,48 @@ d3.selection.enter.prototype.appendClone = d3.selection.prototype.appendClone;
 
 d3.selection.prototype.appendCircle = function (cx, cy, r) {
     var self = this;
-    self.append('path')
-        .attr('d', function (i) { return circleToCubicPath(cx(i), cy(i), r(i)); });
+    return self.append('path')
+        .attr('d', function (i) {
+            var d_cx = typeof cx === 'function' ? cx(i) : cx,
+                d_cy = typeof cy === 'function' ? cy(i) : cy,
+                d_r = typeof r === 'function' ? r(i) : r;
+            return circleToCubicPath(d_cx, d_cy, d_r);
+        });
 };
 d3.selection.enter.prototype.appendCircle = d3.selection.prototype.appendCircle;
 
 d3.selection.prototype.appendRect = function (x, y, width, height) {
     var self = this;
-    self.append('path')
-        .attr('d', function (i) { return rectToCubicPath(x(i), y(i), width(i), height(i)); });
+    return self.append('path')
+        .attr('d', function (i) {
+            var d_x = typeof x === 'function' ? x(i) : x,
+                d_y = typeof y === 'function' ? y(i) : y,
+                d_width = typeof width === 'function' ? width(i) : width,
+                d_height = typeof height === 'function' ? height(i) : height;
+            return rectToCubicPath(d_x, d_y, d_width, d_height);
+        });
 };
 d3.selection.enter.prototype.appendRect = d3.selection.prototype.appendRect;
 
 d3.selection.prototype.appendPath = function (d) {
     var self = this;
-    self.append('path')
-        .attr('d', function (d) { return pathToCubicPath(d(i)); });
+    return self.append('path')
+        .attr('d', function (i) {
+            var d_d = typeof d === 'function' ? d(i) : d;
+            return pathToCubicPath(d_d);
+        });
 };
 d3.selection.enter.prototype.appendPath = d3.selection.prototype.appendPath;
 
+//d3.selection.prototype._nativeDataFunction = d3.selection.prototype.data;
+
+/*d3.selection.prototype.keyFunction = function (keyFunction) {
+    var self = this;
+    self.each(function (e) {
+        this.setAttribute('id3_keyFunction', String(keyFunction));
+    });
+    return self;
+}*/
 /*d3.selection.prototype.iter_d3 = function (callback) {
     // Iterates d3 selections of elements
     this.each(function (e) {
@@ -474,8 +497,8 @@ function renderSelection() {
     tr.append('td').text(function (d) { return d; });
     tr.append('td').text(function (d) {
         var data = d3.select('#' + d).datum();
-        if (data && data.length === 1) {
-            return JSON.stringify(data[0]);
+        if (data) {
+            return JSON.stringify(data);
         } else {
             return "(no data)";
         }
