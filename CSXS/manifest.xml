@@ -34,7 +34,11 @@
             </MinSize>
           </Geometry>
           <Icons>
-            <Icon Type="Normal">./img/icon.png</Icon>
+            <Icon Type="Normal">./img/icon2.png</Icon>
+            <Icon Type="RollOver">./img/icon2.png</Icon>
+            <Icon Type="Disabled">./img/icon.png</Icon>
+            <Icon Type="DarkNormal">./img/icon.png</Icon>
+            <Icon Type="DarkRollOver">./img/icon.png</Icon>
           </Icons>
         </UI>
       </DispatchInfo>

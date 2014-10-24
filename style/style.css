@@ -6,131 +6,108 @@ body {
     position:absolute;
     left:0px;
     top:0px;
-    padding:4px;
+    height:30px;
+    padding-right:16px;
+    padding-left:8px;
 }
-#docControls {
-    position:absolute;
-    right:0px;
-    top:0px;
-    padding:4px;
+#tabControls button {
+    padding-top:6px;
+    background-color: transparent !important;
 }
 #tabControls button.active {
     color:#fff;
 }
 
-#widgetControls {
+#debugButtons {
     position:absolute;
-    left:0px;
-    top:0px;
-    width:100%;
-    height:30px;
+    left:51%;
+    bottom:16px;
+    padding:4px;
     background-color: rgba(255,255,255,0.75);
 }
 
-#debugButton {
-    position:absolute;
-    left:50%;
-    top:0px;
-    padding:4px;
-}
-
-#codePanel, #selectionManipulator {
+#panels {
     position:absolute;
     left:0px;
     top:30px;
-    width:100%;
+    right:51%;
     bottom:0px;
 }
 
-#selectionManipulator {
-    overflow: scroll;
-    padding: 14px;
-}
-
-#selectionManipulator tr {
-    padding: 0px;
-}
-
-#selectionManipulator td {
-    padding: 14px;
-    background-color: rgba(255,255,255,0.75);
-}
-
-div#dom {
+#panels div {
     position:absolute;
+    left: 0px;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+}
+
+textarea {
+    font-family: 'Consolas', monospace;
+    font-size: 9pt;
+    text-align: left;
+}
+
+#codePanel textarea, #cssPanel textarea, #dataPanel textarea {
+    position: absolute;
     left:0px;
-    right:500px;
+    top:30px;
+    right:0px;
+    bottom:0px;
+}
+#cssPanel textarea {
+    top:0px;
+}
+
+#codePanel span, #dataPanel span {
+    position:absolute;
+    padding:4px;
+    top:0px;
+    left:0px;
+    right:0px;
+}
+
+#selectionPreview {
+    padding: 16px;
+    overflow: scroll;
+    border-spacing:2px;
+}
+
+#selectionPreview td {
+    padding: 4px;
+    background-color: #fff;
+}
+
+#dom {
+    position:absolute;
+    left:51%;
+    right:0px;
     top:0px;
     bottom:0px;
     overflow:auto;
     padding:60px;
 }
-div#dom svg {
-    zoom : 50%;
+#dom svg {
+    zoom : 100%;
 }
 
-.artboard {
+#dom .artboard {
     fill:#ffffff !important;
     stroke-width:1px !important;
     stroke:#000000 !important;
 }
 
-path.selection {
+#dom path.selection {
     fill: none;
     stroke:rgb(98,131,255);
     stroke-width: 5px;
 }
 
-div#code {
-    position:absolute;
-    width:500px;
-    right:0px;
-    top:0px;
-    bottom:0px;
-    padding-right:14px;
-}
-div#code fieldset {
-    position:relative;
-    float: right;
-    width: 90%;
-    height: 30%;
-    border: 1px solid black;
-    background-color: rgba(255,255,255,0.75);
-    margin-bottom: 4px;
-}
-div#code fieldset legend {
-    background-color: rgba(255,255,255,0.75);
-}
-div#code fieldset span {
-    position: absolute;
-    right: 16px;
-    bottom: 16px;
-    padding: 4px;
-    background-color: rgba(255,255,255,0.75);
-}
-div#code fieldset textarea {
-    position: absolute;
-    top:10px;
-    bottom:0px;
-    left:0px;
-    right:0px;
-    font-family: 'Consolas', monospace;
-    font-size: 9pt;
-    text-align: left;
-}
-#codeControls {
-    position:relative;
-    float:right;
-    padding:4px;
-    margin-right: 3px;
-    background-color: rgba(255,255,255,0.75);
-}
 #zoomButtons {
     position:absolute;
-    right:516px;
+    right:16px;
     bottom:16px;
     padding:4px;
-    background-color: rgba(255,255,255,0.75);
 }
 button, select {
     border: none;

@@ -84,11 +84,8 @@ function addChildLayers (parent, layer) {
 function docToDom () {
     runJSX(null, 'scripts/docToDom.jsx', function (result) {
         if (result === null) {
-            docIsActive = false;
-            clearDOM();
+            clearGUI();
         } else {
-            docIsActive = true;
-            
             // Set up the document and the GUI
             document.getElementById('dom').innerHTML = "";  // nuke the svg so we start fresh
             
@@ -135,17 +132,7 @@ function docToDom () {
             
             // Update the current selection
             selectedIDs = result.selection;
-            updateSelection();
-            
-            // If the code areas are empty, fill them with some defaults
-            // to give people an idea of what they can / should do
-            if (jQuery('#dataEditor').val() === "") {
-                jQuery('#dataEditor').val('$data = {};');
-            }
-            if (jQuery('#jsEditor').val() === "") {
-                jQuery('#jsEditor').val('var doc = d3.select("#' + result.name + '"),\n' +
-                                        '    artboards = d3.selectAll(".artboard");');
-            }
+            updateGUI();
         }
     });
 }

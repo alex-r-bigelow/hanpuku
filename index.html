@@ -12,72 +12,79 @@
     <script type="application/javascript" src="scripts/domToDoc.js"></script>
     <script type="application/javascript" src="scripts/docToDom.js"></script>
     <script type="application/javascript" src="scripts/iD3.js"></script>
+    <script type="application/javascript" src="scripts/tabs/selection.js"></script>
+    <script type="application/javascript" src="scripts/tabs/data.js"></script>
+    <script type="application/javascript" src="scripts/tabs/code.js"></script>
+    <script type="application/javascript" src="scripts/tabs/css.js"></script>
+    <script type="application/javascript" src="scripts/gui.js"></script>
     <script type="text/css" id="userCSS"></script>
   </head>
   <body onload="main();">
-    <div id="widgetControls">
-      <div id="tabControls">
-        <button id="codePanelButton" onclick="switchTab('codePanel');">DOM</button>
-        <button id="selectionManipulatorButton" onclick="switchTab('selectionManipulator');">Selection</button>
-      </div>
-      <div id="docControls">
-        <button onclick="domToDoc(); docToDom();">Apply</button>
-      </div>
-      <div id="debugButton">
-        Debugging:
-        <button onclick="reload();">Reload Extension</button>
-        <button onclick="docToDom();">Refresh DOM</button>
-        <button onclick="updateSelection();">Refresh Selection</button>
-      </div>
-    </div>
-    <div id="codePanel">
-      <div id="dom"></div>
-      <div id="selectionLayer"></div>
-      <div id="code">
-        <fieldset>
-          <legend>CSS (live)</legend>
-          <textarea id="cssEditor" wrap="off" onchange="updateCSS();" onkeyup="updateCSS();"></textarea>
-        </fieldset>
-        <div id="codeControls">
-          <button onclick="runCode();">Load $data, run Script</button>
-          <select id="sampleMenu" onchange="loadSample();">
-            <option value="header">Samples:</option>
-            <optgroup label="Scatterplot Demo">
-              <option value="scatterplot/style.css,scatterplot/script.js,scatterplot/data.tsv">Create Scatterplot</option>
-              <option value=",scatterplot/script.js,">Update Scatterplot</option>
-              <option value=",scatterplot/selection.js,">Select sepalLength &gt; 6.9</option>
-            </optgroup>
-            <optgroup label="Force-Directed Graph Demo">
-              <option value="force/style.css,force/script.js,force/data.json">Create / Update Graph</option>
-            </optgroup>
+    <div id="panels">
+      <div id="dataPanel">
+        <textarea id="dataEditor" wrap="off"></textarea>
+        <span>
+          <select id="currentDataFile" onchange="switchDataFile();">
           </select>
-        </div>
-        <fieldset>
-          <legend>$data</legend>
-          <textarea id="dataEditor" wrap="off"></textarea>
-          <span style="float:right;">Interpret as:
-            <select id="dataTypeSelect">
-              <option value="csv">CSV</option>
-              <option value="tsv">TSV</option>
-              <option value="json">JSON</option>
-              <option value="js" selected>Javascript</option>
-            </select>
-          </span>
-        </fieldset>
-        <fieldset>
-          <legend>Script</legend>
-          <textarea id="jsEditor" wrap="off"></textarea>
-        </fieldset>
+          <input type="checkbox" id="embedFileCheckBox" onchange="switchDataFile();"/>Embed
+          &emsp;
+          Interpret as:
+          <select id="dataTypeSelect" onchange="switchDataFile();">
+            <option value="text/csv">CSV</option>
+            <option value="text/tsv">TSV</option>
+            <option value="text/json">JSON</option>
+            <option value="text/js">Javascript</option>
+          </select>
+        </span>
       </div>
-      <div id="zoomButtons">
-        <span>50%</span>
-        <button onclick="zoomOut();">-</button>
-        <button onclick="zoomIn();">+</button>
+      <div id="selectionPanel">
+        <table id="selectionPreview"></table>
+      </div>
+      <div id="bindingsPanel">
+        <img src="img/bindings.png" width="100%"/>
+      </div>
+      <div id="influencePanel">
+        <img src="img/influence0.png" width="100%" onclick="this.src='img/influence1.png';"/>
+      </div>
+      <div id="codePanel">
+        <textarea id="jsEditor" wrap="off"></textarea>
+        <span>
+          <button onclick="jQuery('#codeFileInput').click();">Load Script...</button>
+          <input type="checkbox" id="embedCodeCheckBox"/>Embed
+          &emsp;
+          <button onclick="runJS();">Run</button>
+          <input id="codeFileInput" type="file" onchange="loadCodeFile();" style="visibility:hidden"/>
+        </span>
+      </div>
+      <div id="cssPanel">
+        <textarea id="cssEditor" wrap="off" onchange="updateCSS();" onkeyup="updateCSS();"></textarea>
+      </div>
+      <div id="samplePanel">
+        
       </div>
     </div>
     
-    <div id="selectionManipulator">
-      
+    <div id="dom"></div>
+    <div id="tabControls">
+      <button id="dataPanelButton" onclick="switchTab('dataPanel');">Data</button>
+      <button id="selectionPanelButton" onclick="switchTab('selectionPanel');">Selection</button>
+      <button id="bindingsPanelButton" onclick="switchTab('bindingsPanel');">Bindings</button>
+      <button id="influencePanelButton" onclick="switchTab('influencePanel');">Influence</button>
+      <button id="codePanelButton" onclick="switchTab('codePanel');">JS</button>
+      <button id="cssPanelButton" onclick="switchTab('cssPanel');">CSS</button>
+      <button id="samplePanelButton" onclick="switchTab('samplePanel');">Sample Library</button>
+    </div>
+    <div id="debugButtons" class="halo">
+      Debugging:
+      <button onclick="location.reload();">Reload Extension</button>
+    </div>
+    <div id="zoomButtons" class="halo">
+      <span>100%</span>
+      <button onclick="zoomOut();">-</button>
+      <button onclick="zoomIn();">+</button>
+      &emsp;
+      <button onclick="docToDom();">Reset</button>
+      <button onclick="domToDoc(); docToDom();">Apply</button>
     </div>
   </body>
 </html>

@@ -41,8 +41,10 @@ function standardize(activeDoc) {
             // (jQuery / old DOM restrictions), and are unique (case-insensitive)
             oldName = items[i].name;
             name = oldName.replace(invalid, '_');
-            if (name.length === 0 || alphabetic.test(name[0]) !== true) {
-                name = 'entity_' + name;
+            if (name.length === 0) {
+                name = items[i].constructor.name;
+            } else if (alphabetic.test(name[0]) !== true) {
+                name = items[i].constructor.name + '_' + name;
             }
             
             newName = name;
