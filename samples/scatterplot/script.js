@@ -6,7 +6,7 @@ var margin = {top: 20, right: 20, bottom: 30, left: 40},
 var svg = doc.selectAll('#Layer_1');
 svg.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-var data = $data;
+var data = getDataFile('data.tsv');
 
 data.forEach(function(d) {
   d.sepalLength = Number(d.sepalLength);

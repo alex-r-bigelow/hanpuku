@@ -13,7 +13,27 @@ var dataFiles = [],
         'text/json': 'json',
         'text/js' : 'js'
     },
-    selectedDataFile = 'header';
+    extensionLookup = {
+        'csv' : 'text/csv',
+        'tsv' : 'text/tab-separated-values',
+        'json' : 'text/json',
+        'js' : 'text/js'
+    },
+    selectedDataFile = 'header',
+    dataTypingTimer;
+
+function editData() {
+    var f = dataFiles[dataFileLookup[selectedDataFile]];
+    clearTimeout(dataTypingTimer);
+    dataTypingTimer = setTimeout(function () {
+        f.raw = jQuery('#dataEditor').val();
+        f.parsed = parseData(f.raw, f.type);
+    }, TYPING_INTERVAL);
+}
+
+function getDataFile(name) {
+    return dataFiles[dataFileLookup[name]].parsed;
+}
 
 function parseData(raw, dataType) {
     var result;
@@ -33,6 +53,7 @@ function parseData(raw, dataType) {
         result = e.stack;
         console.warn(result);
     }
+    console.log('parsed.');
     return result;
 }
 
@@ -104,6 +125,34 @@ function switchDataFile() {
         updateDataPanel();
     }
 }
+function loadSampleDataFile(url) {
+    jQuery.get(url, function (dataString) {
+        var parts = url.split('/'),
+            name = parts[parts.length - 1],
+            extension = name.split('.'),
+            fileObj;
+        
+        extension = extension[extension.length - 1];
+        extension = extensionLookup[extension.toLowerCase()];
+        
+        fileObj = {
+            'name' : name,
+            'type' : extension,
+            'raw' : dataString,
+            'parsed' : parseData(dataString, extension),
+            'embed' : false
+        };
+        if (dataFileLookup.hasOwnProperty(name)) {
+            dataFiles[dataFileLookup[name]] = fileObj;
+        } else {
+            dataFileLookup[name] = dataFiles.length;
+            dataFiles.push(fileObj);
+        }
+        selectedDataFile = name;
+        updateDataPanel();
+    });
+}
+
 function loadDataFile(f) {
     var fileReader = new FileReader();
     fileReader.onload = function (e) {

@@ -22,7 +22,7 @@
   <body onload="main();">
     <div id="panels">
       <div id="dataPanel">
-        <textarea id="dataEditor" wrap="off"></textarea>
+        <textarea id="dataEditor" wrap="off" onkeyup="editData();"></textarea>
         <span>
           <select id="currentDataFile" onchange="switchDataFile();">
           </select>
@@ -31,7 +31,7 @@
           Interpret as:
           <select id="dataTypeSelect" onchange="switchDataFile();">
             <option value="text/csv">CSV</option>
-            <option value="text/tsv">TSV</option>
+            <option value="text/tab-separated-values">TSV</option>
             <option value="text/json">JSON</option>
             <option value="text/js">Javascript</option>
           </select>
@@ -57,10 +57,16 @@
         </span>
       </div>
       <div id="cssPanel">
-        <textarea id="cssEditor" wrap="off" onchange="updateCSS();" onkeyup="updateCSS();"></textarea>
+        <textarea id="cssEditor" wrap="off" onkeyup="editCSS();"></textarea>
       </div>
       <div id="samplePanel">
-        
+        <select id="sampleSelect" onchange="if (this.value !== 'header') { jQuery.getScript(this.value); }">
+          <option value="header">Load example data, js, and/or css:</option>
+          <optgroup label="Scatterplot">
+            <option value="samples/scatterplot/init.js">Create / Update Scatterplot</option>
+            <option value="samples/scatterplot/selection.js">Select sepalLength > 6.9</option>
+          </optgroup>
+        </select>
       </div>
     </div>
     

@@ -1,5 +1,6 @@
 var CSLibrary = new CSInterface(),
-    loadedJSXlibs= false;
+    loadedJSXlibs= false,
+    TYPING_INTERVAL = 1000;
 
 /* Tools to interact with extendScript */
 function loadJSXlibs() {
@@ -78,11 +79,15 @@ function styleWidget() {
                                 Math.floor(panelColor.green) + ',' +
                                 Math.floor(panelColor.blue) + ',' +
                                 0.5*(panelColor.alpha/255.0) + ')';
+    jQuery('body, button, select').css({
+        'font-family' : i.baseFontFamily,
+        'font-size' : i.baseFontSize
+    });
     jQuery('body').css('background-color', bodyColor);
     jQuery('textarea').css({'background-color':textBackgroundColor,
                             'color':textColor});
     jQuery('.halo').css('background-color',haloColor);
-    jQuery('button, select').css('background-color', buttonColor);
+    jQuery('button').css('background-color', buttonColor);
 }
 
 /* Zooming */
@@ -134,6 +139,7 @@ function clearGUI() {
 function updateGUI() {
     renderSelection();
     updateDataPanel();
+    updateCSS();
 }
 
 /* Where execution begins when the extension is loaded */

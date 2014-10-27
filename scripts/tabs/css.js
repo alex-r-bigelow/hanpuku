@@ -1,4 +1,5 @@
-var cssFiles = {};
+var cssFiles = {},
+    cssTypingTimer;
 
 function updateCSS() {
     jQuery('#userCSS').remove();
@@ -16,4 +17,17 @@ function loadCSSFile() {
         updateCSS();
     };
     fileReader.readAsText(newFile);
+}
+
+function loadSampleCSSFile(url) {
+    jQuery.get(url, function (codeString) {
+        jQuery('#cssEditor').val(codeString);
+    });
+}
+
+function editCSS() {
+    clearTimeout(cssTypingTimer);
+    cssTypingTimer = setTimeout(function () {
+        updateCSS();
+    }, TYPING_INTERVAL);
 }

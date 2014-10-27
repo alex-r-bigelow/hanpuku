@@ -4,8 +4,7 @@ Adding limited support for using d3.js commands directly in Illustrator. Cooler 
 
 ### TODO:
 
-#### High 
-- Quick Sample Library tab
+#### High priority
 - Selection query tools
 - Bindings tab/visualization (reuse part for Data tab preview)
 - Influence tab
@@ -14,6 +13,7 @@ Adding limited support for using d3.js commands directly in Illustrator. Cooler 
   - Rotation
   - Color
     - Requires support for gradients
+  - Shape
 - Walk through HBO Example
   - Requires support for binding data to path points
 
@@ -25,7 +25,7 @@ Adding limited support for using d3.js commands directly in Illustrator. Cooler 
 - Support multiple artboards
 - Ace editors for data, js, css
 - Support embedding data (remember to add a special orphans.json file), js, css
-- External specimen library...
+- Sample library
 
 #### Low priority
 - It would be cool to convert between canvas elements / bitmaps... if so, maybe we could support processing.js code?
