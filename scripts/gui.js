@@ -1,6 +1,15 @@
 var CSLibrary = new CSInterface(),
     loadedJSXlibs= false,
-    TYPING_INTERVAL = 1000;
+    TYPING_INTERVAL = 1000,
+    previewPanels = {
+        "dataPanel" : "dataPreview",
+        "selectionPanel" : "domPreview",
+        "bindingsPanel" : "domPreview",
+        "influencePanel" : "domPreview",
+        "codePanel" : "domPreview",
+        "cssPanel" : "domPreview"
+    },
+    TEXT_COLOR = '#000';
 
 /* Tools to interact with extendScript */
 function loadJSXlibs() {
@@ -79,13 +88,15 @@ function styleWidget() {
                                 Math.floor(panelColor.green) + ',' +
                                 Math.floor(panelColor.blue) + ',' +
                                 0.5*(panelColor.alpha/255.0) + ')';
+    TEXT_COLOR = textColor;
     jQuery('body, button, select').css({
         'font-family' : i.baseFontFamily,
         'font-size' : i.baseFontSize
     });
     jQuery('body').css('background-color', bodyColor);
-    jQuery('textarea').css({'background-color':textBackgroundColor,
-                            'color':textColor});
+    jQuery('textarea, #dataPreview').css({'background-color':textBackgroundColor,
+                            'color':textColor,
+                            'border':'1px solid ' + haloColor});
     jQuery('.halo').css('background-color',haloColor);
     jQuery('button').css('background-color', buttonColor);
 }
@@ -114,7 +125,9 @@ function zoomOut() {
 function setupTabs() {
     var startingTab = 'dataPanel';
     jQuery('#panels > div').hide();
+    jQuery('#previews > div').hide();
     jQuery('#' + startingTab).show();
+    jQuery('#' + previewPanels[startingTab]).show();
     jQuery('#' + startingTab + 'Button').attr('class', 'active');
 }
 
@@ -123,6 +136,10 @@ function switchTab(tabId) {
     oldTab = oldTab.substring(0,oldTab.length-6);
     jQuery('#' + oldTab).hide();
     jQuery('#' + tabId).show();
+    if (previewPanels[oldTab] !== previewPanels[tabId]) {
+        jQuery('#' + previewPanels[oldTab]).hide();
+        jQuery('#' + previewPanels[tabId]).show();
+    }
     
     jQuery('#' + oldTab + "Button").attr('class', null);
     jQuery('#' + tabId + "Button").attr('class', 'active');
@@ -138,7 +155,7 @@ function clearGUI() {
 
 function updateGUI() {
     renderSelection();
-    updateDataPanel();
+    DataFile.UPDATE_PANEL();
     updateCSS();
 }
 

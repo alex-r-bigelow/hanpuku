@@ -1,5 +1,6 @@
 body {
     overflow: hidden;
+    -webkit-user-select: none;
 }
 #tabControls {
     position:absolute;
@@ -56,6 +57,7 @@ textarea {
 }
 #cssPanel textarea {
     top:0px;
+    border: none;
 }
 
 #codePanel span, #dataPanel span {
@@ -75,6 +77,25 @@ textarea {
 #selectionPreview td {
     padding: 4px;
     background-color: #fff;
+}
+
+#dataPreview {
+    position: absolute;
+    left:51%;
+    right:0px;
+    top:0px;
+    bottom:0px;
+    overflow:auto;
+}
+#dataPreviewContainer {
+    padding: 16px;
+}
+
+#dataPreview .binding {
+    stroke-width: 1px;
+}
+#dataPreview .expansion {
+    stroke: none;
 }
 
 #dom {

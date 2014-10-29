@@ -5,8 +5,9 @@ Adding limited support for using d3.js commands directly in Illustrator. Cooler 
 ### TODO:
 
 #### High priority
+- Binding Editor
+  - Requires embedding files?
 - Selection query tools
-- Bindings tab/visualization (reuse part for Data tab preview)
 - Influence tab
   - Position
   - Scale
@@ -24,8 +25,8 @@ Adding limited support for using d3.js commands directly in Illustrator. Cooler 
 - Support text
 - Support multiple artboards
 - Ace editors for data, js, css
-- Support embedding data (remember to add a special orphans.json file), js, css
-- Sample library
+- Support embedding files (remember to add a special orphans.json file), js, css
+- More samples
 
 #### Low priority
 - It would be cool to convert between canvas elements / bitmaps... if so, maybe we could support processing.js code?
@@ -35,8 +36,8 @@ Adding limited support for using d3.js commands directly in Illustrator. Cooler 
 #### Very low priority
 - Investigate what it would take to make an Inkscape clone
 
-### Oddities for writing d3 code:
-- An svg object matching the current Illustrator document will always exist, with its id matching the document name. Its
+### Oddities for d3 code that are introduced by cycling in and out of an Illustrator document:
+- An svg object matching the current Illustrator document will always exist in the DOM, with its id matching the document name. Its
   immediate children are rect objects, representing each artboard, and group objects, representing each layer. Every element's
   id will be the same as the object's name in Illustrator's Layers widget (iD3 may modify these names to ensure that all ids are unique
   and compatible with HTML).
