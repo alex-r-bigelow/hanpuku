@@ -38,9 +38,12 @@ Adding support for using d3.js code directly in Illustrator, with some nuances.
 
 ### TODO:
 
+#### CRITICAL - Heavy rewrite of everything needed for:
+- Support path points
+- Isolate the mirror dom namespace from all my code
+
 #### High priority
 - Refactor to make views more modular
-- Support connections to path points
 - Implement all views listed above. Current status of each view:
  - Implemented views:
   - Raw data editor (could enhance w/Ace)
@@ -61,8 +64,9 @@ Adding support for using d3.js code directly in Illustrator, with some nuances.
 - (external project): Tools for quickly embedding back into a web page
 - Support text
 - Embed data, js, css in .ai file
-- Clean up the JS namespace, find some way to isolate scripts' reach to #dom svg
-- Somehow embed the Chrome debugging window as a view inside the widget (iframe? users will need to enable remote debugging...)
+- Somehow embed the Chrome debugging window as a view inside the widget
+ - users will need to enable remote debugging
+ - iframe? Also need to figure out how to link to embedded document
 - More samples, documentation
 
 #### Low priority
