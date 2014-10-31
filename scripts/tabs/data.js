@@ -1,6 +1,6 @@
 /*jslint evil:true*/
-var BAR_SIZE = 25,
-    FONT_SIZE = 14,
+var BAR_SIZE = 20,
+    FONT_SIZE = 12,
     CHAR_WIDTH = 8,
     LINK_GAP = 100;
 
@@ -43,20 +43,40 @@ function ParseNode(key, data, depth, flag) {
         self.objType = ParseNode.NATIVE;
     }
 }
-ParseNode.NATIVE = 0;
-ParseNode.ARRAY = 1;
-ParseNode.OBJECT = 2;
 
-ParseNode.NUM_NODES = 0;
-ParseNode.ROOT = new ParseNode('Loaded Data Files', {}, 0, 'ROOT');
-
-ParseNode.NEXT_ROW = 0;
-
+ParseNode.INIT = function () {
+    ParseNode.NATIVE = 0;
+    ParseNode.ARRAY = 1;
+    ParseNode.OBJECT = 2;
+    
+    ParseNode.NUM_NODES = 0;
+    
+    ParseNode.NEXT_ROW = 0;
+    
+    ParseNode.ROOT = new ParseNode('Data', {
+        'Data not linked to any file' : [],
+        'Loaded data files' : {}
+    }, 0, 'ROOT');
+    ParseNode.DOC_ROOT = ParseNode.ROOT._children['Loaded data files'];
+    ParseNode.DOC_ROOT.flag = 'DOC_ROOT';
+    ParseNode.ORPHANS = ParseNode.ROOT._children['Data not linked to any file'];
+    ParseNode.ORPHANS.flag = 'ORPHANS';
+    
+    ParseNode.ROOT.toggleExpand();
+    ParseNode.DOC_ROOT.toggleExpand();
+    ParseNode.ORPHANS.toggleExpand();
+};
+ParseNode.prototype.toggleExpand = function () {
+    var self = this,
+        temp = self.children;
+    self.children = self._children;
+    self._children = temp;
+};
 ParseNode.prototype.setFile = function (name, data) {
     var self = this;
     
-    if (self.flag !== 'ROOT') {
-        throw "Can't add a file to anything but ParseNode.ROOT!";
+    if (self.flag !== 'DOC_ROOT') {
+        throw "Can't add a file to anything but ParseNode.DOC_ROOT!";
     }
     
     self.data[name] = data;
@@ -65,15 +85,15 @@ ParseNode.prototype.setFile = function (name, data) {
         self._children[name] = new ParseNode(name, data, self.depth + 1, 'FILE');
     } else {
         self.children[name] = new ParseNode(name, data, self.depth + 1, 'FILE');
+        self.children[name].toggleExpand();
     }
 };
-
 ParseNode.prototype.prepRender = function (useRow) {
     var self = this,
         child,
         nodeList = [];
     
-    if (self.flag === 'ROOT') {
+    if (self === ParseNode.ROOT) {
         ParseNode.NEXT_ROW = 0;
     }
     if (useRow) {
@@ -126,6 +146,171 @@ ParseNode.prototype.prepRender = function (useRow) {
     }
     return nodeList;
 };
+ParseNode.RENDER = function () {
+    var container = jQuery('#dataPreviewContainer'),
+        svg,
+        graphicsList,
+        graphicsListWidth = 0,
+        mappingView,
+        dataList,
+        dataListWidth = 0,
+        height,
+        dataNodes,
+        update;
+    
+    container.html('');
+    
+    svg = d3.select('#dataPreviewContainer').append('svg');
+    graphicsList = svg.append('g');
+    dataList = svg.append('g');
+    mappingView = svg.append('g');  // Needs to be on top
+    
+    function renderDataList() {
+        dataNodes = ParseNode.ROOT.prepRender();
+        
+        dataListWidth = BAR_SIZE;
+        height = (ParseNode.NEXT_ROW + 1) * BAR_SIZE;
+        
+        var nodes = dataList.selectAll('.parseNode').data(dataNodes, phrogz('nodeID'));
+        
+        // Enter
+        var nodeEnter = nodes.enter().append('g')
+            .attr('class','parseNode');
+        nodeEnter.append('text')
+            .attr('font-family', '"Consolas", monospace')
+            .attr('font-size', FONT_SIZE)
+            .attr('dy', 3 * BAR_SIZE / 4)
+            .attr('dx', BAR_SIZE / 2);
+            
+        var controlRadius = BAR_SIZE / 6;
+        var bindEnter = nodeEnter.filter(function (d) {
+            return d.flag === undefined;
+        });
+        bindEnter.append('circle')
+            .attr('class', 'binding')
+            .attr('cx', 0)
+            .attr('cy', BAR_SIZE / 2)
+            .attr('r', controlRadius);
+        var collapseEnter = nodeEnter.filter(function (d) {
+            return d.children !== null || d._children !== null;
+        }).append('path');
+        collapseEnter.attr('class', 'expansion')
+                     .attr('d', 'M' + (-controlRadius) + ',' + (-controlRadius) +
+                                'L' + controlRadius + ',0' +
+                                'L' + (-controlRadius) + ',' + controlRadius + 'Z')
+                     .on('click', function (d) {
+                        d.toggleExpand();
+                        
+                        update();
+                     });
+        
+        // Exit
+        nodes.exit().remove();
+        
+        // Update
+        nodes.attr('transform',function (d) {
+            return 'translate(' + (d.depth*BAR_SIZE) + ',' + d.row*BAR_SIZE + ')';
+        });
+        nodes.selectAll('.binding')
+            .attr('stroke', TEXT_COLOR)
+            .attr('fill', TEXT_COLOR)
+            .attr('fill-opacity', 0.1);
+        nodes.selectAll('.expansion')
+            .attr('transform', function (d) {
+                if (d.children === null) {
+                    return 'matrix(1,0,0,1,0,' + BAR_SIZE + ')'; // just translate, don't rotate
+                } else {
+                    return 'matrix(0,1,-1,0,0,' + BAR_SIZE + ')'; // rotate, then translate
+                }
+            })
+            .attr('fill', TEXT_COLOR);
+        nodes.selectAll('text').text(function (d) {
+                var result = d.key;
+                if (d.flag !== 'ROOT' && d.flag !== 'ERROR') {
+                    result += " : ";
+                    if (d.objType === ParseNode.NATIVE) {
+                        result += d.data;
+                    } else if (d.objType === ParseNode.ARRAY) {
+                        result += '[' + d.data.length + ']';
+                    } else {
+                        result += '{' + Object.keys(d.data).length + '}';
+                    }
+                }
+                // We want to auto-adjust the data group width by the widest, deepest node...
+                var nodeWidth = (d.depth + 1) * BAR_SIZE + result.length * CHAR_WIDTH;
+                if (dataListWidth < nodeWidth) {
+                    dataListWidth = nodeWidth;
+                }
+                return result;
+            }).attr('fill', TEXT_COLOR);
+    }
+    
+    function renderGraphicsList() {
+        graphicsListWidth = 0;
+        
+        if (jQuery('input:radio[name="dataPreviewMode"]').filter(":checked").val() === 'Selection') {
+            graphicsList.selectAll('.fullDocItems').remove();
+            
+            var nodes = graphicsList.selectAll('.selectionItems').data(selectedIDs, function (d) { return d; });
+            
+            // Enter
+            var iconPadding = BAR_SIZE / 8;
+            var nodeEnter = nodes.enter().append('g');
+            nodeEnter.append('text')
+                .attr('font-family', '"Consolas", monospace')
+                .attr('font-size', FONT_SIZE)
+                .attr('dy', 3 * BAR_SIZE / 4)
+                .attr('dx', BAR_SIZE);
+            nodeEnter.append('rect')
+                .attr('x', iconPadding)
+                .attr('y', iconPadding)
+                .attr('width', BAR_SIZE - 2*iconPadding)
+                .attr('height', BAR_SIZE - 2*iconPadding)
+                .attr('fill', '#fff')
+                .attr('stroke', '#000');
+            nodeEnter.appendClone(function (d) { return d; })
+                .setGlobalBBox(iconPadding * 2, iconPadding * 2, BAR_SIZE - 4 * iconPadding, BAR_SIZE - 4 * iconPadding);
+            
+            // Exit
+            nodes.exit().remove();
+            
+            // Update
+            nodes.attr('transform', function (d, i) {
+                return 'translate(0,' + (i * BAR_SIZE) + ')';
+            });
+            nodes.selectAll('text').text(function (d) {
+                var nodeWidth = d.length * CHAR_WIDTH + BAR_SIZE * 2;
+                if (graphicsListWidth < nodeWidth) {
+                    graphicsListWidth = nodeWidth;
+                }
+                return d;
+            }).attr('fill', TEXT_COLOR);
+        } else {
+            graphicsList.selectAll('.selectionItems').remove();
+            
+            graphicsList.selectAll('.fullDocItems').data();
+        }
+        // TODO
+        if (height < 100) {
+            height = 100;
+        }
+    }
+    
+    function renderMappingView() {
+        svg.attr('width', graphicsListWidth + LINK_GAP + dataListWidth).attr('height', height);
+        mappingView.attr('transform','translate(' + graphicsListWidth + ',0)');
+        dataList.attr('transform','translate(' + (graphicsListWidth + LINK_GAP) + ',0)');
+        // TODO
+    }
+    
+    update = function () {
+        renderDataList();
+        renderGraphicsList();
+        renderMappingView();
+    };
+    update();
+};
+ParseNode.INIT();
 
 function DataFile(name, type, raw) {
     var self = this;
@@ -184,7 +369,7 @@ DataFile.EDIT = function () {
         DataFile.TYPING_TIMER = setTimeout(function () {
             f.raw = jQuery('#dataEditor').val();
             f.evaluate();
-            DataFile.RENDER();
+            ParseNode.RENDER();
         }, TYPING_INTERVAL);
     }
 };
@@ -215,131 +400,11 @@ DataFile.prototype.evaluate = function () {
         }
         self.valid = true;
     } catch(e) {
-        self.parsed = "Couldn't parse " + self.name + " as " + self.type + ".\n\nDebug Information:\n" + e.stack;
-        self.parsed = '<tspan>' + self.parsed.replace(/[\n\r]/g, '</tspan><tspan>').replace(/ /g, '&nbsp;') + '</tspan>';
+        self.parsed = {};
+        self.parsed["ERROR: Couldn't parse " + self.name + " as " + self.type] = e.stack.split('\n');
     }
     
-    ParseNode.ROOT.setFile(self.name, self.parsed);
-};
-DataFile.RENDER = function () {
-    var container = jQuery('#dataPreviewContainer'),
-        svg,
-        graphicsList,
-        graphicsListWidth = 0,
-        mappingView,
-        dataList,
-        dataListWidth = 0,
-        height,
-        dataNodes,
-        update;
-    
-    container.html('');
-    
-    svg = d3.select('#dataPreviewContainer').append('svg');
-    graphicsList = svg.append('g');
-    dataList = svg.append('g');
-    mappingView = svg.append('g');  // Needs to be on top
-    
-    function renderDataList() {
-        dataNodes = ParseNode.ROOT.prepRender();
-        
-        dataListWidth = BAR_SIZE;
-        height = (ParseNode.NEXT_ROW + 1) * BAR_SIZE;
-        
-        var nodes = dataList.selectAll('.parseNode').data(dataNodes, phrogz('nodeID'));
-        
-        // Enter
-        var nodeEnter = nodes.enter().append('g')
-            .attr('class','parseNode');
-        nodeEnter.append('text')
-            .attr('font-family', '"Consolas", monospace')
-            .attr('font-size', FONT_SIZE)
-            .attr('dy', 3 * BAR_SIZE / 4)
-            .attr('dx', BAR_SIZE / 2);
-            
-        var controlRadius = BAR_SIZE / 6;
-        var bindEnter = nodeEnter.filter(function (d) {
-            return d.flag === undefined;
-        });
-        bindEnter.append('circle')
-            .attr('class', 'binding')
-            .attr('cx', 0)
-            .attr('cy', BAR_SIZE / 2)
-            .attr('r', controlRadius);
-        var collapseEnter = nodeEnter.filter(function (d) {
-            return d.children !== null || d._children !== null;
-        }).append('path');
-        collapseEnter.attr('class', 'expansion')
-                     .attr('d', 'M' + (-controlRadius) + ',' + (-controlRadius) +
-                                'L' + controlRadius + ',0' +
-                                'L' + (-controlRadius) + ',' + controlRadius + 'Z')
-                     .on('click', function (d) {
-                        var temp = d.children;
-                        d.children = d._children;
-                        d._children = temp;
-                        
-                        update();
-                     });
-        
-        // Exit
-        nodes.exit().remove();
-        
-        // Update
-        nodes.attr('transform',function (d) {
-            return 'translate(' + (d.depth*BAR_SIZE) + ',' + d.row*BAR_SIZE + ')';
-        });
-        nodes.selectAll('.binding')
-            .attr('stroke', TEXT_COLOR)
-            .attr('fill', TEXT_COLOR)
-            .attr('fill-opacity', 0.1);
-        nodes.selectAll('.expansion')
-            .attr('transform', function (d) {
-                if (d.children === null) {
-                    return 'matrix(1,0,0,1,0,' + BAR_SIZE + ')'; // just translate, don't rotate
-                } else {
-                    return 'matrix(0,1,-1,0,0,' + BAR_SIZE + ')'; // rotate, then translate
-                }
-            })
-            .attr('fill', TEXT_COLOR);
-        nodes.selectAll('text').text(function (d) {
-                var result = d.key + " : ";
-                if (d.objType === ParseNode.NATIVE) {
-                    result += d.data;
-                } else if (d.objType === ParseNode.ARRAY) {
-                    result += '[]';
-                } else {
-                    result += '{}';
-                }
-                // We want to auto-adjust the data group width by the widest, deepest node...
-                var nodeWidth = (d.depth + 1) * BAR_SIZE + result.length * CHAR_WIDTH;
-                if (dataListWidth < nodeWidth) {
-                    dataListWidth = nodeWidth;
-                }
-                return result;
-            }).attr('fill', TEXT_COLOR);
-    }
-    
-    function renderGraphicsList() {
-        // TODO
-        graphicsListWidth = 10;
-        if (height < 100) {
-            height = 100;
-        }
-    }
-    
-    function renderMappingView() {
-        svg.attr('width', graphicsListWidth + LINK_GAP + dataListWidth).attr('height', height);
-        mappingView.attr('transform','translate(' + graphicsListWidth + ',0)');
-        dataList.attr('transform','translate(' + (graphicsListWidth + LINK_GAP) + ',0)');
-        // TODO
-    }
-    
-    update = function () {
-        renderDataList();
-        renderGraphicsList();
-        renderMappingView();
-    };
-    update();
+    ParseNode.DOC_ROOT.setFile(self.name, self.parsed);
 };
 
 DataFile.UPDATE_PANEL = function () {
@@ -381,7 +446,7 @@ DataFile.UPDATE_PANEL = function () {
     }
     currentDataFile.append('<option value="loadNewFile">Load...</option>');
     
-    DataFile.RENDER();
+    ParseNode.RENDER();
 };
 
 DataFile.SWITCH_FILE = function () {

@@ -73,6 +73,11 @@
         </div>
       </div>
       <div id="dataPreview">
+        <span style="display:none">
+          Show Bindings:
+          <input type="radio" onchange="ParseNode.RENDER()" name="dataPreviewMode" value="Selection" checked="checked"/>Selection
+          <input type="radio" onchange="ParseNode.RENDER()" name="dataPreviewMode" value="FullDocument"/>Full Document
+        </span>
         <div id="dataPreviewContainer"></div>
       </div>
     </div>
@@ -91,6 +96,7 @@
           <option value="samples/scatterplot/selection.js">Select sepalLength > 6.9</option>
         </optgroup>
       </select>
+      <input type="checkbox" id="advancedMode" onchange="advancedMode();">Show Advanced Tools
     </div>
     <div id="debugButtons" class="halo">
       Debugging:

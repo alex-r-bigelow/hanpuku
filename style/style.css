@@ -14,13 +14,10 @@ body {
     padding-top:6px;
     background-color: transparent !important;
 }
-#tabControls button.active {
-    color:#fff;
-}
 
 #debugButtons {
     position:absolute;
-    left:51%;
+    left:calc(51% + 16px);
     bottom:16px;
     padding:4px;
     background-color: rgba(255,255,255,0.75);
@@ -83,12 +80,17 @@ textarea {
     position: absolute;
     left:51%;
     right:0px;
-    top:0px;
+    top:30px;
     bottom:0px;
     overflow:auto;
 }
 #dataPreviewContainer {
-    padding: 16px;
+    position: absolute;
+    left:0px;
+    right:0px;
+    top:30px;
+    bottom:0px;
+    padding: 4px;
 }
 
 #dataPreview .binding {

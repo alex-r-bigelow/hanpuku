@@ -46,6 +46,29 @@ function matPoint(m, x, y) {
     ];
 }
 
+function getSvgBoundingRect (element) {
+    // like getBoundingClientRect(), but relative to the SVG document that contains e
+    var e = element.getBoundingClientRect(),
+        p = element.parentElement;
+    while (p.parentElement && p.tagName !== 'svg') {
+        p = p.parentElement;
+    }
+    if (p.tagName !== 'svg') {
+        throw "Object not inside SVG: " + String(e);
+    }
+    
+    p = p.getBoundingClientRect();
+    
+    return {
+        bottom : e.bottom - p.bottom,
+        height : e.height,
+        left : e.left - p.left,
+        right : e.right - p.right,
+        top : e.top - p.top,
+        width : e.width
+    };
+}
+
 /* Helper functions for converting circles, rectangles, and paths
  * to cubic-interpolated paths */
 function pathToCubicPath(d, m) {
@@ -159,6 +182,121 @@ function circleToCubicPath(cx, cy, r, m) {
     m);
 }
 
+function elementToCubicPaths(e, m, preserveReverseTransforms) {
+    var transform,
+        reverseTransform,
+        stringMode,
+        params,
+        i,
+        d = null,
+        replaceNodeAttrs = null,
+        newNode,
+        a,
+        data,
+        id = e.getAttribute('id');
+    
+    // Apply all transformations
+    if (m === undefined) {
+        m = [1,0,0,1,0,0];
+    }
+    transform = e.getAttribute('transform');
+    
+    if (transform && transform !== "null") {
+        transform = transform.split('(');
+        stringMode = transform[0].trim().toLowerCase();
+        params = transform[1].substring(0, transform[1].length - 1).split(',');
+                    
+        if (stringMode === 'translate') {
+            reverseTransform = 'translate(' + (-params[0]) + ',' + (-params[1]) + ')';
+            m = matMultiply(m, [1,0,0,1,Number(params[0]),Number(params[1])]);
+        } else if (stringMode === 'matrix') {
+            reverseTransform = 'matrix(' + matInvert(params).join(',') + ')';
+            m = matMultiply(m, params);
+        } else if (stringMode === 'rotate') {
+            reverseTransform = 'rotate(' + (-params[0]) + ')';
+            params[0] = params[0]*Math.PI / 180;    // convert to radians
+            m = matMultiply(m, [Math.cos(params[0]),
+                                Math.sin(params[0]),
+                                -Math.sin(params[0]),
+                                Math.cos(params[0]),
+                                0,
+                                0]);
+        } else {
+            throw stringMode + ' transforms are not yet supported.';
+        }
+        
+        e.removeAttribute('transform');
+        if (preserveReverseTransforms) {
+            e.setAttribute('id3_reverseTransform', reverseTransform);
+        }
+    }
+    
+    // Get a cubic-interpolated path string for each element type, or recurse if a group
+    if (e.tagName === 'rect') {
+        // Convert rect to cubic-interpolated path
+        d = rectToCubicPath(Number(e.getAttribute('x')),
+                            Number(e.getAttribute('y')),
+                            Number(e.getAttribute('width')),
+                            Number(e.getAttribute('height')),
+                            m);
+        replaceNodeAttrs = ['x','y','width','height'];
+    } else if (e.tagName === 'circle') {
+        // Convert circle to cubic-interpolated path
+        d = circleToCubicPath(Number(e.getAttribute('cx')),
+                              Number(e.getAttribute('cy')),
+                              Number(e.getAttribute('r')),
+                              m);
+        replaceNodeAttrs = ['cx','cy','r'];
+    } else if (e.tagName === 'line') {
+        d = lineToCubicPath(Number(e.getAttribute('x1')),
+                            Number(e.getAttribute('y1')),
+                            Number(e.getAttribute('x2')),
+                            Number(e.getAttribute('y2')),
+                            m);
+        replaceNodeAttrs = ['x1','y1','x2','y2'];
+    } else if (e.tagName === 'path') {
+        d = pathToCubicPath(e.getAttribute('d'), m);
+    } else if (e.tagName === 'g' || e.tagName === 'svg') {
+        for (i = 0; i < e.childNodes.length; i += 1) {
+            elementToCubicPaths(e.childNodes[i], m, preserveReverseTransforms);
+        }
+    } else if (e.tagName === 'text') {
+        // I'll need to hack the transformation matrices
+        // for text when I actually convert
+        e.setAttribute('transform','matrix(' + m.join(',') + ')');
+    } else {
+        throw 'iD3 doesn\'t yet support tag ' + e.tagName;
+    }
+    
+    // Do we need to change the actual element? Copy its attributes and d3-assigned
+    // data to a new path element. Don't copy attributes that are being replaced
+    // by the path d attribute
+    if (replaceNodeAttrs !== null) {
+        newNode = document.createElementNS(e.namespaceURI,'path');
+        for (a in e.attributes) {
+            if (e.attributes.hasOwnProperty(a) &&
+                    a !== 'length') {
+                if (replaceNodeAttrs.indexOf(e.attributes[a].nodeName) === -1) {
+                    newNode.setAttribute(e.attributes[a].nodeName, e.attributes[a].value);
+                }
+            }
+        }
+        
+        data = d3.select('#' + id).data();
+        e.parentNode.replaceChild(newNode,e);
+        d3.select('#' + id).data(data);
+        nameLookup[id] = newNode;
+        e = newNode;
+    }
+    
+    // Finally, set the d attribute (ignore if a group)
+    if (d !== null) {
+        e.setAttribute('d', d);
+    }
+    
+    return e;
+}
+
 /* Monkey patch .appendClone(), .appendCircle(), .appendRect(),
    .appendPath() to d3.selection and d3.selection.enter,
    as well as .keyFunction() to d3.selection */
@@ -171,9 +309,7 @@ function circleToCubicPath(cx, cy, r, m) {
 
 
 d3.selection.prototype.appendClone = function (idToClone) {
-    var self = this,
-        proto = document.getElementById(idToClone),
-        clone = self.append(proto.tagName);
+    var self = this;
     
     function constructClone (proto, clone) {
         var a,
@@ -205,19 +341,31 @@ d3.selection.prototype.appendClone = function (idToClone) {
         }
     }
     
-    constructClone(proto, clone);
-    
-    return clone;
+    if (typeof idToClone === 'function') {
+        var clones = [];
+        self.each(function (d, i) {
+            var proto = document.getElementById(idToClone.call(this, d)),
+                clone = d3.select(this).append(proto.tagName);
+            constructClone(proto, clone);
+            clones.push(clone[0][0]);
+        });
+        return d3.selectAll(clones);
+    } else {
+        var proto = document.getElementById(idToClone),
+            clone = self.append(proto.tagName);
+        constructClone(proto, clone);
+        return clone;
+    }
 };
 d3.selection.enter.prototype.appendClone = d3.selection.prototype.appendClone;
 
 d3.selection.prototype.appendCircle = function (cx, cy, r) {
     var self = this;
     return self.append('path')
-        .attr('d', function (i) {
-            var d_cx = typeof cx === 'function' ? cx(i) : cx,
-                d_cy = typeof cy === 'function' ? cy(i) : cy,
-                d_r = typeof r === 'function' ? r(i) : r;
+        .attr('d', function (d, i) {
+            var d_cx = typeof cx === 'function' ? cx.call(this, d, i) : cx,
+                d_cy = typeof cy === 'function' ? cy.call(this, d, i) : cy,
+                d_r = typeof r === 'function' ? r.call(this, d, i) : r;
             return circleToCubicPath(d_cx, d_cy, d_r);
         });
 };
@@ -226,11 +374,11 @@ d3.selection.enter.prototype.appendCircle = d3.selection.prototype.appendCircle;
 d3.selection.prototype.appendRect = function (x, y, width, height) {
     var self = this;
     return self.append('path')
-        .attr('d', function (i) {
-            var d_x = typeof x === 'function' ? x(i) : x,
-                d_y = typeof y === 'function' ? y(i) : y,
-                d_width = typeof width === 'function' ? width(i) : width,
-                d_height = typeof height === 'function' ? height(i) : height;
+        .attr('d', function (d, i) {
+            var d_x = typeof x === 'function' ? x.call(this, d, i) : x,
+                d_y = typeof y === 'function' ? y.call(this, d, i) : y,
+                d_width = typeof width === 'function' ? width.call(this, d, i) : width,
+                d_height = typeof height === 'function' ? height.call(this, d, i) : height;
             return rectToCubicPath(d_x, d_y, d_width, d_height);
         });
 };
@@ -239,12 +387,106 @@ d3.selection.enter.prototype.appendRect = d3.selection.prototype.appendRect;
 d3.selection.prototype.appendPath = function (d) {
     var self = this;
     return self.append('path')
-        .attr('d', function (i) {
-            var d_d = typeof d === 'function' ? d(i) : d;
+        .attr('d', function (data, i) {
+            var d_d = typeof d === 'function' ? d.call(this, data, i) : d;
             return pathToCubicPath(d_d);
         });
 };
 d3.selection.enter.prototype.appendPath = d3.selection.prototype.appendPath;
+
+d3.ANCHORS = {
+    'TOP_LEFT' : 0,
+    'TOP_CENTER' : 1,
+    'TOP_RIGHT' : 2,
+    'MIDDLE_LEFT' : 3,
+    'MIDDLE_CENTER' : 4,
+    'MIDDLE_RIGHT' : 5,
+    'BOTTOM_LEFT' : 6,
+    'BOTTOM_CENTER' : 7,
+    'BOTTOM_RIGHT' : 8
+};
+d3.ANCHOR_OFFSET = {
+    0 : [-0.5,-0.5],
+    1 : [0,-0.5],
+    2 : [0.5,-0.5],
+    3 : [-0.5,0],
+    4 : [0,0],
+    5 : [0.5,0],
+    6 : [-0.5,0.5],
+    7 : [0,0.5],
+    8 : [0.5,0.5]
+};
+d3.selection.prototype.setGlobalPosition = function (x, y, anchor) {
+    var self = this;
+    if (anchor === undefined) {
+        anchor = d3.ANCHORS.MIDDLE_CENTER;
+    }
+    return self.setGlobalTransform(function (d, i, e_bounds) {
+        var d_x = typeof x === 'function' ? x.call(this, d, i) : x,
+            d_y = typeof y === 'function' ? y.call(this, d, i) : y,
+            d_anchor = typeof anchor === 'function' ? anchor.call(this, d, i) : anchor;
+        
+        return [1,0,0,1,
+                d_x + d3.ANCHOR_OFFSET[d_anchor][0] * e_bounds.width,
+                d_y + d3.ANCHOR_OFFSET[d_anchor][1] * e_bounds.height];
+    });
+};
+d3.selection.prototype.setGlobalBBox = function (x, y, width, height) {
+    var self = this;
+    return self.setGlobalTransform(function (d, i, e_bounds) {
+        var d_x = typeof x === 'function' ? x.call(this, d, i) : x,
+            d_y = typeof y === 'function' ? y.call(this, d, i) : y,
+            d_width = typeof width === 'function' ? width.call(this, d, i) : width,
+            d_height = typeof height === 'function' ? height.call(this, d, i) : height,
+            scale_x = d_width / e_bounds.width,
+            scale_y = d_height / e_bounds.height;
+        
+        return [scale_x, 0, 0, scale_y, d_x + d_width/2, d_y + d_height/2];
+    });
+};
+d3.selection.prototype.setGlobalTransform = function (m) {
+    var self = this;
+    return self.each(function (d, i) {
+        var e = this,
+            e_bounds = getSvgBoundingRect(e),
+            toGlobalZeroM = [1,0,0,1,-(e_bounds.left + e_bounds.width/2),-(e_bounds.top + e_bounds.width/2)],
+            currentM = e.getAttribute('transform'),
+            d_m = typeof m === 'function' ? m.call(this, d, i, e_bounds) : m,
+            stringMode,
+            params;
+        
+        if (currentM && currentM !== "null") {
+            currentM = currentM.split('(');
+            stringMode = currentM[0].trim().toLowerCase();
+            params = currentM[1].substring(0, currentM[1].length - 1).split(',');
+                        
+            if (stringMode === 'translate') {
+                currentM = [1,0,0,1,Number(params[0]),Number(params[1])];
+            } else if (stringMode === 'matrix') {
+                currentM = params;
+            } else if (stringMode === 'rotate') {
+                currentM = [Math.cos(params[0]),
+                            Math.sin(params[0]),
+                            -Math.sin(params[0]),
+                            Math.cos(params[0]),
+                            0,
+                            0];
+            } else {
+                throw stringMode + ' transforms are not yet supported.';
+            }
+        } else {
+            currentM = [1,0,0,1,0,0];
+        }
+        // Given its current transform matrix, translate the object so it's centered at 0,0
+        currentM = matMultiply(toGlobalZeroM, currentM);
+        // Now apply d_m
+        currentM = matMultiply(d_m, currentM);
+        
+        e.setAttribute('transform', 'matrix(' + currentM.join(',') + ')');
+    });
+};
+
+// TODO: forceSize()
 
 //d3.selection.prototype._nativeDataFunction = d3.selection.prototype.data;
 

@@ -9,7 +9,8 @@ var CSLibrary = new CSInterface(),
         "codePanel" : "domPreview",
         "cssPanel" : "domPreview"
     },
-    TEXT_COLOR = '#000';
+    TEXT_COLOR = '#000',
+    OPPOSITE_COLOR = '#FFF';
 
 /* Tools to interact with extendScript */
 function loadJSXlibs() {
@@ -89,16 +90,20 @@ function styleWidget() {
                                 Math.floor(panelColor.blue) + ',' +
                                 0.5*(panelColor.alpha/255.0) + ')';
     TEXT_COLOR = textColor;
+    OPPOSITE_COLOR = TEXT_COLOR === '#fff' ? '#000' : '#fff';
     jQuery('body, button, select').css({
         'font-family' : i.baseFontFamily,
         'font-size' : i.baseFontSize
     });
     jQuery('body').css('background-color', bodyColor);
-    jQuery('textarea, #dataPreview').css({'background-color':textBackgroundColor,
+    jQuery('textarea, #dataPreviewContainer').css({'background-color':textBackgroundColor,
                             'color':textColor,
                             'border':'1px solid ' + haloColor});
     jQuery('.halo').css('background-color',haloColor);
     jQuery('button').css('background-color', buttonColor);
+    jQuery('input:radio').css({
+        'color' : buttonColor
+    });
 }
 
 /* Zooming */
@@ -128,7 +133,9 @@ function setupTabs() {
     jQuery('#previews > div').hide();
     jQuery('#' + startingTab).show();
     jQuery('#' + previewPanels[startingTab]).show();
-    jQuery('#' + startingTab + 'Button').attr('class', 'active');
+    jQuery('#tabControls > button').css('color', OPPOSITE_COLOR);
+    jQuery('#' + startingTab + 'Button').attr('class', 'active').css('color', TEXT_COLOR);
+    advancedMode();
 }
 
 function switchTab(tabId) {
@@ -141,8 +148,16 @@ function switchTab(tabId) {
         jQuery('#' + previewPanels[tabId]).show();
     }
     
-    jQuery('#' + oldTab + "Button").attr('class', null);
-    jQuery('#' + tabId + "Button").attr('class', 'active');
+    jQuery('#' + oldTab + "Button").attr('class', null).css('color', OPPOSITE_COLOR);
+    jQuery('#' + tabId + "Button").attr('class', 'active').css('color', TEXT_COLOR);
+}
+
+function advancedMode() {
+    if (jQuery('#advancedMode').prop("checked") === true) {
+        jQuery('#codePanelButton, #cssPanelButton, #sampleSelect').css('visibility', 'visible');
+    } else {
+        jQuery('#codePanelButton, #cssPanelButton, #sampleSelect').css('visibility', 'hidden');
+    }
 }
 
 /* General */
@@ -150,7 +165,7 @@ function clearGUI() {
     document.getElementById('dom').innerHTML = "";
     jQuery('button, textarea, input, select')
         .attr('disabled', true);
-    jQuery('#debugButton button').attr('disabled', false);
+    jQuery('#debugButtons button').attr('disabled', false);
 }
 
 function updateGUI() {
@@ -161,8 +176,8 @@ function updateGUI() {
 
 /* Where execution begins when the extension is loaded */
 function main() {
-    setupTabs();
     styleWidget();
+    setupTabs();
     loadJSXlibs();
     docToDom();
     CSLibrary.addEventListener('documentAfterActivate', docToDom);
