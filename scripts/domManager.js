@@ -17,6 +17,10 @@ function DomManager (targetDiv) {
     self.loadedJSXlibs = false;
     self.loadJSXlibs();
     
+    // Because we're the one with the connection to Illustrator, we need to pass
+    // UI details to the extension itself
+    EXTENSION.setupUI(self.CSLibrary);
+    
     // Set up our iframe
     targetDiv = document.getElementById(targetDiv);
     targetDiv.innerHTML = "";
@@ -26,12 +30,13 @@ function DomManager (targetDiv) {
     // Clear out the javascript scope and then load the relevant libraries
     self.initScope();
     
-    // Give it the CSS header for user-injected CSS:
+    // Give it a CSS header element for user-injected CSS:
     element = self.iframe.contentDocument.createElement('style');
     element.setAttribute('type', 'text/css');
     element.setAttribute('id', 'userCSS');
     self.iframe.contentDocument.head.appendChild(element);
 }
+DomManager.PADDING = 64;
 DomManager.DOM_LIBS = [
     'lib/jquery-1.11.0.min.js',
     'lib/d3.min.js',
@@ -43,7 +48,10 @@ DomManager.JSX_LIBS = [
 ];
 DomManager.prototype.initScope = function () {
     var self = this,
-        s;
+        s,
+        callback = function (script) {
+            self.runScript(script);
+        };
     self.iframeScope = {
         window : self.iframe.contentWindow,
         document : self.iframe.contentDocument,
@@ -52,9 +60,7 @@ DomManager.prototype.initScope = function () {
     for (s = 0; s < DomManager.DOM_LIBS.length; s += 1) {
         ejQuery.ajax({
             url : DomManager.DOM_LIBS[s],
-            success : function (script) {
-                self.runScript(script);
-            },
+            success : callback,
             async : false
         });
     }
@@ -69,11 +75,12 @@ DomManager.prototype.runScript = function (script)
 {
     var self = this;
     
-    // execute script in private context - not really secure, but
-    // gives it a clean scope and it feels like a normal web page
-    // with the only exception that selectedIDs is visible
+    // execute script in private context - not for security, but
+    // for a cleaner scope that feels more like coding in a normal browser
     (new Function( "with(this) { " + script + "}")).call(self.iframeScope);
 };
+
+
 /* Tools to interact with extendScript */
 DomManager.prototype.loadJSXlibs = function () {
     var self = this,
@@ -136,19 +143,34 @@ DomManager.prototype.runJSX = function (input, path, callback) {
 DomManager.prototype.domToDoc = function () {
     
 };
-/*DomManager.prototype.docToDom = function () {
-    DomManager.runJSX(null, 'scripts/docToDom.jsx', function (result) {
+
+/* docToDom functions */
+DomManager.prototype.docToDom = function () {
+    var self = this;
+    self.runJSX(null, 'scripts/docToDom.jsx', function (result) {
         if (result !== null) {
-            // Set up the document and the GUI
+            // Set up the document
             self.iframe.contentDocument.body.innerHTML = ""; // nuke everything so we start fresh
             
-            var svg = d3.select('#dom')
-                .append('svg')
-                .attr('width', result.width)
-                .attr('height', result.height)
-                .attr('id', result.name);
-            jQuery('div button, textarea, input, select')
-                .attr('disabled', false);
+            self.selectedIDs = result.selection;
+            self.initScope();
+            
+            // Style the main svg element to match Illustrator's UI
+            result.left = result.left - DomManager.PADDING;
+            result.top = result.top - DomManager.PADDING;
+            result.right = result.right + DomManager.PADDING;
+            result.bottom = result.bottom + DomManager.PADDING;
+            
+            d3.select('body').style('margin','0');
+            
+            var svg = d3.select('body').append('svg')
+                .attr('width', result.right - result.left)
+                .attr('height', result.bottom - result.top)
+                .attr('viewBox', (result.left) + ' ' + (result.top) + ' ' +
+                                  (result.right - result.left) + ' ' + (result.bottom - result.top))
+                .style('zoom', '100%;')
+                .style('stroke-width', 0)
+                .style('background-color', EXTENSION.bodyColor);
             
             // Add the artboards
             var artboards = svg.selectAll('.artboard').data(result.artboards);
@@ -158,7 +180,10 @@ DomManager.prototype.domToDoc = function () {
                 .attr('x',function (d) { return d.rect[0]; })
                 .attr('y',function (d) { return d.rect[1]; })
                 .attr('width',function (d) { return d.rect[2] - d.rect[0]; })
-                .attr('height',function (d) { return d.rect[3] - d.rect[1]; });
+                .attr('height',function (d) { return d.rect[3] - d.rect[1]; })
+                .attr('fill','#fff')
+                .attr('stroke-width', 1)
+                .attr('stroke','#000');
             
             // Add the layers
             var l, newLayer;
@@ -166,33 +191,28 @@ DomManager.prototype.domToDoc = function () {
             for (l = 0; l < result.layers.length; l += 1) {
                 newLayer = svg.append('g')
                     .attr('id', result.layers[l].name);
-                addChildLayers(newLayer, result.layers[l]);
+                self.addChildLayers(newLayer, result.layers[l]);
             }
             
-            // Sneaky hack: calling standardize will apply all the reverse transforms
+            // Sneaky hack: we set all the REVERSE transforms in the self.addChildLayers()
+            // recursive bit; calling toCubicPaths on everything will apply all the reverse transforms
             // so that elements will have their native coordinates - and then we can
-            // set the new, double-reversed transforms as the regular transformation.
+            // set the new, double-reversed transforms as the regular transform property.
             // This way, everything in d3-land looks like nothing happened to the
-            // transform tags, even if the native Illustrator positions were previously
+            // transform tags, even though the native Illustrator positions were previously
             // baked in.
-            standardize();
-            jQuery('#dom g, #dom path').each(function () {
+            svg.toCubicPaths(undefined, true);
+            jQuery('svg g, svg path').each(function () {
                 if (this.hasAttribute('id3_reverseTransform')) {
                     this.setAttribute('transform',this.getAttribute('id3_reverseTransform'));
                     this.removeAttribute('id3_reverseTransform');
                 }
             });
-            
-            // Update the current selection
-            selectedIDs = result.selection;
-            updateGUI();
         }
         EXTENSION.refresh();
     });
 };
-
-
-function extractPathString(path) {
+DomManager.prototype.extractPathString = function (path) {
     var p,
         point = path.points[0],
         nextPoint,
@@ -217,12 +237,12 @@ function extractPathString(path) {
         d += "Z";
     }
     return d;
-}
-
-function addPath (parent, path) {
-    var p = parent.append('path')
+};
+DomManager.prototype.addPath = function (parent, path) {
+    var self = this,
+        p = parent.append('path')
         .attr('id', path.name)
-        .attr('d', extractPathString(path))
+        .attr('d', self.extractPathString(path))
         .style('fill', path.fill)
         .style('stroke', path.stroke)
         .style('stroke-width', path.strokeWidth)
@@ -234,10 +254,10 @@ function addPath (parent, path) {
         p.attr('transform', path.reverseTransform);
     }
     d3.select('#' + path.name).datum(path.data);
-}
-
-function addChildGroups (parent, group) {
-    var g,
+};
+DomManager.prototype.addChildGroups = function (parent, group) {
+    var self = this,
+        g,
         newGroup,
         p;
     group.groups = group.groups.sort(phrogz('zIndex'));
@@ -251,30 +271,26 @@ function addChildGroups (parent, group) {
             newGroup.attr('transform', group.groups[g].reverseTransform);
         }
         d3.select('#' + group.groups[g].name).datum(group.groups[g].data);
-        addChildGroups(newGroup, group.groups[g]);
+        self.addChildGroups(newGroup, group.groups[g]);
     }
     group.paths = group.paths.sort(phrogz('zIndex'));
     for (p = 0; p < group.paths.length; p += 1) {
-        addPath(parent, group.paths[p]);
+        self.addPath(parent, group.paths[p]);
     }
-}
-
-function addChildLayers (parent, layer) {
-    var l,
+};
+DomManager.prototype.addChildLayers = function (parent, layer) {
+    var self = this,
+        l,
         newGroup,
         p;
     layer.groups = layer.groups.sort(phrogz('zIndex'));
     for (l = 0; l < layer.groups.length; l += 1) {
         newGroup = parent.append('g')
             .attr('id', layer.groups[l].name);
-        addChildGroups(newGroup, layer.groups[l]);
+        self.addChildGroups(newGroup, layer.groups[l]);
     }
     layer.paths = layer.paths.sort(phrogz('zIndex'));
     for (p = 0; p < layer.paths.length; p += 1) {
-        addPath(parent, layer.paths[p]);
+        self.addPath(parent, layer.paths[p]);
     }
-}
-
-DomManager.prototype.reset = function () {
-    
-}*/
+};

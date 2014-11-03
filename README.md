@@ -40,10 +40,10 @@ Adding support for using d3.js code directly in Illustrator, with some nuances.
 
 #### CRITICAL - Heavy rewrite of everything needed for:
 - Support path points
-- Isolate the mirror dom namespace from all my code
+- Refactor to make views more modular
+- Embed data, js, css in .ai file?
 
 #### High priority
-- Refactor to make views more modular
 - Implement all views listed above. Current status of each view:
  - Implemented views:
   - Raw data editor (could enhance w/Ace)
@@ -63,7 +63,6 @@ Adding support for using d3.js code directly in Illustrator, with some nuances.
 - (external project): Browser SVG+data channel extractor
 - (external project): Tools for quickly embedding back into a web page
 - Support text
-- Embed data, js, css in .ai file
 - Somehow embed the Chrome debugging window as a view inside the widget
  - users will need to enable remote debugging
  - iframe? Also need to figure out how to link to embedded document
@@ -71,12 +70,13 @@ Adding support for using d3.js code directly in Illustrator, with some nuances.
 
 #### Low priority
 - Replace textareas with ace editors
+- Regex search/replace in text editors (esp. data)
 - Support stroke properties (dashes, cap, etc.)
 - Support multiple artboards
 
 #### Very low priority
 - Investigate what it would take to make an Inkscape clone
-- It would be cool to convert between canvas elements / bitmaps...
+- It would be cool to convert between canvas elements / bitmaps
  - If so, maybe we could support processing.js code as well?
  - Or maybe that should be its own extension (maybe compatible with Photoshop instead)?
 - Windows support

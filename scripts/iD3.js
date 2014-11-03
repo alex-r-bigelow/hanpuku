@@ -291,7 +291,6 @@
             data = d3.select('#' + id).data();
             e.parentNode.replaceChild(newNode,e);
             d3.select('#' + id).data(data);
-            nameLookup[id] = newNode;
             e = newNode;
         }
         
@@ -303,16 +302,13 @@
         return e;
     }
     
-    /* Monkey patch .appendClone(), .appendCircle(), .appendRect(),
-       .appendPath() to d3.selection and d3.selection.enter,
-       as well as .keyFunction() to d3.selection */
+    /* Monkey-patched functions */
     /* These are important to allow d3 to work with a DOM that has
        gone through Illustrator; Illustrator applies all transforms
        immediately instead of as an attribute, and every shape is
        a cubic-interpolated path. These monkey-patched functions
        apply transforms behind the scenes and convert shapes to
        cubic-interpolated paths */
-    
     
     d3.selection.prototype.appendClone = function (idToClone) {
         var self = this;
@@ -400,9 +396,17 @@
     };
     d3.selection.enter.prototype.appendPath = d3.selection.prototype.appendPath;
     
-    // TODO: monkey patch a toCubicPaths() function that calls elementToCubicPaths() on
-    // a d3 selection
-    
+    /**
+     * Extra goodies monkey-patched on to selections only (useful for manipulating
+     * selections with existing objects more like Illustrator)
+     */
+    d3.selection.prototype.toCubicPaths = function (m, preserveReverseTransforms) {
+        var self = this;
+        self.each(function (d, i) {
+            var e = this;
+            elementToCubicPaths(e, m, preserveReverseTransforms);
+        });
+    };
     d3.ANCHORS = {
         'TOP_LEFT' : 0,
         'TOP_CENTER' : 1,

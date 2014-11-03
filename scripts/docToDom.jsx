@@ -202,31 +202,49 @@ function extractDocument() {
 
     if (app.documents.length > 0) {
         var activeDoc = app.activeDocument,
-            a,
-            l,
-            s;
+            newBoard,
+            left, right, top, bottom,
+            a, l, s;
         
         standardize(activeDoc);
         
         output = {
             itemType : 'document',
             name : activeDoc.name.split('.')[0],
-            width : activeDoc.width,
-            height : activeDoc.height,
             artboards : [],
             layers : [],
             selection : []
         };
         
         for (a = 0; a < activeDoc.artboards.length; a += 1) {
-            output.artboards.push({
+            newBoard = {
                 name: activeDoc.artboards[a].name,
                 rect: activeDoc.artboards[a].artboardRect
-            });
+            };
             // Illustrator has inverted Y coordinates
-            output.artboards[a].rect[1] = -output.artboards[a].rect[1];
-            output.artboards[a].rect[3] = -output.artboards[a].rect[3];
+            newBoard.rect[1] = -newBoard.rect[1];
+            newBoard.rect[3] = -newBoard.rect[3];
+            
+            // Update the bounds of the whole document
+            if (left === undefined || left > newBoard.rect[0]) {
+                left = newBoard.rect[0];
+            }
+            if (top === undefined || top > newBoard.rect[1]) {
+                top = newBoard.rect[1];
+            }
+            if (right === undefined || right < newBoard.rect[2]) {
+                right = newBoard.rect[2];
+            }
+            if (bottom === undefined || bottom < newBoard.rect[3]) {
+                bottom = newBoard.rect[3];
+            }
+            
+            output.artboards.push(newBoard);
         }
+        output.left = left;
+        output.top = top;
+        output.right = right;
+        output.bottom = bottom;
         for (l = 0; l < activeDoc.layers.length; l += 1) {
             output.layers.push(extractGroup(activeDoc.layers[l], 'layer'));
         }
