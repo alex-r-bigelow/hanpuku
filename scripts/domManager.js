@@ -12,15 +12,6 @@ function DomManager (targetDiv) {
     // Init our selectedIDs array; this is null when a document isn't loaded
     self.selectedIDs = null;
     
-    // Load the libraries that JSX scripts need (this is async, so do it first!)
-    self.CSLibrary = new CSInterface();
-    self.loadedJSXlibs = false;
-    self.loadJSXlibs();
-    
-    // Because we're the one with the connection to Illustrator, we need to pass
-    // UI details to the extension itself
-    EXTENSION.setupUI(self.CSLibrary);
-    
     // Set up our iframe
     targetDiv = document.getElementById(targetDiv);
     targetDiv.innerHTML = "";
@@ -80,66 +71,6 @@ DomManager.prototype.runScript = function (script)
     (new Function( "with(this) { " + script + "}")).call(self.iframeScope);
 };
 
-
-/* Tools to interact with extendScript */
-DomManager.prototype.loadJSXlibs = function () {
-    var self = this,
-        i = 0,
-        successFunction = function (script) {
-            self.CSLibrary.evalScript(script, function (r) {
-                // evalScript is asynchronous, so we have to loop
-                // this way to make sure everything is loaded
-                // before we run stuff
-                if (r.isOk === false) {
-                    console.warn(r);
-                    throw "Error Loading JSX";
-                }
-                i += 1;
-                if (i < DomManager.JSX_LIBS.length) {
-                    ejQuery.ajax({
-                        url: DomManager.JSX_LIBS[i],
-                        success: successFunction
-                    });
-                } else {
-                    self.loadedJSXlibs = true;
-                }
-            });
-        };
-    ejQuery.ajax({
-        url: DomManager.JSX_LIBS[i],
-        success: successFunction
-    });
-};
-DomManager.prototype.runJSX = function (input, path, callback) {
-    var self = this;
-    if (self.loadedJSXlibs === false) {
-        // Try again in a second...
-        window.setTimeout(function () { self.runJSX(input, path, callback); }, 1000);
-    } else {
-        ejQuery.ajax({
-            url: path,
-            success: function (script) {
-                script = "var input=" + JSON.stringify(input) + ";\n" + script;
-                self.CSLibrary.evalScript(script, function (r) {
-                    var result;
-                    if (r.search("Error") === 0 || r.isOk === false) {
-                        throw r;
-                    } else {
-                        try {
-                            result = JSON.parse(r);
-                        } catch (e) {
-                            console.warn("Couldn't parse:\n" + r);
-                            throw e;
-                        }
-                    }
-                    callback(result);
-                });
-            },
-            cache: false
-        });
-    }
-};
-
 DomManager.prototype.domToDoc = function () {
     
 };
@@ -147,7 +78,7 @@ DomManager.prototype.domToDoc = function () {
 /* docToDom functions */
 DomManager.prototype.docToDom = function () {
     var self = this;
-    self.runJSX(null, 'scripts/docToDom.jsx', function (result) {
+    ILLUSTRATOR.runJSX(null, 'scripts/docToDom.jsx', function (result) {
         if (result !== null) {
             // Set up the document
             self.iframe.contentDocument.body.innerHTML = ""; // nuke everything so we start fresh
@@ -161,16 +92,16 @@ DomManager.prototype.docToDom = function () {
             result.right = result.right + DomManager.PADDING;
             result.bottom = result.bottom + DomManager.PADDING;
             
-            d3.select('body').style('margin','0');
+            d3.select('body')
+                .style('margin','0')
+                .style('background-color', EXTENSION.bodyColor);
             
             var svg = d3.select('body').append('svg')
                 .attr('width', result.right - result.left)
                 .attr('height', result.bottom - result.top)
                 .attr('viewBox', (result.left) + ' ' + (result.top) + ' ' +
                                   (result.right - result.left) + ' ' + (result.bottom - result.top))
-                .style('zoom', '100%;')
-                .style('stroke-width', 0)
-                .style('background-color', EXTENSION.bodyColor);
+                .style('zoom', '100%;');
             
             // Add the artboards
             var artboards = svg.selectAll('.artboard').data(result.artboards);
@@ -209,7 +140,7 @@ DomManager.prototype.docToDom = function () {
                 }
             });
         }
-        EXTENSION.refresh();
+        EXTENSION.updateUI();
     });
 };
 DomManager.prototype.extractPathString = function (path) {

@@ -2,10 +2,31 @@
 <html>
   <head>
     <link type="text/css" rel="stylesheet" href="extension.css"/>
-    <script type="application/javascript" src="scripts/main.js"></script>
+    <script type="application/javascript" src="scripts/extension.js"></script>
   </head>
   <body onload="window.setupExtension();">
+    <div id="extensionControls">
+      <button id="Data_PanelButton" onclick="EXTENSION.switchTab('Data');">Data</button>
+      <button id="Bindings_PanelButton" onclick="EXTENSION.switchTab('Bindings');">Bindings</button>
+      <button id="Influence_PanelButton" onclick="EXTENSION.switchTab('Influence');">Influence</button>
+      <button id="JS_PanelButton" onclick="EXTENSION.switchTab('JS');">JS</button>
+      <button id="CSS_PanelButton" onclick="EXTENSION.switchTab('CSS');">CSS</button>
+      <select id="sampleSelect" onchange="if (this.value !== 'header') { jQuery.getScript(this.value); }">
+        <option value="header">Examples</option>
+        <optgroup label="Scatterplot">
+          <option value="samples/scatterplot/init.js">Create / Update Scatterplot</option>
+          <option value="samples/scatterplot/selection.js">Select sepalLength > 6.9</option>
+        </optgroup>
+      </select>
+      <input type="checkbox" id="advancedMode" onchange="advancedMode();">Show Advanced Tools
+    </div>
+    <div id="dataEditor"></div>
+    <div id="dataPreview"></div>
     <div id="domPreview"></div>
+    <div id="selectionQueryTools"></div>
+    <div id="influenceTools"></div>
+    <div id="jsEditor"></div>
+    <div id="cssEditor"></div>
     <button onclick="location.reload();">Refresh Extension</button>
   </body>
 </html>
