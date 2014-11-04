@@ -71,11 +71,21 @@ DomManager.prototype.runScript = function (script)
     (new Function( "with(this) { " + script + "}")).call(self.iframeScope);
 };
 
+/**
+ *
+ * domToDoc
+ *
+ **/
+
 DomManager.prototype.domToDoc = function () {
     
 };
 
-/* docToDom functions */
+/**
+ *
+ * docToDom
+ *
+ **/
 DomManager.prototype.docToDom = function () {
     var self = this;
     ILLUSTRATOR.runJSX(null, 'scripts/docToDom.jsx', function (result) {

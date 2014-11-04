@@ -38,10 +38,11 @@ Adding support for using d3.js code directly in Illustrator, with some nuances.
 
 ### TODO:
 
-#### CRITICAL - Heavy rewrite of everything needed for:
-- Support path points
+#### CRITICAL - I'm in a heavy rewrite of everything to support the following:
+- Support binding to path points
+- Clean up the JS namespace, DOM for more natural d3 coding
 - Refactor to make views more modular
-- Embed data, js, css in .ai file?
+- Embedding data, js, css files inside the .ai file
 
 #### High priority
 - Implement all views listed above. Current status of each view:

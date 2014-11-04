@@ -103,7 +103,8 @@
         "lib/d3.min.js",
         "scripts/iD3.js",
         "scripts/domManager.js",
-        "scripts/dataManager.js"
+        "scripts/dataManager.js",
+        "scripts/codeManager.js"
     ];
     ExtensionManager.PANELS = {
         "Data" : {
@@ -122,10 +123,10 @@
             "advanced" : false,
             "views" : {
                 "domPreview" : {
-                    "bounds" : ['0px', '0px', '50%', '100px']
+                    "bounds" : ['0px', '0px', '50%', '200px']
                 },
                 "selectionQueryTools" : {
-                    "bounds" : ['0px', 'calc(100% - 100px)', '50%', '0px']
+                    "bounds" : ['0px', 'calc(100% - 200px)', '50%', '0px']
                 },
                 "dataPreview" : {
                     "bounds" : ['50%', '0px', '0px', '0px'],
@@ -190,6 +191,8 @@
         
         self.textColor = useWhite ? '#fff' : '#000';
         self.oppositeTextColor = useWhite ? '#000' : '#fff';
+        self.fontFamily = i.baseFontFamily;
+        self.fontSize = i.baseFontSize;
         
         self.backgroundColor = 'rgba(' + Math.floor(background.red) + ',' +
                                 Math.floor(background.green) + ',' +
@@ -210,6 +213,15 @@
                                     Math.floor(background.blue) + ',' +
                                     0.5*(background.alpha/255.0) + ')';
         
+        // Apply the font and colors
+        ejQuery('body').css('font-family', self.fontFamily)
+                       .css('font-size', self.fontSize)
+                       .css('background-color', self.backgroundColor);
+        
+        ejQuery('.halo').css('background-color', self.haloColor);
+        ejQuery('button, select').css('background-color', self.buttonColor);
+        
+        
         // Init the tab buttons
         var p, panel, v, view;
         for (p in ExtensionManager.PANELS) {
@@ -219,7 +231,8 @@
                     if (panel.views.hasOwnProperty(v)) {
                         view = panel.views[v];
                         ejQuery('#' + v).hide();
-                        ejQuery('#' + v + '_PanelButton').css('color', self.oppositeTextColor);
+                        ejQuery('#' + v + '_PanelButton')
+                            .css('color', self.oppositeTextColor);
                     }
                 }
             }
@@ -228,13 +241,18 @@
         self.switchTab('Data');
     };
     ExtensionManager.prototype.switchTab = function (tabId) {
-        var oldTab = ejQuery('#tabControls button.active').attr('id'),
+        var self = this,
+            oldTab = ejQuery('#extensionControls button.active').attr('id'),
+            button,
             v,
             view,
             viewElement;
         
         if (oldTab !== undefined) {
-            ejQuery('#' + oldTab).attr('class', null).css('color', self.oppositeTextColor);
+            button = ejQuery('#' + oldTab);
+            button.attr('class', null);
+            button.css('color', self.oppositeTextColor);
+            
             oldTab = oldTab.substring(0,oldTab.length-12);
             for (v in ExtensionManager.PANELS[oldTab].views) {
                 if (ExtensionManager.PANELS[oldTab].views.hasOwnProperty(v)) {
@@ -243,7 +261,10 @@
             }
         }
         
-        ejQuery('#' + tabId + "Button").attr('class', 'active').css('color', self.textColor);
+        button = ejQuery('#' + tabId + '_PanelButton');
+        button.attr('class', 'active');
+        button.css('color', self.textColor);
+        
         for (v in ExtensionManager.PANELS[tabId].views) {
             if (ExtensionManager.PANELS[tabId].views.hasOwnProperty(v)) {
                 view = ExtensionManager.PANELS[tabId].views[v];
@@ -266,6 +287,7 @@
                     ejQuery('#' + p + '_PanelButton').show();
                 }
             }
+            ejQuery('#sampleSelect').show();
         } else {
             for (p in ExtensionManager.PANELS) {
                 if (ExtensionManager.PANELS.hasOwnProperty(p) &&
@@ -273,6 +295,7 @@
                     ejQuery('#' + p + '_PanelButton').hide();
                 }
             }
+            ejQuery('#sampleSelect').hide();
         }
     };
     ExtensionManager.prototype.updateUI = function () {
@@ -284,8 +307,9 @@
         extensionScope.ILLUSTRATOR = new IllustratorConnection();
         extensionScope.EXTENSION.initUI();
         
-        extensionScope.DOM = new DomManager('domPreview');
+        extensionScope.DOM = new DomManager('domPreviewContent');
         extensionScope.DATA = new DataManager();
+        extensionScope.CODE = new CodeManager();
         
         extensionScope.DOM.docToDom();
     };
