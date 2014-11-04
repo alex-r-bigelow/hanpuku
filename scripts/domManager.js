@@ -9,9 +9,6 @@
 function DomManager (targetDiv) {
     var self = this;
     
-    // Init our selectedIDs array; this is null when a document isn't loaded
-    self.selectedIDs = null;
-    
     // Set up our iframe
     targetDiv = document.getElementById(targetDiv);
     targetDiv.innerHTML = "";
@@ -46,7 +43,7 @@ DomManager.prototype.initScope = function () {
     self.iframeScope = {
         window : self.iframe.contentWindow,
         document : self.iframe.contentDocument,
-        selectedIDs : self.selectedIDs
+        selectedIDs : SELECTED_IDS
     };
     for (s = 0; s < DomManager.DOM_LIBS.length; s += 1) {
         ejQuery.ajax({
@@ -93,7 +90,7 @@ DomManager.prototype.docToDom = function () {
             // Set up the document
             self.iframe.contentDocument.body.innerHTML = ""; // nuke everything so we start fresh
             
-            self.selectedIDs = result.selection;
+            SELECTED_IDS = result.selection;
             self.initScope();
             
             // Style the main svg element to match Illustrator's UI

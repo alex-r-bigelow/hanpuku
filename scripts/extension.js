@@ -276,6 +276,11 @@
                 viewElement.css('top', view.bounds[1]);
                 viewElement.css('right', view.bounds[2]);
                 viewElement.css('bottom', view.bounds[3]);
+                
+                if (v === 'dataPreview') {
+                    DATA.showSelection = view.showSelection;
+                    DATA.updatePanel();
+                }
             }
         }
     };
@@ -303,14 +308,20 @@
     };
     
     window.setupExtension = function () {
+        extensionScope.TYPING_INTERVAL = 2000;
+        extensionScope.SELECTED_IDS = null;
+        
         extensionScope.EXTENSION = new ExtensionManager();
+        
         extensionScope.ILLUSTRATOR = new IllustratorConnection();
+        
+        extensionScope.DATA = new DataManager();
+        
+        extensionScope.CODE = new CodeManager();
+        
         extensionScope.EXTENSION.initUI();
         
         extensionScope.DOM = new DomManager('domPreviewContent');
-        extensionScope.DATA = new DataManager();
-        extensionScope.CODE = new CodeManager();
-        
         extensionScope.DOM.docToDom();
     };
 })();

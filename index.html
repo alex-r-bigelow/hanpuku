@@ -21,14 +21,31 @@
       <span style="float:right">
         <input type="checkbox" id="advancedMode" onchange="EXTENSION.advancedMode();">Show Advanced Tools
         &emsp;
-        <button onclick="docToDom();">Reset</button>
-        <button onclick="domToDoc(); docToDom();">Apply</button>
+        <button onclick="DOM.docToDom();">Reset</button>
+        <button onclick="DOM.domToDoc(); DOM.docToDom();">Apply</button>
       </span>
       
     </div>
+    
     <div id="views">
-      <div id="dataEditor"></div>
+      
+      <div id="dataEditor">
+        <div id="dataEditorControls"></div>
+        <textarea id="dataTextEditor" wrap="off" onkeyup="DATA.edit();"></textarea>
+        <select id="currentDataFile" onchange="DATA.switchFile();"></select>
+        <input type="checkbox" id="embedFileCheckBox" onchange="DATA.changeEmbed();"/>Embed
+        &emsp;
+        Interpret as:
+        <select id="dataTypeSelect" onchange="DATA.changeType();">
+          <option value="text/csv">CSV</option>
+          <option value="text/tab-separated-values">TSV</option>
+          <option value="text/json">JSON</option>
+          <option value="text/js">Javascript</option>
+        </select>
+      </div>
+      
       <div id="dataPreview"></div>
+      
       <div id="domPreview">
         <div id="domPreviewContent"></div>
         <div id="zoomButtons" class="halo">
@@ -37,11 +54,17 @@
           <button onclick="zoomIn();">+</button>
         </div>
       </div>
+      
       <div id="selectionQueryTools"></div>
+      
       <div id="influenceTools"></div>
+      
       <div id="jsEditor"></div>
+      
       <div id="cssEditor"></div>
+      
     </div>
+    
     <div id="debugButtons" class="halo">
       Debugging:
       <button onclick="location.reload();">Reload Extension</button>
