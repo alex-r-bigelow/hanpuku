@@ -76,7 +76,7 @@
         /**
         * First load up any libraries / scripts the extension needs.
         * I load scripts this way instead of the HTML header so that
-        * the iframe DOM's namespace isn't polluted with all my scripts
+        * the JS namespace isn't polluted with all my scripts
         * and libraries
         */
         var s;
@@ -87,7 +87,7 @@
         /**
          * A little hack to differentiate between libraries
          * that are loaded in context of the extension, and which
-         * are loaded in context of the iframe. Extension-level libraries
+         * are loaded in context of the DOM iframe. Extension-level libraries
          * start with 'e'
          */
         extensionScope.ejQuery = jQuery;
@@ -98,15 +98,24 @@
     ExtensionManager.EXTENSION_SCRIPTS = [
         "lib/jquery-1.11.0.min.js",
         "lib/CSInterface.js",
-        "lib/pwnCSS.js",
         "lib/phrogz.js",
         "lib/d3.min.js",
+        "lib/htmlParser.js",
         "scripts/iD3.js",
+        "scripts/examplesManager.js",
         "scripts/domManager.js",
         "scripts/dataManager.js",
         "scripts/codeManager.js"
     ];
     ExtensionManager.PANELS = {
+        "Examples" : {
+            "advanced" : true,
+            "views" : {
+                "examplesView" : {
+                    "bounds" : ['0px', '0px', '0px', '0px']
+                }
+            }
+        },
         "Data" : {
             "advanced" : false,
             "views" : {
@@ -206,7 +215,7 @@
         self.bodyColor = 'rgba(' + Math.floor(background.red) + ',' +
                                    Math.floor(background.green) + ',' +
                                    Math.floor(background.blue) + ',' +
-                                   0.9*(background.alpha/255.0) + ')';
+                                   (background.alpha/255.0) + ')';
         self.haloColor = useWhite ? 'rgba(255,255,255,0.75)' : 'rgba(150,150,150,0.75)';
         self.buttonColor = 'rgba(' + Math.floor(background.red) + ',' +
                                     Math.floor(background.green) + ',' +
@@ -220,6 +229,8 @@
         
         ejQuery('.halo').css('background-color', self.haloColor);
         ejQuery('button, select').css('background-color', self.buttonColor);
+        ejQuery('textarea').css('background-color', self.textBackgroundColor)
+                           .css('color', self.textColor);
         
         
         // Init the tab buttons
@@ -238,7 +249,7 @@
             }
         }
         self.advancedMode();
-        self.switchTab('Data');
+        self.switchTab('Examples');
     };
     ExtensionManager.prototype.switchTab = function (tabId) {
         var self = this,
@@ -312,6 +323,8 @@
         extensionScope.SELECTED_IDS = null;
         
         extensionScope.EXTENSION = new ExtensionManager();
+        
+        extensionScope.EXAMPLES = new ExamplesManager();
         
         extensionScope.ILLUSTRATOR = new IllustratorConnection();
         

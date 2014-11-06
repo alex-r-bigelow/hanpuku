@@ -6,20 +6,14 @@
   </head>
   <body onload="window.setupExtension();">
     <div id="extensionControls" class="halo">
+      <button id="Examples_PanelButton" onclick="EXTENSION.switchTab('Examples');">Examples</button>
       <button id="Data_PanelButton" onclick="EXTENSION.switchTab('Data');">Data</button>
-      <button id="Bindings_PanelButton" onclick="EXTENSION.switchTab('Bindings');">Bindings</button>
-      <button id="Influence_PanelButton" onclick="EXTENSION.switchTab('Influence');">Influence</button>
+      <!--<button id="Bindings_PanelButton" onclick="EXTENSION.switchTab('Bindings');">Bindings</button>-->
+      <!--<button id="Influence_PanelButton" onclick="EXTENSION.switchTab('Influence');">Influence</button>-->
       <button id="JS_PanelButton" onclick="EXTENSION.switchTab('JS');">JS</button>
       <button id="CSS_PanelButton" onclick="EXTENSION.switchTab('CSS');">CSS</button>
-      <select id="sampleSelect" onchange="if (this.value !== 'header') { jQuery.getScript(this.value); }">
-        <option value="header">Examples</option>
-        <optgroup label="Scatterplot">
-          <option value="samples/scatterplot/init.js">Create / Update Scatterplot</option>
-          <option value="samples/scatterplot/selection.js">Select sepalLength > 6.9</option>
-        </optgroup>
-      </select>
       <span style="float:right">
-        <input type="checkbox" id="advancedMode" onchange="EXTENSION.advancedMode();">Show Advanced Tools
+        <input type="checkbox" id="advancedMode" onchange="EXTENSION.advancedMode();" checked style="visibility: hidden"><!--Show Advanced Tools-->
         &emsp;
         <button onclick="DOM.docToDom();">Reset</button>
         <button onclick="DOM.domToDoc(); DOM.docToDom();">Apply</button>
@@ -29,19 +23,33 @@
     
     <div id="views">
       
+      <div id="examplesView">
+        <div id="examplesControls" class="halo">
+          <div id="examplesButtons">
+            <button id="examplesLoadButton" onclick="EXAMPLES.loadBlock()">Import</button>
+            &emsp;
+            <button id="examplesBackButton" onclick="EXAMPLES.back();">&lt;</button>
+            <button id="examplesForwardButton" onclick="EXAMPLES.forward();">&gt;</button>
+          </div>
+          <input id="examplesUrl" onchange="EXAMPLES.changeUrl();" type="text"/>
+        </div>
+        <iframe id="examplesBrowser"></iframe>
+      </div>
+      
       <div id="dataEditor">
-        <div id="dataEditorControls"></div>
         <textarea id="dataTextEditor" wrap="off" onkeyup="DATA.edit();"></textarea>
-        <select id="currentDataFile" onchange="DATA.switchFile();"></select>
-        <input type="checkbox" id="embedFileCheckBox" onchange="DATA.changeEmbed();"/>Embed
-        &emsp;
-        Interpret as:
-        <select id="dataTypeSelect" onchange="DATA.changeType();">
-          <option value="text/csv">CSV</option>
-          <option value="text/tab-separated-values">TSV</option>
-          <option value="text/json">JSON</option>
-          <option value="text/js">Javascript</option>
-        </select>
+        <div id="dataEditorControls" class="halo">
+          <select id="currentDataFile" onchange="DATA.switchFile();"></select>
+          <!--<input type="checkbox" id="embedFileCheckBox" onchange="DATA.changeEmbed();"/>Embed-->
+          &emsp;
+          Interpret as:
+          <select id="dataTypeSelect" onchange="DATA.changeType();">
+            <option value="text/csv">CSV</option>
+            <option value="text/tab-separated-values">TSV</option>
+            <option value="text/json">JSON</option>
+            <option value="text/js">Javascript</option>
+          </select>
+        </div>
       </div>
       
       <div id="dataPreview"></div>
@@ -50,8 +58,8 @@
         <div id="domPreviewContent"></div>
         <div id="zoomButtons" class="halo">
           <span>100%</span>
-          <button onclick="zoomOut();">-</button>
-          <button onclick="zoomIn();">+</button>
+          <button onclick="DOM.zoomOut();">-</button>
+          <button onclick="DOM.zoomIn();">+</button>
         </div>
       </div>
       

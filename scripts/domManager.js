@@ -15,14 +15,14 @@ function DomManager (targetDiv) {
     self.iframe = document.createElement('iframe');
     targetDiv.appendChild(self.iframe);
     
-    // Clear out the javascript scope and then load the relevant libraries
-    self.initScope();
-    
     // Give it a CSS header element for user-injected CSS:
     element = self.iframe.contentDocument.createElement('style');
     element.setAttribute('type', 'text/css');
     element.setAttribute('id', 'userCSS');
     self.iframe.contentDocument.head.appendChild(element);
+    
+    // Variables I set later
+    self.docName = undefined;
 }
 DomManager.PADDING = 64;
 DomManager.DOM_LIBS = [
@@ -34,11 +34,40 @@ DomManager.DOM_LIBS = [
 DomManager.JSX_LIBS = [
     'lib/json2.js'
 ];
+DomManager.prototype.zoomIn = function () {
+    var self = this;
+    var current = jQuery('#' + self.docName).css('zoom'),
+        newZoom = current * 2;
+    if (newZoom > 64) {
+        newZoom = 64;
+    }
+    jQuery('#' + self.docName).css('zoom', newZoom);
+    ejQuery('#zoomButtons span').text((newZoom*100) + "%");
+};
+DomManager.prototype.zoomOut = function () {
+    var self = this;
+    var current = jQuery('#' + self.docName).css('zoom'),
+        newZoom = current / 2;
+    if (newZoom < 0.03125) {
+        newZoom = 0.03125;
+    }
+    jQuery('#' + self.docName).css('zoom', newZoom);
+    ejQuery('#zoomButtons span').text((newZoom*100) + "%");
+};
 DomManager.prototype.initScope = function () {
     var self = this,
         s,
-        callback = function (script) {
+        scriptCallback = function (script) {
             self.runScript(script);
+        },
+        loadFunc = function () {
+            var url = arguments[0],
+                callback = arguments.length === 3 ? arguments[2] : arguments[1];
+            if (DATA.hasFile(url) === true) {
+                callback(undefined, DATA.getFile(url).parsed);
+            } else {
+                callback(url + " has not been loaded in the Data tab.", undefined);
+            }
         };
     self.iframeScope = {
         window : self.iframe.contentWindow,
@@ -48,7 +77,7 @@ DomManager.prototype.initScope = function () {
     for (s = 0; s < DomManager.DOM_LIBS.length; s += 1) {
         ejQuery.ajax({
             url : DomManager.DOM_LIBS[s],
-            success : callback,
+            success : scriptCallback,
             async : false
         });
     }
@@ -58,6 +87,18 @@ DomManager.prototype.initScope = function () {
      * properly without this hack)
      */
     self.runScript('jQuery = window.jQuery;');
+    /**
+     * I also need to monkey patch the local d3's file loading schemes;
+     * we've already loaded and parsed any relevant files in the Data tab
+     * (or if we haven't they need to put it there!)
+     */
+    d3.text = loadFunc;
+    d3.json = loadFunc;
+    d3.xml = loadFunc;
+    d3.html = loadFunc;
+    d3.csv = loadFunc;
+    d3.tsv = loadFunc;
+    d3.js = loadFunc;
 };
 DomManager.prototype.runScript = function (script)
 {
@@ -66,6 +107,16 @@ DomManager.prototype.runScript = function (script)
     // execute script in private context - not for security, but
     // for a cleaner scope that feels more like coding in a normal browser
     (new Function( "with(this) { " + script + "}")).call(self.iframeScope);
+    
+    // if we ran a script that appended an SVG (most bl.ocks.org examples do this),
+    // we need to convert it to a layer group and add an artboard
+    ejQuery(self.iframe).contents().find('svg').each(function () {
+        self.unifySvgTags(this);
+    });
+};
+DomManager.prototype.unifySvgTags = function (svgElement) {
+    var self = this;
+    console.warn('TODO:', self.docName, svgElement.getAttribute('id'));
 };
 
 /**
@@ -73,7 +124,6 @@ DomManager.prototype.runScript = function (script)
  * domToDoc
  *
  **/
-
 DomManager.prototype.domToDoc = function () {
     
 };
@@ -88,8 +138,10 @@ DomManager.prototype.docToDom = function () {
     ILLUSTRATOR.runJSX(null, 'scripts/docToDom.jsx', function (result) {
         if (result !== null) {
             // Set up the document
+            self.docName = result.name;
             self.iframe.contentDocument.body.innerHTML = ""; // nuke everything so we start fresh
             
+            // Clear out the javascript scope, load the relevant libraries, and init selectedIDs
             SELECTED_IDS = result.selection;
             self.initScope();
             
@@ -104,11 +156,12 @@ DomManager.prototype.docToDom = function () {
                 .style('background-color', EXTENSION.bodyColor);
             
             var svg = d3.select('body').append('svg')
+                .attr('id', result.name)
                 .attr('width', result.right - result.left)
                 .attr('height', result.bottom - result.top)
                 .attr('viewBox', (result.left) + ' ' + (result.top) + ' ' +
                                   (result.right - result.left) + ' ' + (result.bottom - result.top))
-                .style('zoom', '100%;');
+                .attr('zoom', '100%');
             
             // Add the artboards
             var artboards = svg.selectAll('.artboard').data(result.artboards);

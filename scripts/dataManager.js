@@ -365,7 +365,7 @@ DataFile.prototype.evaluate = function () {
 };
 
 function OrphanFile () {
-    DataFile.call('(no file link)', 'text/json', '{}');
+    DataFile.call(this, 'default.json', 'text/json', '{}');
     var self = this;
     
     self.embed = true;
@@ -421,52 +421,27 @@ DataManager.prototype.updatePanel = function () {
         i, f,
         currentDataFile = ejQuery('#currentDataFile'),
         editor = ejQuery('#dataTextEditor'),
-        embedBox = ejQuery('#embedFileCheckBox'),
+        //embedBox = ejQuery('#embedFileCheckBox'),
         dataTypeSelect = ejQuery('#dataTypeSelect'),
         optionText = "";
     
     // Inject a fresh invisible file uploading control
     ejQuery('#dataFileInput').remove();
-    ejQuery('#dataEditorControls').append('<input id="dataFileInput" type="file" onchange="DATA.loadFiles();" multiple style="visibility:hidden"/>');
+    ejQuery('#dataEditorControls').prepend('<input id="dataFileInput" type="file" onchange="DATA.loadFiles();" multiple style="visibility:hidden"/>');
     
     // Update the visible controls (rebuild the file selection menu from scratch)
     currentDataFile.find('option').remove();
-    currentDataFile.find('optgroup').remove();
     
-    currentDataFile.append('<optgroup label="Embedded Data"></optgroup>');
     for (i = 0; i < self.allFiles.length; i += 1) {
         f = self.allFiles[i];
-        if (f.embed === false) {
-            continue;
-        }
         optionText = '<option value="' + f.name + '"';
         
         if (self.currentFile === f.name) {
             optionText += ' selected';
             editor.val(f.raw);
-            embedBox.prop('disabled', f instanceof OrphanFile);
-            embedBox.prop('checked', true);
+            //embedBox.prop('disabled', f instanceof OrphanFile);
+            //embedBox.prop('checked', true);
             dataTypeSelect.prop('disabled', f instanceof OrphanFile);
-            dataTypeSelect.val(f.type);
-        }
-        optionText += '>' + f.name + '</option>';
-        currentDataFile.append(optionText);
-    }
-    
-    currentDataFile.append('<optgroup label="External Data"></optgroup>');
-    for (i = 0; i < self.allFiles.length; i += 1) {
-        f = self.allFiles[i];
-        if (f.embed === true) {
-            continue;
-        }
-        optionText = '<option value="' + f.name + '"';
-        
-        if (self.currentFile === f.name) {
-            optionText += ' selected';
-            editor.val(f.raw);
-            embedBox.prop('disabled', false);
-            embedBox.prop('checked', false);
-            dataTypeSelect.prop('disabled', false);
             dataTypeSelect.val(f.type);
         }
         optionText += '>' + f.name + '</option>';
@@ -482,22 +457,22 @@ DataManager.prototype.edit = function () {
         f = self.getFile(self.currentFile);
     clearTimeout(self.typingTimer);
     self.typingTimer = setTimeout(function () {
-        f.raw = jQuery('#dataTextEditor').val();
+        f.raw = ejQuery('#dataTextEditor').val();
         f.evaluate();
         self.render();
     }, TYPING_INTERVAL);
 };
-DataManager.prototype.switchType = function () {
+DataManager.prototype.switchFile = function () {
     var self = this,
-        newFile = jQuery('#currentDataFile').val();
+        newFile = ejQuery('#currentDataFile').val();
     
     if (newFile === 'loadNewFile') {
         // It will take a while for the user to pick some files, so for now,
         // revert back to the previous file in case they don't pick anything
         // that we can load (the loading and panel updating will be fired by
         // dataFileInput's onchange):
-        jQuery('#currentDataFile').val(self.currentFile);
-        jQuery('#dataFileInput').click();
+        ejQuery('#currentDataFile').val(self.currentFile);
+        ejQuery('#dataFileInput').click();
     } else {
         self.currentFile = newFile;
         self.updatePanel();
@@ -516,15 +491,19 @@ DataManager.prototype.changeType = function () {
     current.evaluate();
     self.updatePanel();
 };
-DataManger.prototype.addFile = function(newFile) {
+DataManager.prototype.addFile = function(newFile) {
     var self = this;
     
     if (self.fileLookup.hasOwnProperty(newFile.name)) {
         self.allFiles[self.fileLookup[newFile.name]] = newFile;
     } else {
         self.fileLookup[newFile.name] = self.allFiles.length;
-        self.allFiles.push(newFile.name);
+        self.allFiles.push(newFile);
     }
+};
+DataManager.prototype.hasFile = function(fileName) {
+    var self = this;
+    return self.fileLookup.hasOwnProperty(fileName);
 };
 DataManager.prototype.getFile = function(fileName) {
     var self = this;
@@ -546,7 +525,8 @@ DataManager.prototype.loadSample = function (url) {
     });
 };
 DataManager.prototype.loadFile = function (f) {
-    var fileReader = new FileReader();
+    var self = this,
+        fileReader = new FileReader();
     fileReader.onload = function (e) {
         self.addFile(new DataFile(f.name, DataManager.FORMAT_LOOKUP[f.type], e.target.result));
     };
@@ -554,7 +534,7 @@ DataManager.prototype.loadFile = function (f) {
 };
 DataManager.prototype.loadFiles = function () {
     var self = this,
-        newFiles = jQuery('#dataFileInput')[0].files,
+        newFiles = ejQuery('#dataFileInput')[0].files,
         i,
         j,
         warningText,

@@ -36,6 +36,32 @@ button, select, optgroup, option {
     bottom:16px;
 }
 
+#examplesView #examplesControls {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+}
+
+#examplesView #examplesButtons {
+    display:inline-block;
+    width:120px;
+}
+
+#examplesView #examplesUrl {
+    display: inline-block;
+    width: calc(100% - 140px);
+}
+
+#examplesView iframe {
+    position:absolute;
+    left: 0px;
+    top: 30px;
+    width: 100%;
+    height: calc(100% - 30px);
+    background-color: #fff;
+}
+
 #domPreview #domPreviewContent {
     position: absolute;
     left: 0px;
@@ -55,4 +81,23 @@ button, select, optgroup, option {
     right:16px;
     bottom:16px;
     padding:4px;
+}
+
+#dataEditor #dataEditorControls {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    text-align: right;
+}
+#dataEditor textarea {
+    position: absolute;
+    top:30px;
+    left:0px;
+    right:0px;
+    bottom:0px;
+    font-family: Consolas, monospace;
+    font-size: 9pt;
+    border: none;
+    resize: none;
 }
