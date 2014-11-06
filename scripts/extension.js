@@ -325,10 +325,13 @@
     };
     
     ExtensionManager.prototype.debug = function () {
+        /*
+        Load force-directed graph:
+        
         DATA.loadSampleDataFile('examples/miserables.json');
         CODE.loadSampleJSFile('examples/force.js');
         CODE.loadSampleCSSFile('examples/force.css');
-        CODE.runJS();
+        CODE.runJS();*/
     };
     
     window.setupExtension = function () {

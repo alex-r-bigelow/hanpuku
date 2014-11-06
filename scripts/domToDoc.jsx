@@ -7,7 +7,7 @@ if (typeof Array.prototype.indexOf != "function") {
     Array.prototype.indexOf = function (el) {  
         for(var i = 0; i < this.length; i++) if(el === this[i]) return i;  
         return -1;  
-    }  
+    };
 }  
 
 function phrogz(name)
@@ -121,13 +121,13 @@ function applyDocument()
         app.documents.add();
     }
     activeDoc = app.activeDocument;
-    var a, artboard, l, layer, s, selectedItems = [];
+    var a, artboard, l, layer;
     
     for (a = 0; a < doc.artboards.length; a += 1)
     {
         if (activeDoc.artboards.length === a)
         {
-            artboard = activeDoc.artboards.add(doc.artboards.rect);
+            artboard = activeDoc.artboards.add(doc.artboards[a].rect);
         } else {
             artboard = activeDoc.artboards[0];
         }

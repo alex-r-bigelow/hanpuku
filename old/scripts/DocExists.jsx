@@ -1,1 +1,0 @@
-JSON.stringify(app.activeDocument !== undefined);

@@ -39,7 +39,6 @@ Adding support for using d3.js code directly in Illustrator, with some nuances.
 ### TODO:
 
 #### High priority
-- Fix domToDoc (today!)
 Tomorrow:
  -- prepaper talk --
  -- vis seminar --

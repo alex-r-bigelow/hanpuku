@@ -14,7 +14,7 @@ CodeManager.prototype.loadSampleJSFile = function (url, docName) {
     });
 };
 CodeManager.prototype.loadJSFile = function () {
-    var newFile = ejQuery('#codeFileInput')[0].files[0],
+    var newFile = ejQuery('#jsFileInput')[0].files[0],
         fileReader = new FileReader();
     fileReader.onload = function (e) {
         ejQuery('#jsTextEditor').val(e.target.result);

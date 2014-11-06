@@ -7,6 +7,10 @@
                     window.parent.DATA.loadSampleDataFile('examples/miserables.json');
                     window.parent.CODE.loadSampleJSFile('examples/force.js');
                     window.parent.CODE.loadSampleCSSFile('examples/force.css');
+                } else if (name === 'scatterplot') {
+                    window.parent.DATA.loadSampleDataFile('examples/flowers.tsv');
+                    window.parent.CODE.loadSampleJSFile('examples/scatterplot.js', window.parent.DOM.docName);
+                    window.parent.CODE.loadSampleCSSFile('examples/scatterplot.css');
                 }
             }
         </script>
@@ -16,5 +20,6 @@
         <a href="http://bl.ocks.org/mbostock">Mike Bostock's Examples</a><br/><br/>
         Debugging examples:<br/>
         <button onclick="loadSample('force');">Force</button>
+        <button onclick="loadSample('scatterplot');">Scatterplot</button>
     </body>
 </html>
