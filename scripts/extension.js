@@ -234,7 +234,9 @@
                         .css('color', self.oppositeTextColor);
         ejQuery('button, select').css('background-color', self.buttonColor);
         ejQuery('textarea').css('background-color', self.textBackgroundColor)
-                           .css('color', self.textColor);
+                           .css('color', self.textColor)
+                           .css('font-size', self.fontSize);
+        ejQuery('#dataPreview').css('background-color', self.bodyColor);
         
         
         // Init the tab buttons
@@ -331,7 +333,7 @@
     
     window.setupExtension = function () {
         extensionScope.TYPING_INTERVAL = 2000;
-        extensionScope.SELECTED_IDS = null;
+        extensionScope.SELECTED_IDS = [];
         
         extensionScope.EXTENSION = new ExtensionManager();
         

@@ -93,12 +93,19 @@ DomManager.prototype.initScope = function () {
      * we've already loaded and parsed any relevant files in the Data tab
      * (or if we haven't they need to put it there!)
      */
+    d3._text = d3.text;
     d3.text = loadFunc;
+    d3._json = d3.json;
     d3.json = loadFunc;
+    d3._xml = d3.xml;
     d3.xml = loadFunc;
+    d3._html = d3.html;
     d3.html = loadFunc;
+    d3._csv = d3.csv;
     d3.csv = loadFunc;
+    d3._tsv = d3.tsv;
     d3.tsv = loadFunc;
+    //d3._js = d3.js;
     d3.js = loadFunc;
 };
 DomManager.prototype.runScript = function (script)

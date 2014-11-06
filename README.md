@@ -39,15 +39,18 @@ Adding support for using d3.js code directly in Illustrator, with some nuances.
 ### TODO:
 
 #### High priority
+- Fix domToDoc (today!)
+Tomorrow:
+ -- prepaper talk --
+ -- vis seminar --
 - Support text
 - Support stroke properties (dashes, cap, etc.)
 - Make sure any other elements (bitmaps, etc) are preserved
-- Fix domToDoc
-- Fix data preview
+Saturday:
+- Documentation, iD3-specific Examples
 - Bundle for user testing (start a release cycle?)
 
 #### Medium priority
-- Documentation, iD3-specific Examples
 - Import directly from Examples tab
 - Support HTML conversion to SVG + a more elegant way to incorporate new SVG elements
 - Regex search/replace in text editors (esp. data)
