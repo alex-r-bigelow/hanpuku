@@ -12,10 +12,6 @@ function ExamplesManager () {
     self.changeUrl();
     self.update();
 }
-ExamplesManager.POSSIBLE_CONTAINERS = [
-    'gist-source',
-    'gist-sources'
-];
 ExamplesManager.prototype.pushUrl = function () {
     var self = this,
         newUrl = self.iframe.contentWindow.location.href,
@@ -24,7 +20,7 @@ ExamplesManager.prototype.pushUrl = function () {
         isBack = (currentIndex > 0 && self.history[currentIndex - 1] === newUrl);
     
     // suppress console messages from other sites
-    console.clear();
+    //console.clear();
     
     if (!isForward && !isBack) {
         self.history.splice(currentIndex + 1);

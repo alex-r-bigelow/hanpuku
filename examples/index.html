@@ -1,10 +1,20 @@
 <!doctype html>
 <html>
     <head>
-        
+        <script type="application/javascript">
+            function loadSample(name) {
+                if (name === 'force') {
+                    window.parent.DATA.loadSampleDataFile('examples/miserables.json');
+                    window.parent.CODE.loadSampleJSFile('examples/force.js');
+                    window.parent.CODE.loadSampleCSSFile('examples/force.css');
+                }
+            }
+        </script>
     </head>
     <body>
         <a href="http://bl.ocks.org/yasashiku">Examples built for Illustrator + iD3</a><br/>
-        <a href="http://bl.ocks.org/mbostock">Mike Bostock's Examples</a>
+        <a href="http://bl.ocks.org/mbostock">Mike Bostock's Examples</a><br/><br/>
+        Debugging examples:<br/>
+        <button onclick="loadSample('force');">Force</button>
     </body>
 </html>

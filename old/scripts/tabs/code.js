@@ -20,5 +20,4 @@ function loadCodeFile() {
 
 function runJS() {
     eval(jQuery('#jsEditor').val());
-    updateGUI();
 }

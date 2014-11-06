@@ -88,12 +88,12 @@
          * A little hack to differentiate between libraries
          * that are loaded in context of the extension, and which
          * are loaded in context of the DOM iframe. Extension-level libraries
-         * start with 'e'
+         * start with 'e' (jQuery will get overwritten in the iframe)
          */
         extensionScope.ejQuery = jQuery;
         extensionScope.ed3 = d3;
-        jQuery = undefined;
-        d3 = undefined;
+        //jQuery = undefined;
+        //d3 = undefined;
     }
     ExtensionManager.EXTENSION_SCRIPTS = [
         "lib/jquery-1.11.0.min.js",
@@ -206,7 +206,7 @@
         self.backgroundColor = 'rgba(' + Math.floor(background.red) + ',' +
                                 Math.floor(background.green) + ',' +
                                 Math.floor(background.blue) + ',' +
-                                (background.alpha/255.0) + ')';
+                                0.5*(background.alpha/255.0) + ')';
         
         self.textBackgroundColor = 'rgba(' + Math.floor(background.red) + ',' +
                                             Math.floor(background.green) + ',' +
@@ -215,19 +215,23 @@
         self.bodyColor = 'rgba(' + Math.floor(background.red) + ',' +
                                    Math.floor(background.green) + ',' +
                                    Math.floor(background.blue) + ',' +
-                                   (background.alpha/255.0) + ')';
-        self.haloColor = useWhite ? 'rgba(255,255,255,0.75)' : 'rgba(150,150,150,0.75)';
+                                   0.75*(background.alpha/255.0) + ')';
+        self.haloColor = 'rgba(' + (255 - Math.floor(background.red)) + ',' +
+                                (255 - Math.floor(background.green)) + ',' +
+                                (255 - Math.floor(background.blue)) + ',' +
+                                (background.alpha/255.0) + ')';
         self.buttonColor = 'rgba(' + Math.floor(background.red) + ',' +
                                     Math.floor(background.green) + ',' +
                                     Math.floor(background.blue) + ',' +
-                                    0.5*(background.alpha/255.0) + ')';
+                                    0.25*(background.alpha/255.0) + ')';
         
         // Apply the font and colors
         ejQuery('body').css('font-family', self.fontFamily)
                        .css('font-size', self.fontSize)
                        .css('background-color', self.backgroundColor);
         
-        ejQuery('.halo').css('background-color', self.haloColor);
+        ejQuery('.halo').css('background-color', self.haloColor)
+                        .css('color', self.oppositeTextColor);
         ejQuery('button, select').css('background-color', self.buttonColor);
         ejQuery('textarea').css('background-color', self.textBackgroundColor)
                            .css('color', self.textColor);
@@ -242,14 +246,14 @@
                     if (panel.views.hasOwnProperty(v)) {
                         view = panel.views[v];
                         ejQuery('#' + v).hide();
-                        ejQuery('#' + v + '_PanelButton')
-                            .css('color', self.oppositeTextColor);
                     }
                 }
+                ejQuery('#' + p + '_PanelButton')
+                    .css('color', self.oppositeTextColor);
             }
         }
         self.advancedMode();
-        self.switchTab('Examples');
+        self.switchTab('Data');
     };
     ExtensionManager.prototype.switchTab = function (tabId) {
         var self = this,
@@ -318,6 +322,13 @@
         
     };
     
+    ExtensionManager.prototype.debug = function () {
+        DATA.loadSampleDataFile('examples/miserables.json');
+        CODE.loadSampleJSFile('examples/force.js');
+        CODE.loadSampleCSSFile('examples/force.css');
+        CODE.runJS();
+    };
+    
     window.setupExtension = function () {
         extensionScope.TYPING_INTERVAL = 2000;
         extensionScope.SELECTED_IDS = null;
@@ -330,11 +341,14 @@
         
         extensionScope.DATA = new DataManager();
         
-        extensionScope.CODE = new CodeManager();
-        
         extensionScope.EXTENSION.initUI();
         
         extensionScope.DOM = new DomManager('domPreviewContent');
+        
         extensionScope.DOM.docToDom();
+        
+        extensionScope.CODE = new CodeManager();
+        
+        extensionScope.EXTENSION.debug();
     };
 })();

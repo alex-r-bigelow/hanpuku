@@ -427,7 +427,7 @@ DataManager.prototype.updatePanel = function () {
     
     // Inject a fresh invisible file uploading control
     ejQuery('#dataFileInput').remove();
-    ejQuery('#dataEditorControls').prepend('<input id="dataFileInput" type="file" onchange="DATA.loadFiles();" multiple style="visibility:hidden"/>');
+    ejQuery('#dataEditorControls').append('<input id="dataFileInput" type="file" onchange="DATA.loadFiles();" multiple style="visibility:hidden"/>');
     
     // Update the visible controls (rebuild the file selection menu from scratch)
     currentDataFile.find('option').remove();
@@ -509,7 +509,7 @@ DataManager.prototype.getFile = function(fileName) {
     var self = this;
     return self.allFiles[self.fileLookup[fileName]];
 };
-DataManager.prototype.loadSample = function (url) {
+DataManager.prototype.loadSampleDataFile = function (url) {
     var self = this;
     ejQuery.get(url, function (dataString) {
         var parts = url.split('/'),

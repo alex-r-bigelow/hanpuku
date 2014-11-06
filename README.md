@@ -38,48 +38,37 @@ Adding support for using d3.js code directly in Illustrator, with some nuances.
 
 ### TODO:
 
-#### CRITICAL - I'm in a heavy rewrite of everything to support the following:
-- Support binding to path points
-- Clean up the JS namespace, DOM for more natural d3 coding
-- Refactor to make views more modular
-- Embedding data, js, css files inside the .ai file
-
 #### High priority
-- Implement all views listed above. Current status of each view:
- - Implemented views:
-  - Raw data editor (could enhance w/Ace)
-  - Data list preview
-  - Selection list (about 90% finished)
-  - Dom preview (need to add selection functionality?)
-  - JS code editor (could enhance w/Ace)
-  - CSS code editor (could enhance w/Ace)
-  - Sample library menu (maybe should be its own tab w/Documentation?)
- - Views I need to implement:
-  - Selection query tools
-  - All influence tools
-- Walk through HBO Example
+- Support text
+- Support stroke properties (dashes, cap, etc.)
+- Make sure any other elements (bitmaps, etc) are preserved
+- Fix domToDoc
+- Fix data preview
 - Bundle for user testing (start a release cycle?)
 
 #### Medium priority
-- (external project): Browser SVG+data channel extractor
-- (external project): Tools for quickly embedding back into a web page
-- Support text
-- Somehow embed the Chrome debugging window as a view inside the widget
- - users will need to enable remote debugging
- - iframe? Also need to figure out how to link to embedded document
-- More samples, documentation
-
-#### Low priority
-- Replace textareas with ace editors
+- Documentation, iD3-specific Examples
+- Import directly from Examples tab
+- Support HTML conversion to SVG + a more elegant way to incorporate new SVG elements
 - Regex search/replace in text editors (esp. data)
-- Support stroke properties (dashes, cap, etc.)
-- Support multiple artboards
+- Replace textareas with ace editors
+- Embed the Chrome debugging window as a view
+- Export as/to web page tool
+- Embed data, js, css files inside the .ai file
+- Load multiple js, css files, distinguish between js libraries and scripts (run the former immediately)
+
+#### Low priority (probably next paper)
+- Bindings tab
+- Selection query tools
+- Dom preview selection functionality
+- Influence tab
+- Support binding to path points (you can get around this by being creative
+  with your data abstraction!)
+- Walk through HBO Example
 
 #### Very low priority
 - Investigate what it would take to make an Inkscape clone
 - It would be cool to convert between canvas elements / bitmaps
- - If so, maybe we could support processing.js code as well?
- - Or maybe that should be its own extension (maybe compatible with Photoshop instead)?
 - Windows support
 
 ### Notes for when I write the code documentation (oddities for d3 code that are introduced by cycling in and out of an Illustrator document)

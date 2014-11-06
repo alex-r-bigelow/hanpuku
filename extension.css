@@ -9,19 +9,20 @@ button, select, optgroup, option {
     border: none;
 }
 
-#extensionControls button, #sampleSelect {
+#extensionControls button {
     margin:2px;
     padding-left:4px;
     padding-right:4px;
 }
-#sampleSelect {
-    width:8em;
-}
-
 .halo {
     padding:4px;
 }
-
+.controls {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+}
 #views {
     position: absolute;
     top:30px;
@@ -32,27 +33,18 @@ button, select, optgroup, option {
 
 #debugButtons {
     position:absolute;
-    left:calc(51% + 16px);
+    right:16px;
     bottom:16px;
-}
-
-#examplesView #examplesControls {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    width: 100%;
 }
 
 #examplesView #examplesButtons {
     display:inline-block;
     width:120px;
 }
-
 #examplesView #examplesUrl {
     display: inline-block;
     width: calc(100% - 140px);
 }
-
 #examplesView iframe {
     position:absolute;
     left: 0px;
@@ -69,28 +61,18 @@ button, select, optgroup, option {
     right: 0px;
     bottom: 0px;
 }
-
 #domPreview iframe {
     width: 100%;
     height:100%;
     border: none;
 }
-
 #domPreview #zoomButtons {
     position:absolute;
     right:16px;
     bottom:16px;
     padding:4px;
 }
-
-#dataEditor #dataEditorControls {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    width: 100%;
-    text-align: right;
-}
-#dataEditor textarea {
+textarea {
     position: absolute;
     top:30px;
     left:0px;

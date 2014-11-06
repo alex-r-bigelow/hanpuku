@@ -23,6 +23,7 @@ function DomManager (targetDiv) {
     
     // Variables I set later
     self.docName = undefined;
+    self.viewBounds = undefined;
 }
 DomManager.PADDING = 64;
 DomManager.DOM_LIBS = [
@@ -82,11 +83,11 @@ DomManager.prototype.initScope = function () {
         });
     }
     /**
-     * I need to make the locally defined jQuery accessible
-     * in the normal way (d3 overlaps as well, but it loads
-     * properly without this hack)
+     * I need to make the locally defined libraries accessible
+     * in the normal way... this is kind of nuanced for each library
      */
     self.runScript('jQuery = window.jQuery;');
+    self.runScript('var d3 = window.parent.d3;');
     /**
      * I also need to monkey patch the local d3's file loading schemes;
      * we've already loaded and parsed any relevant files in the Data tab
@@ -111,12 +112,88 @@ DomManager.prototype.runScript = function (script)
     // if we ran a script that appended an SVG (most bl.ocks.org examples do this),
     // we need to convert it to a layer group and add an artboard
     ejQuery(self.iframe).contents().find('svg').each(function () {
+        // TODO: Support HTML conversion + a more elegant way to incorporate any SVG elements
         self.unifySvgTags(this);
     });
 };
-DomManager.prototype.unifySvgTags = function (svgElement) {
-    var self = this;
-    console.warn('TODO:', self.docName, svgElement.getAttribute('id'));
+DomManager.prototype.unifySvgTags = function (svgNode) {
+    var self = this,
+        newId = svgNode.getAttribute('id'),
+        svg,
+        artboard,
+        group,
+        groupNode,
+        bounds,
+        targetSvg;
+    if (self.docName === newId) {
+        return;
+    }
+    
+    // Force the SVG to absolute coordinates (TODO: do this more elegantly!)
+    svg = jQuery(svgNode);
+    svg.css({
+        position: 'absolute',
+        left: '0px',
+        top: '0px'
+    });
+    bounds = svgNode.getBoundingClientRect();
+    
+    // Create the artboard and group elements
+    artboard = jQuery(document.createElementNS('http://www.w3.org/2000/svg','path'));
+    artboard.attr({
+        'class' : 'artboard',
+        'fill' : '#fff',
+        'stroke-width' : '1',
+        'stroke' : '#000',
+        'd' : 'M' + bounds.left + ',' + bounds.top +
+              'L' + bounds.right + ',' + bounds.top +
+              'L' + bounds.right + ',' + bounds.bottom +
+              'L' + bounds.left + ',' + bounds.bottom + 'Z'
+    });
+    groupNode = document.createElementNS('http://www.w3.org/2000/svg','g');
+    group = jQuery(groupNode);
+    group.attr({
+        'transform' : 'translate(' + bounds.left + ',' + bounds.top + ')'
+    });
+    if (newId !== null) {
+        artboard.attr('id', newId + '_Artboard');
+        group.attr('id', newId);
+    }
+    
+    // Move all the child nodes over
+    while (svgNode.childNodes.length > 0) {
+        groupNode.appendChild(svgNode.childNodes[0]);
+    }
+    
+    // Remove the old svg tag
+    svg.remove();
+    
+    // Add the new stuff to the main svg
+    targetSvg = jQuery('#' + self.docName);
+    targetSvg.find('.artboard:last').after(artboard);
+    targetSvg.find('g:last').after(group);
+    
+    // Update the main svg viewbox
+    if (bounds.left - DomManager.PADDING < self.viewBounds.left) {
+        self.viewBounds.left = bounds.left - DomManager.PADDING;
+    }
+    if (bounds.top - DomManager.PADDING < self.viewBounds.top) {
+        self.viewBounds.top = bounds.top - DomManager.PADDING;
+    }
+    if (bounds.right + DomManager.PADDING > self.viewBounds.right) {
+        self.viewBounds.right = bounds.right + DomManager.PADDING;
+    }
+    if (bounds.bottom + DomManager.PADDING > self.viewBounds.bottom) {
+        self.viewBounds.bottom = bounds.bottom + DomManager.PADDING;
+    }
+    self.viewBounds.width = self.viewBounds.right - self.viewBounds.left;
+    self.viewBounds.height = self.viewBounds.bottom - self.viewBounds.top;
+    
+    targetSvg.attr('width', self.viewBounds.width)
+             .attr('height', self.viewBounds.height);
+    // jQuery changes viewBox to viewbox
+    targetSvg[0].setAttribute('viewBox', (self.viewBounds.left) + ' ' + (self.viewBounds.top) + ' ' +
+                              (self.viewBounds.width) + ' ' + (self.viewBounds.height));
 };
 
 /**
@@ -146,10 +223,14 @@ DomManager.prototype.docToDom = function () {
             self.initScope();
             
             // Style the main svg element to match Illustrator's UI
-            result.left = result.left - DomManager.PADDING;
-            result.top = result.top - DomManager.PADDING;
-            result.right = result.right + DomManager.PADDING;
-            result.bottom = result.bottom + DomManager.PADDING;
+            self.viewBounds = {
+                left : result.left - DomManager.PADDING,
+                top : result.top - DomManager.PADDING,
+                right : result.right + DomManager.PADDING,
+                bottom : result.bottom + DomManager.PADDING
+            };
+            self.viewBounds.width = self.viewBounds.right - self.viewBounds.left;
+            self.viewBounds.height = self.viewBounds.bottom - self.viewBounds.top;
             
             d3.select('body')
                 .style('margin','0')
@@ -157,10 +238,10 @@ DomManager.prototype.docToDom = function () {
             
             var svg = d3.select('body').append('svg')
                 .attr('id', result.name)
-                .attr('width', result.right - result.left)
-                .attr('height', result.bottom - result.top)
-                .attr('viewBox', (result.left) + ' ' + (result.top) + ' ' +
-                                  (result.right - result.left) + ' ' + (result.bottom - result.top))
+                .attr('width', self.viewBounds.width)
+                .attr('height', self.viewBounds.height)
+                .attr('viewBox', (self.viewBounds.left) + ' ' + (self.viewBounds.top) + ' ' +
+                                  (self.viewBounds.width) + ' ' + (self.viewBounds.height))
                 .attr('zoom', '100%');
             
             // Add the artboards

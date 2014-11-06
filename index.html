@@ -24,7 +24,7 @@
     <div id="views">
       
       <div id="examplesView">
-        <div id="examplesControls" class="halo">
+        <div id="examplesControls" class="halo controls">
           <div id="examplesButtons">
             <button id="examplesLoadButton" onclick="EXAMPLES.loadBlock()">Import</button>
             &emsp;
@@ -40,8 +40,7 @@
         <textarea id="dataTextEditor" wrap="off" onkeyup="DATA.edit();"></textarea>
         <div id="dataEditorControls" class="halo">
           <select id="currentDataFile" onchange="DATA.switchFile();"></select>
-          <!--<input type="checkbox" id="embedFileCheckBox" onchange="DATA.changeEmbed();"/>Embed-->
-          &emsp;
+          <!--<input type="checkbox" id="embedFileCheckBox" onchange="DATA.changeEmbed();"/>Embed&emsp;-->
           Interpret as:
           <select id="dataTypeSelect" onchange="DATA.changeType();">
             <option value="text/csv">CSV</option>
@@ -67,9 +66,22 @@
       
       <div id="influenceTools"></div>
       
-      <div id="jsEditor"></div>
+      <div id="jsEditor">
+        <textarea id="jsTextEditor" wrap="off"></textarea>
+        <div id="jsEditorControls" class="halo controls">
+          <button onclick="ejQuery('#jsFileInput').click();">Load Script...</button>
+          <button onclick="CODE.runJS();">Run</button>
+          <input id="jsFileInput" type="file" onchange="CODE.loadCodeFile();" style="visibility:hidden"/>
+        </div>
+      </div>
       
-      <div id="cssEditor"></div>
+      <div id="cssEditor">
+        <textarea id="cssTextEditor" wrap="off" onkeyup="CODE.editCSS();"></textarea>
+        <div id="cssEditorControls" class="halo controls">
+          <button onclick="ejQuery('#cssFileInput').click();">Load Stylesheet...</button>
+          <input id="cssFileInput" type="file" onchange="CODE.loadCSSFile();" style="visibility:hidden"/>
+        </div>
+      </div>
       
     </div>
     
