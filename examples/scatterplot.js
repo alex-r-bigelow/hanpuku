@@ -4,9 +4,12 @@ var margin = {top: 20, right: 20, bottom: 30, left: 40},
   width = artboardBounds.width - margin.left - margin.right,
   height = artboardBounds.height - margin.top - margin.bottom;
 
-// Select container
-var svg = d3.select('#Layer_1');
-svg.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+// Get our container, apply the margin if it's the first time
+var svg = d3.select('#Layer_1').selectAll('.scatterplot').data([0]);
+var svgEnter = svg.enter();
+svgEnter.append('g')
+   .attr('class', 'scatterplot')
+   .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
 d3.tsv("flowers.tsv", function(error, data) {
   data.forEach(function(d) {
@@ -77,7 +80,7 @@ d3.tsv("flowers.tsv", function(error, data) {
   var initLegend = legend.enter().append("g")
       .attr("class", "legend");
   initLegend.append("circle")
-      .attr("class", "glyph")
+      .attr("class", "legendDot")
       .attr("r", 3.5);
   initLegend.append("text");
   // Remove old legend entries

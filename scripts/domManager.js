@@ -257,14 +257,6 @@ DomManager.prototype.enforceUniqueIds = function (e) {
         }
     }
 };
-DomManager.prototype.standardize = function () {
-    var self = this;
-    
-    self.nameLookup = {};
-    
-    self.enforceUniqueIds(jQuery('svg')[0]);
-    d3.selectAll('svg').toCubicPaths(undefined, true);
-};
 DomManager.PATH_SPLITTER = new RegExp('[MmZzLlHhVvCcSsQqTtAa]', 'g');
 DomManager.prototype.extractPath = function (g, z) {
     var self = this,
@@ -366,6 +358,14 @@ DomManager.prototype.extractGroup = function (g, z, iType) {
     }
     return output;
 };
+DomManager.prototype.standardize = function () {
+    var self = this;
+    
+    self.nameLookup = {};
+    
+    self.enforceUniqueIds(jQuery('svg')[0]);
+    d3.selectAll('svg').toCubicPaths(undefined, true);
+};
 DomManager.prototype.extractDocument = function () {
     var self = this,
         output = {
@@ -462,13 +462,11 @@ DomManager.prototype.docToDom = function () {
                 .attr('stroke-width', 1)
                 .attr('stroke','#000');
             
-            // Add the layers
-            var l, newLayer;
+            // Add the layers (just groups)
+            var l;
             result.layers = result.layers.sort(phrogz('zIndex'));
             for (l = 0; l < result.layers.length; l += 1) {
-                newLayer = svg.append('g')
-                    .attr('id', result.layers[l].name);
-                self.addChildLayers(newLayer, result.layers[l]);
+                self.addGroup(svg, result.layers[l]);
             }
             
             // Sneaky hack: we set all the REVERSE transforms in the self.addChildLayers()
@@ -527,47 +525,33 @@ DomManager.prototype.addPath = function (parent, path) {
     if (path.classNames !== null) {
         p.attr('class', path.classNames);
     }
-    if (p.reverseTransform !== null) {
+    if (path.reverseTransform !== null) {
         p.attr('transform', path.reverseTransform);
     }
     d3.select('#' + path.name).datum(path.data);
 };
-DomManager.prototype.addChildGroups = function (parent, group) {
+DomManager.prototype.addGroup = function (parent, group) {
     var self = this,
-        g,
-        newGroup,
+        g = parent.append('g')
+        .attr('id', group.name),
+        c,
         p;
+    if (group.classNames !== null) {
+        g.attr('class', group.classNames);
+    }
+    if (group.reverseTransform !== null) {
+        g.attr('transform', group.reverseTransform);
+    }
+    if (group.hasOwnProperty('data')) {
+        d3.select('#' + group.name).datum(group.data);
+    }
+    
     group.groups = group.groups.sort(phrogz('zIndex'));
-    for (g = 0; g < group.groups.length; g += 1) {
-        newGroup = parent.append('g')
-            .attr('id', group.groups[g].name);
-        if (group.groups[g].classNames !== null) {
-            newGroup.attr('class', group.groups[g].classNames);
-        }
-        if (group.groups[g].reverseTransform !== null) {
-            newGroup.attr('transform', group.groups[g].reverseTransform);
-        }
-        d3.select('#' + group.groups[g].name).datum(group.groups[g].data);
-        self.addChildGroups(newGroup, group.groups[g]);
+    for (c = 0; c < group.groups.length; c += 1) {
+        self.addGroup(g, group.groups[c]);
     }
     group.paths = group.paths.sort(phrogz('zIndex'));
     for (p = 0; p < group.paths.length; p += 1) {
-        self.addPath(parent, group.paths[p]);
-    }
-};
-DomManager.prototype.addChildLayers = function (parent, layer) {
-    var self = this,
-        l,
-        newGroup,
-        p;
-    layer.groups = layer.groups.sort(phrogz('zIndex'));
-    for (l = 0; l < layer.groups.length; l += 1) {
-        newGroup = parent.append('g')
-            .attr('id', layer.groups[l].name);
-        self.addChildGroups(newGroup, layer.groups[l]);
-    }
-    layer.paths = layer.paths.sort(phrogz('zIndex'));
-    for (p = 0; p < layer.paths.length; p += 1) {
-        self.addPath(parent, layer.paths[p]);
+        self.addPath(g, group.paths[p]);
     }
 };

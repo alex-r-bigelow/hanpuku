@@ -68,7 +68,14 @@
             });
         }
     };
-    
+    IllustratorConnection.prototype.addListeners = function () {
+        var self = this,
+            updateFunc = function () { DOM.docToDom(); };
+        
+        // TODO: when Illustrator adds more listeners, inject them here!
+        self.connection.addEventListener('documentAfterActivate', updateFunc);
+        self.connection.addEventListener('documentAfterDeactivate', updateFunc);
+    };
     
     function ExtensionManager() {
         var self = this;
@@ -337,13 +344,9 @@
     window.setupExtension = function () {
         extensionScope.TYPING_INTERVAL = 2000;
         extensionScope.SELECTED_IDS = [];
-        
         extensionScope.EXTENSION = new ExtensionManager();
-        
         extensionScope.EXAMPLES = new ExamplesManager();
-        
         extensionScope.ILLUSTRATOR = new IllustratorConnection();
-        
         extensionScope.DATA = new DataManager();
         
         extensionScope.EXTENSION.initUI();
@@ -353,6 +356,8 @@
         extensionScope.DOM.docToDom();
         
         extensionScope.CODE = new CodeManager();
+        
+        extensionScope.ILLUSTRATOR.addListeners();
         
         extensionScope.EXTENSION.debug();
     };

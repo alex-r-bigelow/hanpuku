@@ -39,9 +39,6 @@ Adding support for using d3.js code directly in Illustrator, with some nuances.
 ### TODO:
 
 #### High priority
-Tomorrow:
- -- prepaper talk --
- -- vis seminar --
 - Support text
 - Support stroke properties (dashes, cap, etc.)
 - Make sure any other elements (bitmaps, etc) are preserved
@@ -56,7 +53,7 @@ Saturday:
 - Replace textareas with ace editors
 - Embed the Chrome debugging window as a view
 - Export as/to web page tool
-- Embed data, js, css files inside the .ai file
+- Embed data, js, css files inside the .ai file (preserve layer-level properties while I'm at it)
 - Load multiple js, css files, distinguish between js libraries and scripts (run the former immediately)
 
 #### Low priority (probably next paper)

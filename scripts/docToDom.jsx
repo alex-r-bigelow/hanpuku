@@ -1,5 +1,5 @@
 var alertedCMYK = false,
-    alertedUnsupported = false,
+    alertedUnsupported = true,
     reservedNames = {   // All IDs in the panel are reserved, and we include the empty
         "" : true,      // string so that elements with no name will be given one
         "userCSS" : true,
