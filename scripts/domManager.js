@@ -61,7 +61,7 @@ DomManager.prototype.initScope = function () {
     var self = this,
         s,
         scriptCallback = function (script) {
-            self.runScript(script);
+            self.runScript(script, true);
         },
         loadFunc = function () {
             var url = arguments[0],
@@ -88,8 +88,8 @@ DomManager.prototype.initScope = function () {
      * I need to make the locally defined libraries accessible
      * in the normal way... this is kind of nuanced for each library
      */
-    self.runScript('jQuery = window.jQuery;');
-    self.runScript('var d3 = window.parent.d3;');
+    self.runScript('jQuery = window.jQuery;', true);
+    self.runScript('var d3 = window.parent.d3;', true);
     /**
      * I also need to monkey patch the local d3's file loading schemes;
      * we've already loaded and parsed any relevant files in the Data tab
@@ -110,9 +110,14 @@ DomManager.prototype.initScope = function () {
     //d3._js = d3.js;
     d3.js = loadFunc;
 };
-DomManager.prototype.runScript = function (script)
+DomManager.prototype.runScript = function (script, ignoreSelection)
 {
     var self = this;
+    
+    if (ignoreSelection !== true) {
+        // remove our selection layer
+        jQuery('#id3_selectionLayer').remove();
+    }
     
     // execute script in private context - not for security, but
     // for a cleaner scope that feels more like coding in a normal browser
@@ -124,6 +129,34 @@ DomManager.prototype.runScript = function (script)
         // TODO: Support HTML conversion + a more elegant way to incorporate any SVG elements
         self.unifySvgTags(this);
     });
+    
+    if (ignoreSelection !== true) {
+        // restore the selection layer
+        self.updateSelectionLayer();
+    }
+};
+DomManager.prototype.updateSelectionLayer = function () {
+    var self = this;
+    
+    jQuery('#id3_selectionLayer').remove();
+    var layer = d3.select('#' + self.docName).append('g')
+                    .attr('id', 'id3_selectionLayer'),
+        selectionRect = layer.selectAll('path').data(SELECTED_IDS);
+    selectionRect.enter().append('path')
+        .attr('fill', 'none')
+        .attr('stroke-width', '5px')
+        .attr('stroke', 'rgb(98,131,255)')
+        .attr('d', function (d) {
+            var bounds = self.iframe.contentDocument.getElementById(d).getBoundingClientRect();
+            // I don't use getBBox() because we might be overlaying something inside a group
+            // and the overlay paths need to be at the root level so we can add/remove them
+            // easily. That said, we need to account for the svg element's viewBounds
+            return "M" + (bounds.left + self.viewBounds.left) + "," + (bounds.top + self.viewBounds.top) +
+                   "L" + (bounds.right + self.viewBounds.left) + "," + (bounds.top + self.viewBounds.top) +
+                   "L" + (bounds.right + self.viewBounds.left) + "," + (bounds.bottom + self.viewBounds.top) +
+                   "L" + (bounds.left + self.viewBounds.left) + "," + (bounds.bottom + self.viewBounds.top) +
+                   "Z";
+        });
 };
 DomManager.prototype.unifySvgTags = function (svgNode) {
     var self = this,
@@ -405,7 +438,7 @@ DomManager.prototype.extractDocument = function () {
 DomManager.prototype.domToDoc = function () {
     // Throw away all the selection rectangles
     var self = this;
-    jQuery('path.selection').remove();
+    jQuery('#id3_selectionLayer').remove();
     
     ILLUSTRATOR.runJSX(JSON.stringify(self.extractDocument()), 'scripts/domToDoc.jsx', function (result) {});
 };
@@ -483,6 +516,10 @@ DomManager.prototype.docToDom = function () {
                     this.removeAttribute('id3_reverseTransform');
                 }
             });
+            
+            // Finally, add the selection layer
+            SELECTED_IDS = result.selection;
+            self.updateSelectionLayer();
         }
         EXTENSION.updateUI();
     });

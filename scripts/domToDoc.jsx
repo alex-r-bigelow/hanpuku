@@ -69,6 +69,7 @@ function applyPath(iPath, dPath) {
         iPath.pathPoints[i].leftDirection = dPath.points[i].leftDirection;
         iPath.pathPoints[i].rightDirection = dPath.points[i].rightDirection;
     }
+    iPath.closed = dPath.closed;
     
     if (doc.selection.indexOf(dPath.name) !== -1) {
         iPath.selected = true;
@@ -77,10 +78,13 @@ function applyPath(iPath, dPath) {
 
 function applyGroup(iGroup, dGroup)
 {
-    var itemOrder = dGroup.groups.concat(dGroup.paths).sort(phrogz('zIndex')),
+    var existingGroupNames = [],
+        existingPathNames = [],
+        itemOrder = dGroup.groups.concat(dGroup.paths).sort(phrogz('zIndex')),
         i,
         newItem;
     
+    // Update the parent's tags (Layers don't support tags :-( TODO: hack them into activeDoc.XMPString?))
     iGroup.name = dGroup.name;
     if (dGroup.itemType === 'group') {
         i = iGroup.tags.add();
@@ -96,19 +100,45 @@ function applyGroup(iGroup, dGroup)
         i.value = dGroup.reverseTransform;
     }
     
+    // Get the lists of existing names in case we need to remove any
+    for (i = 0; i < iGroup.groupItems.length; i += 1) {
+        existingGroupNames.push(iGroup.groupItems[i].name);
+    }
+    for (i = 0; i < iGroup.pathItems.length; i += 1) {
+        existingPathNames.push(iGroup.pathItems[i].name);
+    }
+    // Modify / add needed groups and paths in order
     for (i = 0; i < itemOrder.length; i += 1) {
         if (itemOrder[i].itemType === 'group') {
-            newItem = iGroup.groupItems.add();
+            try {
+                newItem = iGroup.groupItems.getByName(itemOrder[i].name);
+                existingGroupNames.splice(existingGroupNames.indexOf(newItem.name), 1);
+            } catch (e) {
+                newItem = iGroup.groupItems.add();
+            }
             applyGroup(newItem, itemOrder[i]);
         } else if (itemOrder[i].itemType === 'path') {
-            newItem = iGroup.pathItems.add();
+            try {
+                newItem = iGroup.pathItems.getByName(itemOrder[i].name);
+                existingPathNames.splice(existingPathNames.indexOf(newItem.name), 1);
+            } catch (e) {
+                newItem = iGroup.pathItems.add();
+            }
             applyPath(newItem, itemOrder[i]);
         } else if (itemOrder[i].itemType === 'text') {
             //TODO
         }
         newItem.zOrder(ZOrderMethod.BRINGTOFRONT);
     }
+    // Remove any leftover groups or paths that were deleted in the DOM
+    /*for (i = 0; i < existingGroupNames.length; i += 1) {
+        iGroup.groupItems.getByName(existingGroupNames[i]).remove();
+    }
+    for (i = 0; i < existingPathNames.length; i += 1) {
+        iGroup.pathItems.getByName(existingPathNames[i]).remove();
+    }*/
     
+    // Finally, check if the parent is selected
     if (doc.selection.indexOf(dGroup.name) !== -1) {
         iGroup.selected = true;
     }
@@ -121,35 +151,59 @@ function applyDocument()
         app.documents.add();
     }
     activeDoc = app.activeDocument;
-    var a, artboard, l, layer;
+    var existingNames, a, artboard, l, layer;
     
+    // Get the list of current artboard names in case we need to remove any
+    existingNames = [];
+    for (a = 0; a < activeDoc.artboards.length; a += 1) {
+        existingNames.push(activeDoc.artboards[a].name);
+    }
+    // Modify / add needed artboards
     for (a = 0; a < doc.artboards.length; a += 1)
     {
-        if (activeDoc.artboards.length === a)
-        {
+        try {
+            artboard = activeDoc.artboards.getByName(doc.artboards[a].name);
+            existingNames.splice(existingNames.indexOf(artboard.name), 1);
+        } catch (e) {
             artboard = activeDoc.artboards.add(doc.artboards[a].rect);
-        } else {
-            artboard = activeDoc.artboards[0];
         }
         artboard.artboardRect = doc.artboards[a].rect;
         artboard.name = doc.artboards[a].name;
     }
-
-    // Nuke the document's current contents (everything will have been saved in doc)
-    activeDoc.layers.removeAll();
-
+    // Remove any leftover artboards that were deleted in the DOM
+    /*for (a = 0; a < existingNames.length; a += 1) {
+        activeDoc.artboards.getByName(existingNames[a]).remove();
+    }*/
+    
+    // Get the list of current layer names in case we need to remove any
+    existingNames = [];
+    for (l = 0; l < activeDoc.layers.length; l += 1) {
+        existingNames.push(activeDoc.layers[l].name);
+    }
+    // Modify / add needed layers in order
     doc.layers = doc.layers.sort(phrogz('zIndex'));
     for (l = 0; l < doc.layers.length; l += 1)
     {
-        if (activeDoc.layers.length === l) {
+        try {
+            layer = activeDoc.layers.getByName(doc.layers[l].name);
+            existingNames.splice(existingNames.indexOf(layer.name), 1);
+        } catch (e) {
             layer = activeDoc.layers.add();
-        } else {
-            layer = activeDoc.layers[0];
         }
         layer.zOrder(ZOrderMethod.BRINGTOFRONT);
         applyGroup(layer, doc.layers[l]);
     }
+    // Remove any leftover layers that were deleted in the DOM
+    /*for (l = 0; l < existingNames.length; l += 1) {
+        activeDoc.layers.getByName(existingNames[l]).remove();
+    }*/
 }
+
+// (for now, I don't do remove anything, because the user could have added stuff
+// without refreshing the extension... better to ignore deleting actions
+// than to delete too much. I'll uncomment when Illustrator adds more
+// event listeners)
+
 applyDocument();
 app.redraw();
 console;

@@ -52,29 +52,6 @@
         ];
     }
     
-    function getSvgBoundingRect (element) {
-        // like getBoundingClientRect(), but relative to the SVG document that contains e
-        var e = element.getBoundingClientRect(),
-            p = element.parentElement;
-        while (p.parentElement && p.tagName !== 'svg') {
-            p = p.parentElement;
-        }
-        if (p.tagName !== 'svg') {
-            throw "Object not inside SVG: " + String(e);
-        }
-        
-        p = p.getBoundingClientRect();
-        
-        return {
-            bottom : e.bottom - p.bottom,
-            height : e.height,
-            left : e.left - p.left,
-            right : e.right - p.right,
-            top : e.top - p.top,
-            width : e.width
-        };
-    }
-    
     /* Helper functions for converting circles, rectangles, paths, and any object
      * to cubic-interpolated paths with absolute coordinates (no nested transforms) */
     function pathToCubicPath(d, m) {

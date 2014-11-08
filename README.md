@@ -39,9 +39,9 @@ Adding support for using d3.js code directly in Illustrator, with some nuances.
 ### TODO:
 
 #### High priority
+- Fix Isolation Mode bug
 - Support text
 - Support stroke properties (dashes, cap, etc.)
-- Make sure any other elements (bitmaps, etc) are preserved
 Saturday:
 - Documentation, iD3-specific Examples
 - Bundle for user testing (start a release cycle?)

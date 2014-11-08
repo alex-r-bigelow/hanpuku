@@ -206,6 +206,10 @@ function extractDocument() {
             left, right, top, bottom,
             a, l, s;
         
+        /*if (activeDoc.activeLayer.name === 'Isolation Mode') {
+            alert('isolation!');
+        }*/
+        
         standardize(activeDoc);
         
         output = {
