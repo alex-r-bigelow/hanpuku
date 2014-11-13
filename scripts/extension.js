@@ -71,7 +71,7 @@
     IllustratorConnection.prototype.addListeners = function () {
         var self = this,
             updateFunc = function () { DOM.docToDom(); };
-        
+        window.onfocus = updateFunc;
         // TODO: when Illustrator adds more listeners, inject them here!
         self.connection.addEventListener('documentAfterActivate', updateFunc);
         self.connection.addEventListener('documentAfterDeactivate', updateFunc);

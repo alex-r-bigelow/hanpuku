@@ -39,11 +39,11 @@ button, select, optgroup, option {
 
 #examplesView #examplesButtons {
     display:inline-block;
-    width:120px;
+    width:180px;
 }
 #examplesView #examplesUrl {
     display: inline-block;
-    width: calc(100% - 140px);
+    width: calc(100% - 220px);
 }
 #examplesView iframe {
     position:absolute;

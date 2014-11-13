@@ -44,10 +44,10 @@ ExamplesManager.prototype.changeUrl = function () {
     if (newUrl !== self.currentUrl) {
         self.currentUrl = newUrl;
         if (!newUrl) {
-            self.iframe.src = 'examples/index.html';
-        } else {
-            self.iframe.src = newUrl;
+            newUrl = 'examples/index.html';
         }
+        
+        self.iframe.src = newUrl;
         // Changing src will fire onload, and consequently pushUrl
     }
 };

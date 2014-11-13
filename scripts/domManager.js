@@ -31,6 +31,7 @@ DomManager.PADDING = 64;
 DomManager.DOM_LIBS = [
     'lib/jquery-1.11.0.min.js',
     'lib/d3.min.js',
+    'lib/topojson.js',
     'scripts/iD3.js',
     'lib/phrogz.js'
 ];
@@ -245,7 +246,7 @@ DomManager.prototype.unifySvgTags = function (svgNode) {
  **/
 DomManager.SHORTHAND_REGEX = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
 DomManager.HEX_PARSING_REGEX = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i;
-DomManager.prototype.standardizeColor = function (s) {
+DomManager.prototype.Color = function (s) {
     if (s[0] === '#') {
         // Stolen from http://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
         // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
@@ -299,8 +300,8 @@ DomManager.prototype.extractPath = function (g, z) {
             itemType : 'path',
             name : g.getAttribute('id'),
             zIndex : z,
-            fill : self.standardizeColor(window.getComputedStyle(g).fill),
-            stroke : self.standardizeColor(window.getComputedStyle(g).stroke),
+            fill : self.Color(window.getComputedStyle(g).fill),
+            stroke : self.Color(window.getComputedStyle(g).stroke),
             strokeWidth : parseFloat(window.getComputedStyle(g).strokeWidth),
             opacity : parseFloat(window.getComputedStyle(g).opacity),
             points : [],
@@ -397,7 +398,7 @@ DomManager.prototype.standardize = function () {
     self.nameLookup = {};
     
     self.enforceUniqueIds(jQuery('svg')[0]);
-    d3.selectAll('svg').toCubicPaths(undefined, true);
+    d3.selectAll('svg').standardize(undefined, true);
 };
 DomManager.prototype.extractDocument = function () {
     var self = this,
@@ -503,13 +504,13 @@ DomManager.prototype.docToDom = function () {
             }
             
             // Sneaky hack: we set all the REVERSE transforms in the self.addChildLayers()
-            // recursive bit; calling toCubicPaths on everything will apply all the reverse transforms
+            // recursive bit; calling standardize on everything will apply all the reverse transforms
             // so that elements will have their native coordinates - and then we can
             // set the new, double-reversed transforms as the regular transform property.
             // This way, everything in d3-land looks like nothing happened to the
             // transform tags, even though the native Illustrator positions were previously
             // baked in.
-            svg.toCubicPaths(undefined, true);
+            svg.standardize(undefined, true);
             jQuery('svg g, svg path').each(function () {
                 if (this.hasAttribute('id3_reverseTransform')) {
                     this.setAttribute('transform',this.getAttribute('id3_reverseTransform'));

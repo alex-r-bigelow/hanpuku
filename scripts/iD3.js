@@ -377,7 +377,7 @@
      * Extra goodies monkey-patched on to selections only (useful for manipulating
      * selections with existing objects more like Illustrator)
      */
-    d3.selection.prototype.toCubicPaths = function (m, preserveReverseTransforms) {
+    d3.selection.prototype.standardize = function (m, preserveReverseTransforms) {
         var self = this;
         self.each(function (d, i) {
             var e = this;
@@ -436,15 +436,6 @@
         });
     };
     
-    /**
-     * Applies a transformation matrix to every element in the selection AFTER first centering
-     * the element on the document's 0,0 coordinate.
-     *
-     * @method setGlobalTransform
-     * @param {Array} m A 6-element matrix in SVG order, e.g.
-     * a matrix that translates 5px in x and 10px in y would be [1,0,0,1,5,10]. May also be
-     * a function that returns an Array; TODO: better explanation of parameters
-     */
     d3.selection.prototype.setGlobalTransform = function (m) {
         var self = this;
         return self.each(function (d, i) {

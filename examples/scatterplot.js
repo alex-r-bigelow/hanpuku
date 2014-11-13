@@ -1,4 +1,4 @@
-var artboardBounds = jQuery('#Artboard_1')[0].getBoundingClientRect();
+var artboardBounds = jQuery('.artboard')[0].getBoundingClientRect();
 
 var margin = {top: 20, right: 20, bottom: 30, left: 40},
   width = artboardBounds.width - margin.left - margin.right,

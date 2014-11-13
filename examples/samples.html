@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+    <head>
+        <link type="text/css" rel="stylesheet" href="style.css"/>
+        <script type="application/javascript">
+            function loadSample(name) {
+                if (name === 'force') {
+                    window.parent.DATA.loadSampleDataFile('examples/miserables.json');
+                    window.parent.CODE.loadSampleJSFile('examples/force.js');
+                    window.parent.CODE.loadSampleCSSFile('examples/force.css');
+                } else if (name === 'scatterplot') {
+                    window.parent.DATA.loadSampleDataFile('examples/flowers.tsv');
+                    window.parent.CODE.loadSampleJSFile('examples/scatterplot.js', window.parent.DOM.docName);
+                    window.parent.CODE.loadSampleCSSFile('examples/scatterplot.css');
+                }
+            }
+            
+            var sampleNames = {
+                    'scatterplot' : 'Scatterplot',
+                    'force' : 'Force-directed graph'
+                },
+                resultText = "",
+                name;
+            
+            for (name in sampleNames) {
+                if (sampleNames.hasOwnProperty(name)) {
+                    resultText += '<div class="sample">' + sampleNames[name] +
+                                  '<button onclick="loadSample(\'' + name + '\')">Load</button>' +
+                                  '<img src="thumbnails/' + name + '.png"/>' +
+                                  '</div>';
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <h2 style="margin-left:30px;">Samples built for iD3</h2>
+        <div id="content"></div>
+        <script type="application/javascript">
+            document.getElementById('content').innerHTML = resultText;
+        </script>
+    </body>
+</html>
