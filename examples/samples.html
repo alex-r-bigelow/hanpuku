@@ -12,11 +12,20 @@
                     window.parent.DATA.loadSampleDataFile('examples/flowers.tsv');
                     window.parent.CODE.loadSampleJSFile('examples/scatterplot.js', window.parent.DOM.docName);
                     window.parent.CODE.loadSampleCSSFile('examples/scatterplot.css');
+                } else if (name === 'groupedBars') {
+                    window.parent.DATA.loadSampleDataFile('examples/statePopulation.csv');
+                    window.parent.CODE.loadSampleJSFile('examples/groupedBars.js');
+                    window.parent.CODE.loadSampleCSSFile('examples/groupedBars.css');
+                } else if (name === 'lineChart') {
+                    window.parent.DATA.loadSampleDataFile('examples/stock.tsv');
+                    window.parent.CODE.loadSampleJSFile('examples/lineChart.js');
+                    window.parent.CODE.loadSampleCSSFile('examples/lineChart.css');
                 }
             }
             
             var sampleNames = {
                     'scatterplot' : 'Scatterplot',
+                    'groupedBars' : 'Grouped Bar Chart',
                     'force' : 'Force-directed graph'
                 },
                 resultText = "",

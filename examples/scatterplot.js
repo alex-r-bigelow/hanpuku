@@ -86,7 +86,7 @@ d3.tsv("flowers.tsv", function(error, data) {
   // Remove old legend entries
   legend.exit().remove();
   // Update legend entries
-  legend.select(".glyph")
+  legend.select(".legendDot")
       .attr("transform", function(d, i) { return "translate(" + (width - 16) + "," + (i * 20) + ")"; })
       .style("fill", color);
   legend.select("text")

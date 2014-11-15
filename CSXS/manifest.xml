@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<ExtensionManifest ExtensionBundleId="com.sci.iD3" ExtensionBundleName="iD3" ExtensionBundleVersion="0.1" Version="4.0">
+<ExtensionManifest ExtensionBundleId="iD3" ExtensionBundleName="iD3" ExtensionBundleVersion="0.1" Version="4.0">
+  <Author>Alex Bigelow</Author>
+  <Contact mailto="abigelow@cs.utah.edu"/>
+  <Abstract href="http://alex.bigelowsite.com">
+    <![CDATA[
+iD3 is an interface between d3.js and Adobe Illustrator, enabling a more flexible data visualization workflow. Data bindings no longer disappear when you edit a d3-generated graphic in Illustrator; those bindings now survive custom edits, and even get saved inside native .ai files.
+
+On the flip side, your custom Illustrator edits will also survive properly-written d3.js scripts: now, when your data changes after you've done lots of hand-crafted awesomeness, you don't have to start over from scratch!
+    ]]>
+  </Abstract>
   <ExtensionList>
-    <Extension Id="com.sci.iD3.extension" Version="1.0"/>
+    <Extension Id="iD3.extension" Version="1.0"/>
   </ExtensionList>
   <ExecutionEnvironment>
     <HostList>
@@ -15,7 +24,7 @@
     </RequiredRuntimeList>
   </ExecutionEnvironment>
   <DispatchInfoList>
-    <Extension Id="com.sci.iD3.extension">
+    <Extension Id="iD3.extension">
       <DispatchInfo>
         <Resources>
           <MainPath>./index.html</MainPath>

@@ -8,29 +8,51 @@
             <h2 class="dontmove">Quick Links</h2>
             <ul>
                 <li><h3><a href="samples.html">iD3 Examples</a></h3></li>
-                <li><h3><a href="http://bl.ocks.org/mbostock">Mike Bostock's D3 Examples</a></h3>
+                <li><h3><a href="http://bl.ocks.org/mbostock">Mike Bostock's d3 Examples</a></h3>
                 <small>(May need a little hacking to work)</small></li>
-                <li><h3><a href="https://github.com/mbostock/d3/wiki/Gallery">D3 Example Gallery</a></h3>
+                <li><h3><a href="https://github.com/mbostock/d3/wiki/Gallery">d3 Example Gallery</a></h3>
                 <small>(May need more than a little hacking to work)</small></li>
             </ul>
             
         </div>
         <div id="column">
+            <h2></h2>
+            <p>iD3 is an interface between d3.js and Adobe Illustrator, enabling a more flexible
+            data visualization workflow. Data bindings no longer disappear when you edit a d3-generated
+            graphic in Illustrator; those bindings now survive custom edits, and even
+            get saved inside native .ai files.</p>
+            
+            <p>On the flip side, your custom Illustrator edits
+            will also survive properly-written d3.js scripts: now, when your data changes after
+            you've done lots of hand-crafted awesomeness, you don't have to start over from scratch!</p>
             <h2>Not a programmer?</h2>
-            <p>Try loading an existing chart from our <a href="samples.html">sample library</a>. If you
-            paste similar data into the Data tab, you can just press "Run" in the JS tab and see the graph
-            with your data in it. Click "Apply" to save your changes.</p>
-            <p>Need to change the data? Even after you've changed stuff with Illustrator tools? No problem! Just
-            change the data in the Data tab, and pres "Run" in the JS tab to update everything.</p>
-            <p>Of course, feel free to change things in the javascript or CSS if you're feeling adventurous. Nothing
-            will change in your actual document until you click the "Apply" button. Many
-            of <a href="http://bl.ocks.org/mbostock">Mike Bostock's D3 Examples</a> can be imported
-            and work with only a few minor changes.</p>
+            <p>Try loading an existing chart from our <a href="samples.html">sample library</a>, and press
+            "Run" in the JS tab. To use your own data, follow these steps. Note that these steps still work
+            even <strong>after</strong> you've changed stuff with Illustrator tools!
+            </p>
+            <ul>
+                <li>Press "Refresh From Document" (Illustrator doesn't yet have a clean way to automate this
+                when you change things in your document)</li>
+                <li>Load / paste / edit the data in the Data tab</li>
+                <li>Press "Run" in the JS tab (the same script should still be loaded)</li>
+                <li>If things updated as you expected, press "Apply"</li>
+            </ul>
+            <p>The scripts are written to affect only the data-relevant bits (in the scatterplot example,
+            only the position and fill of the dots are affected. If you change the shape of a few
+            points and re-run the script with new data, your custom shapes will be preserved, though
+            they may be moved or re-colored according to the data changes). If things <i>don't</i>
+            behave as you expect, the "Apply" button ensures that your document won't change
+            until you tell it to.</p>
+            <p>Of course, feel free to try hacking the javascript or CSS if you're feeling adventurous.
+            Remember, nothing will change in your actual document until you click the "Apply" button,
+            so feel free to explore! The iD3 sample library is still pretty small, but most
+            of <a href="http://bl.ocks.org/mbostock">Mike Bostock's d3 Examples</a> can be used
+            with only a few minor changes.</p>
             
             <h2>For programmers - Things to be aware of</h2>
             <p>There are several quirks for d3 code that are introduced by integrating
             d3.js with Illustrator. iD3 includes a DOM, rendered using Adobe's built-in,
-            Google Chrome-based extension engine. The "Reset" button clears the DOM in iD3, and reverts
+            Google Chrome-based extension engine. The "Refresh From Document" button clears the DOM in iD3, and reverts
             the widget back to the current state of the Illustrator document. "Apply"
             maps any changes that have been made to the iD3 DOM to the currently active Illustrator document,
             and then updates the iD3 DOM to match the Illustrator document's state.</p>
@@ -47,7 +69,7 @@
             time, here are the ones that are included:</p>
             <ul>
                 <li>d3.js</li>
-                <li>id3.js (adds functionality listed below)</li>
+                <li>iD3.js (adds functionality listed below)</li>
                 <li>topojson.js</li>
                 <li>jQuery</li>
             </ul>
@@ -85,51 +107,46 @@
                     <p>Illustrator only supports cubic-interpolated path elements. On clicking the "Apply"
                     button, iD3 must convert every SVG primitive in
                     its DOM to cubic-interpolated paths; while class and style attributes will be
-                    preserved in the converted path, its identity as a circle, rect, or non-cubic path
+                    preserved in the converted path element, its identity as a circle, rect, or non-cubic path
                     will be lost. To allow free manipulation of primitives in Illustrator, these
                     semantics can not be hidden from the d3 code.</p>
-                    <p>In some situations, this can make for confusing update code; to mitigate this
-                    a little, we have monkey-patched
-                    these functions onto d3 selections that do the conversion immediately instead of
-                    waiting for "Apply":</p>
+                    <p>In some situations, this can make for confusing or even impossible update code; to
+                    mitigate this, we have monkey-patched
+                    these functions onto d3 selections that allow you to manipulate paths as if
+                    they were circles, rectangles, or non-cubic paths:</p>
                     <ul>
                         <li>
-                            <p><strong>d3.selection.appendCircle(cx, cy, r);</strong> Equivalent to:<br/>
-                            d3.selection.append('circle')<br/>
-                            &emsp;.attr('cx', cx)<br/>
+                            <p><strong>d3.selection.circleAttr(cx, cy, r);</strong> Equivalent to:<br/>
+                            d3.selection.attr('cx', cx)<br/>
                             &emsp;.attr('cy', cy)<br/>
                             &emsp;.attr('r', r);<br/>
-                            except a cubic-interpolated path is created instead of a circle element.</p>
+                            if the selection actually contained &lt;circle&gt; elements, except these
+                            commands change existing paths' geometry to be circles with these properties.</p>
                         </li>
                         <li>
-                            <p><strong>d3.selection.appendRect(x, y, width, height);</strong> Equivalent to:<br/>
-                            d3.selection.append('rect')<br/>
-                            &emsp;.attr('x', x)<br/>
+                            <p><strong>d3.selection.rectAttr(x, y, width, height);</strong> Equivalent to:<br/>
+                            d3.selection.attr('x', x)<br/>
                             &emsp;.attr('y', y)<br/>
                             &emsp;.attr('width', width)<br/>
                             &emsp;.attr('height', height);<br/>
-                            except a cubic-interpolated path is created instead of a rect element.</p>
+                            if the selection actually contained &lt;rect&gt; elements, except these
+                            commands change existing paths' geometry to be rectangles with these properties.</p>
                         </li>
                         <li>
-                            <p><strong>d3.selection.appendPath(d);</strong> Equivalent to:<br/>
-                            d3.selection.append('path')<br/>
-                            &emsp;.attr('d', d);<br/>
+                            <p><strong>d3.selection.pathAttr(d);</strong> Equivalent to:<br/>
+                            d3.selection.attr('d', d);<br/>
                             except the d parameter is immediately converted to cubic-interpolated control points.</p>
                         </li>
                     </ul>
                     <p>As with any d3 function, each parameter may be a function instead of a value that
                     will be called with two parameters: the data element, and its index. Of course, SVG primitives
-                    can still be added in the traditional way, but these may help make your code more consistent
-                    after "Apply" has been
-                    clicked.</p>
-                    
-                    TODO: .appendClone(), .appendCircle(), .appendRect(), .appendPath(), .toCubicPaths(),
-                    .setGlobalPosition(), .setGlobalBBox(), .setGlobalTransform()
+                    can still be added in the traditional way, but these may help make your code more update-friendly
+                    after "Apply" has been clicked.</p>
                 </li>
                 <li><h3>Additional d3 Functions: Absolute Coordinates</h3><br/>
                     <p>Illustrator only supports global coordinates (i.e. SVG-style nested transformations on
                     various groups can not be used). This is very problematic for perhaps the majority of
-                    existing D3 code; nested transformations are used extensively. iD3 masks this process
+                    existing d3 code; nested transformations are used extensively. iD3 masks this process
                     from its DOM; when refreshing the DOM from the existing document, old tranformation tags
                     and local coordinates are reapplied where they previously existed.</p>
                     <p>That said, some nuances can still exist, especially if you plan on manipulating

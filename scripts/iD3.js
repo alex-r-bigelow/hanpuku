@@ -285,7 +285,8 @@
        immediately instead of as an attribute, and every shape is
        a cubic-interpolated path. These monkey-patched functions
        apply transforms behind the scenes and convert shapes to
-       cubic-interpolated paths */
+       cubic-interpolated paths, and allow the programmer to treat
+       paths as if they were still rect, circle, or non-cubic paths */
     
     d3.selection.prototype.appendClone = function (idToClone) {
         var self = this;
@@ -338,22 +339,19 @@
     };
     d3.selection.enter.prototype.appendClone = d3.selection.prototype.appendClone;
     
-    d3.selection.prototype.appendCircle = function (cx, cy, r) {
+    d3.selection.prototype.circleAttr = function (cx, cy, r) {
         var self = this;
-        return self.append('path')
-            .attr('d', function (d, i) {
+        return self.attr('d', function (d, i) {
                 var d_cx = typeof cx === 'function' ? cx.call(this, d, i) : cx,
                     d_cy = typeof cy === 'function' ? cy.call(this, d, i) : cy,
                     d_r = typeof r === 'function' ? r.call(this, d, i) : r;
                 return circleToCubicPath(d_cx, d_cy, d_r);
             });
     };
-    d3.selection.enter.prototype.appendCircle = d3.selection.prototype.appendCircle;
     
-    d3.selection.prototype.appendRect = function (x, y, width, height) {
+    d3.selection.prototype.rectAttr = function (x, y, width, height) {
         var self = this;
-        return self.append('path')
-            .attr('d', function (d, i) {
+        return self.attr('d', function (d, i) {
                 var d_x = typeof x === 'function' ? x.call(this, d, i) : x,
                     d_y = typeof y === 'function' ? y.call(this, d, i) : y,
                     d_width = typeof width === 'function' ? width.call(this, d, i) : width,
@@ -361,20 +359,17 @@
                 return rectToCubicPath(d_x, d_y, d_width, d_height);
             });
     };
-    d3.selection.enter.prototype.appendRect = d3.selection.prototype.appendRect;
     
-    d3.selection.prototype.appendPath = function (d) {
+    d3.selection.prototype.pathAttr = function (d) {
         var self = this;
-        return self.append('path')
-            .attr('d', function (data, i) {
+        return self.attr('d', function (data, i) {
                 var d_d = typeof d === 'function' ? d.call(this, data, i) : d;
                 return pathToCubicPath(d_d);
             });
     };
-    d3.selection.enter.prototype.appendPath = d3.selection.prototype.appendPath;
     
     /**
-     * Extra goodies monkey-patched on to selections only (useful for manipulating
+     * Extra goodies monkey-patched on to selections (useful for manipulating
      * selections with existing objects more like Illustrator)
      */
     d3.selection.prototype.standardize = function (m, preserveReverseTransforms) {

@@ -11,10 +11,14 @@ var force = d3.layout.force()
     .size([width, height]);
 
 // Get our container, apply the margin if it's the first time
-var svg = d3.select('#Layer_1').selectAll('.scatterplot').data([0]);
+var svg = d3.select('#Layer_1').selectAll('.force').data([0]);
 var svgEnter = svg.enter();
 svgEnter.append('g')
-   .attr('class', 'scatterplot');
+   .attr('class', 'linkLayer');
+svgEnter.append('g')
+   .attr('class', 'nodeLayer');
+var linkLayer = d3.select('g.linkLayer');
+var nodeLayer = d3.select('g.nodeLayer');
 
 d3.json("miserables.json", function(error, graph) {
   force
@@ -22,13 +26,13 @@ d3.json("miserables.json", function(error, graph) {
       .links(graph.links)
       .start();
 
-  var link = svg.selectAll(".link")
+  var link = linkLayer.selectAll(".link")
       .data(graph.links);
   link.enter().append("path")
       .attr("class", "link")
       .style("stroke-width", function(d) { return Math.sqrt(d.value); });
 
-  var node = svg.selectAll(".node")
+  var node = nodeLayer.selectAll(".node")
       .data(graph.nodes, function (d) { return d.name; });
   node.enter().append("circle")
       .attr("class", "node")

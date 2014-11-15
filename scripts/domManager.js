@@ -73,11 +73,14 @@ DomManager.prototype.initScope = function () {
                 callback(url + " has not been loaded in the Data tab.", undefined);
             }
         };
-    self.iframeScope = {
-        window : self.iframe.contentWindow,
-        document : self.iframe.contentDocument,
-        selectedIDs : SELECTED_IDS
-    };
+    // Clear out old variables
+    self.iframeScope = {};
+    
+    // Give it the basics
+    self.iframeScope.window = self.iframe.contentWindow;
+    self.iframeScope.document = self.iframe.contentDocument;
+    self.iframeScope.selectedIDs = SELECTED_IDS;
+    
     for (s = 0; s < DomManager.DOM_LIBS.length; s += 1) {
         ejQuery.ajax({
             url : DomManager.DOM_LIBS[s],
@@ -90,7 +93,8 @@ DomManager.prototype.initScope = function () {
      * in the normal way... this is kind of nuanced for each library
      */
     self.runScript('jQuery = window.jQuery;', true);
-    self.runScript('var d3 = window.parent.d3;', true);
+    self.iframeScope.window.d3 = self.iframe.contentWindow.parent.d3;
+    self.iframeScope.window.topojson = self.iframe.contentWindow.parent.topojson;
     /**
      * I also need to monkey patch the local d3's file loading schemes;
      * we've already loaded and parsed any relevant files in the Data tab
@@ -433,14 +437,12 @@ DomManager.prototype.extractDocument = function () {
             z += 1;
         }
     }
-    
     return output;
 };
 DomManager.prototype.domToDoc = function () {
     // Throw away all the selection rectangles
     var self = this;
     jQuery('#id3_selectionLayer').remove();
-    
     ILLUSTRATOR.runJSX(JSON.stringify(self.extractDocument()), 'scripts/domToDoc.jsx', function (result) {});
 };
 

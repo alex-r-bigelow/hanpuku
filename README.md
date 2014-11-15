@@ -1,8 +1,15 @@
-# com.sci.iD3 #
+# iD3 #
 
-Adding support for using d3.js code directly in Illustrator, with some nuances.
+iD3 is an interface between d3.js and Adobe Illustrator, enabling a more flexible
+data visualization workflow. Data bindings no longer disappear when you edit a d3-generated
+graphic in Illustrator; those bindings now survive custom edits, and even
+get saved inside native .ai files.
 
-### Panels:
+On the flip side, your custom Illustrator edits
+will also survive properly-written d3.js scripts: now, when your data changes after
+you've done lots of hand-crafted awesomeness, you don't have to start over from scratch!
+
+### Panels (existing and planned):
 - Data
  - Tasks
   - Load, edit data
@@ -41,31 +48,31 @@ Adding support for using d3.js code directly in Illustrator, with some nuances.
 #### High priority
 - Fix Isolation Mode bug
 - Support text
-- Documentation, iD3-specific Examples
+- More iD3-specific Examples
 - Import directly from Examples tab
-- Bundle for user testing (start a release cycle?)
 
 #### Medium priority
-- Support HTML conversion to SVG + a more elegant way to incorporate new SVG elements
 - Regex search/replace in text editors (esp. data)
 - Replace textareas with ace editors
 - Embed the Chrome debugging window as a view
 - Export as/to web page tool
 - Embed data, js, css files inside the .ai file (preserve layer-level properties while I'm at it)
 - Load multiple js, css files, distinguish between js libraries and scripts (run the former immediately)
+- Support Gradients, CMYK color, stroke properties (dashes, cap, etc.), Masks
 
 #### Low priority (probably next paper)
+- Fix bug associated with single paths too long for Illustrator
 - Bindings tab
 - Selection query tools
 - Dom preview selection functionality
 - Influence tab
 - Add some kind of placeholder for unsupported items like blends or graphs?
-- Support Text, Gradients, CMYK color, stroke properties (dashes, cap, etc.), Masks
 - Support binding to path points (you can get around this by being creative
   with your data abstraction!)
 - Walk through HBO Example
 
 #### Very low priority
+- Support converting HTML outside the SVG?
 - Investigate what it would take to make an Inkscape clone
-- It would be cool to convert between canvas elements / bitmaps
-- Windows support
+- It would be cool to convert between canvas elements / bitmaps...
+- Test on Windows

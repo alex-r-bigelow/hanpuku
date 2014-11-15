@@ -40,7 +40,8 @@
         });
     };
     IllustratorConnection.prototype.runJSX = function (input, path, callback) {
-        var self = this;
+        var self = this,
+            i;
         if (self.loadedJSXlibs === false) {
             // Try again in a second...
             window.setTimeout(function () { self.runJSX(input, path, callback); }, 1000);
@@ -51,17 +52,24 @@
                     script = "var input=" + JSON.stringify(input) + ";\n" + script;
                     self.connection.evalScript(script, function (r) {
                         var result;
-                        if (r.search("Error") === 0 || r.isOk === false) {
+                        if (r.isOk === false) {
                             throw r;
                         } else {
                             try {
                                 result = JSON.parse(r);
                             } catch (e) {
-                                console.warn("Couldn't parse:\n" + r);
+                                console.warn("Couldn't parse JSX result in " + path + ":\n" + r);
                                 throw e;
                             }
+                            for (i = 0; i < result.logs.length; i += 1) {
+                                console.log(result.logs[i]);
+                            }
+                            if (result.error !== null) {
+                                console.warn("JSX Error in " + path + " on line: " + result.error.line);
+                                throw "JSX Error:" + result.error.message;
+                            }
                         }
-                        callback(result);
+                        callback(result.output);
                     });
                 },
                 cache: false
@@ -71,7 +79,7 @@
     IllustratorConnection.prototype.addListeners = function () {
         var self = this,
             updateFunc = function () { DOM.docToDom(); };
-        window.onfocus = updateFunc;
+        //window.onfocus = updateFunc;
         // TODO: when Illustrator adds more listeners, inject them here!
         self.connection.addEventListener('documentAfterActivate', updateFunc);
         self.connection.addEventListener('documentAfterDeactivate', updateFunc);

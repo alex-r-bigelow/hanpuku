@@ -5,6 +5,6 @@
   shape-rendering: crispEdges;
 }
 
-.dot, .legendDots {
+.dot, .legendDot {
   stroke: #000;
 }

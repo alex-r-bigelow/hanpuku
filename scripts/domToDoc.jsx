@@ -1,6 +1,37 @@
 var doc = JSON.parse(input),
-    console = '"success"',
     activeDoc;
+
+function ConsoleProxy () {
+    var self = this;
+    self.logs = [];
+    self.error = null;
+    self.output = null;
+}
+ConsoleProxy.prototype.log = function (message) {
+    var self = this;
+    self.logs.push(String(message));
+};
+ConsoleProxy.prototype.logError = function (e) {
+    var self = this;
+    self.error = {
+        'message' : String(e.message),
+        'line' : String(e.line)
+    };
+};
+ConsoleProxy.prototype.setOutput = function (o) {
+    var self = this;
+    self.output = o;
+};
+ConsoleProxy.prototype.jsonPacket = function () {
+    var self = this;
+    return JSON.stringify({
+        'logs' : self.logs,
+        'error' : self.error,
+        'output' : self.output
+    });
+};
+
+var console = new ConsoleProxy();
 
 // Shim - ExtendScript doesn't have indexOf
 if (typeof Array.prototype.indexOf != "function") {  
@@ -204,6 +235,10 @@ function applyDocument()
 // than to delete too much. I'll uncomment when Illustrator adds more
 // event listeners)
 
-applyDocument();
-app.redraw();
-console;
+try {
+    applyDocument();
+    app.redraw();
+} catch(e) {
+    console.logError(e);
+}
+console.jsonPacket();

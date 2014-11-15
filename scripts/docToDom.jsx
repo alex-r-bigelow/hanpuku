@@ -21,8 +21,39 @@ var alertedCMYK = false,
         "id3_data",
         "id3_classNames",
         "id3_reverseTransform"
-    ],
-    memo = "";
+    ];
+
+function ConsoleProxy () {
+    var self = this;
+    self.logs = [];
+    self.error = null;
+    self.output = null;
+}
+ConsoleProxy.prototype.log = function (message) {
+    var self = this;
+    self.logs.push(String(message));
+};
+ConsoleProxy.prototype.logError = function (e) {
+    var self = this;
+    self.error = {
+        'message' : String(e.message),
+        'line' : String(e.line)
+    };
+};
+ConsoleProxy.prototype.setOutput = function (o) {
+    var self = this;
+    self.output = o;
+};
+ConsoleProxy.prototype.jsonPacket = function () {
+    var self = this;
+    return JSON.stringify({
+        'logs' : self.logs,
+        'error' : self.error,
+        'output' : self.output
+    });
+};
+
+var console = new ConsoleProxy();
 
 function standardize(activeDoc) {
     var nameLookup = {};
@@ -115,7 +146,6 @@ function extractColor(e, attr) {
 }
 
 function extractPath (p) {
-    memo = p.name;
     var output = {
         itemType : 'path',
         name : p.name,
@@ -261,7 +291,8 @@ function extractDocument() {
 }
 
 try {
-    JSON.stringify(extractDocument());
+    console.setOutput(extractDocument());
 } catch(e) {
-    'Error: ' + e.message + '\nLine ' + e.line + ': ' + e.source.split('\n')[e.line-1] + '\n\nmemo:' + memo;
+    console.logError(e);
 }
+console.jsonPacket();
