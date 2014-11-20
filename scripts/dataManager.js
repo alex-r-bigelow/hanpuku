@@ -521,10 +521,13 @@ DataManager.prototype.loadSampleDataFile = function (url) {
         
         extension = extension[extension.length - 1];
         extension = DataManager.FORMAT_LOOKUP[extension.toLowerCase()];
-        
+        if (typeof dataString !== 'string') {
+            dataString = JSON.stringify(dataString);
+        }
         self.addFile(new DataFile(name, extension, dataString));
         self.currentFile = name;
         self.updatePanel();
+        EXTENSION.displayMessage('Loaded ' + name);
     });
 };
 DataManager.prototype.loadFile = function (f) {

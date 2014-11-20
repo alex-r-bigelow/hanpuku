@@ -38,6 +38,12 @@ DomManager.DOM_LIBS = [
 DomManager.JSX_LIBS = [
     'lib/json2.js'
 ];
+DomManager.prototype.disableUI = function () {
+    ejQuery('#zoomButtons button').attr('disabled', true);
+};
+DomManager.prototype.enableUI = function () {
+    ejQuery('#zoomButtons button').attr('disabled', false);
+};
 DomManager.prototype.zoomIn = function () {
     var self = this;
     var current = jQuery('#' + self.docName).css('zoom'),
@@ -524,6 +530,9 @@ DomManager.prototype.docToDom = function () {
             // (the original D3 selection will have been empty)
             self.iframeScope.selection = ILLUSTRATOR.getD3selection();
             self.updateSelectionLayer();
+        } else {
+            self.docName = undefined;
+            self.viewBounds = undefined;
         }
         EXTENSION.updateUI();
     });

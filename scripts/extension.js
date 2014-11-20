@@ -68,7 +68,7 @@
                             }
                             if (result.error !== null) {
                                 console.warn("JSX Error in " + path + " on line: " + result.error.line);
-                                throw "JSX Error:" + result.error.message;
+                                throw "JSX Error: " + result.error.message;
                             }
                         }
                         callback(result.output);
@@ -77,6 +77,10 @@
                 cache: false
             });
         }
+    };
+    IllustratorConnection.prototype.openBrowser = function (url) {
+        var self = this;
+        self.connection.openURLInDefaultBrowser(url);
     };
     IllustratorConnection.prototype.addListeners = function () {
         var self = this,
@@ -126,12 +130,18 @@
         extensionScope.ed3 = d3;
         //jQuery = undefined;
         //d3 = undefined;
+        
+        self.messages = [];
+        self.messageTimer = undefined;
     }
+    ExtensionManager.MESSAGE_DELAY = 5000;
+    ExtensionManager.ANIMATION_DELAY = 500;
     ExtensionManager.EXTENSION_SCRIPTS = [
         "lib/jquery-1.11.0.min.js",
         "lib/CSInterface.js",
         "lib/phrogz.js",
         "lib/d3.min.js",
+        "lib/topojson.js",
         "lib/htmlParser.js",
         "scripts/hanpuku.js",
         "scripts/examplesManager.js",
@@ -288,6 +298,56 @@
         }
         self.advancedMode();
         self.switchTab('Examples');
+        
+        // Init the message area
+        ejQuery('#messageOverlay').hide();
+    };
+    ExtensionManager.prototype.displayMessage = function (message) {
+        var self = this,
+            mobj = {
+                'html' : message,
+                'timer' : undefined
+            },
+            mContents = "";
+        
+        self.messages.push(mobj);
+        // Update the message area contents
+        for (i = 0; i < self.messages.length; i += 1) {
+            mContents += "<p>" + self.messages[i].html + "</p>";
+        }
+        ejQuery('#messageOverlay').html(mContents).fadeIn(ExtensionManager.ANIMATION_DELAY);
+        
+        function clearMessage(m) {
+            // First, remove the message from the array
+            var i = self.messages.indexOf(m),
+                contents = "";
+            
+            if (i !== -1) {
+                self.messages.splice(i, 1);
+            }
+            
+            if (self.messages.length > 0) {
+                // Update the message area contents
+                for (i = 0; i < self.messages.length; i += 1) {
+                    contents += "<p>" + self.messages[i].html + "</p>";
+                }
+                ejQuery('#messageOverlay').html(contents);
+            } else {
+                ejQuery('#messageOverlay').fadeOut(ExtensionManager.ANIMATION_DELAY);
+            }
+        }
+        
+        mobj.timer = setTimeout(function () { clearMessage(mobj); }, ExtensionManager.MESSAGE_DELAY);
+    };
+    ExtensionManager.prototype.clearMessages = function () {
+        var self = this,
+            i;
+            
+        for (i = 0; i < self.messages.length; i += 1) {
+            clearTimeout(self.messages[i].timer);
+        }
+        self.messages = [];
+        ejQuery('#messageOverlay').html("").hide();
     };
     ExtensionManager.prototype.switchTab = function (tabId) {
         var self = this,
@@ -353,7 +413,22 @@
         }
     };
     ExtensionManager.prototype.updateUI = function () {
-        
+        var self = this;
+        if (DOM.docName === undefined) {
+            self.disableUI();
+            DOM.disableUI();
+            CODE.disableUI();
+        } else {
+            self.enableUI();
+            DOM.enableUI();
+            CODE.enableUI();
+        }
+    };
+    ExtensionManager.prototype.disableUI = function () {
+        ejQuery('#refreshButton, #applyButton').attr('disabled', true);
+    };
+    ExtensionManager.prototype.enableUI = function () {
+        ejQuery('#refreshButton, #applyButton').attr('disabled', false);
     };
     
     ExtensionManager.prototype.debug = function () {

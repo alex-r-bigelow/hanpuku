@@ -1,19 +1,6 @@
-var alertedCMYK = false,
-    alertedUnsupported = true,
-    reservedNames = {   // All IDs in the panel are reserved, and we include the empty
-        "" : true,      // string so that elements with no name will be given one
-        "userCSS" : true,
-        "dom" : true,
-        "code" : true,
-        "cssEditor" : true,
-        "codeControls" : true,
-        "sampleMenu" : true,
-        "dataEditor" : true,
-        "dataTypeSelect" : true,
-        "jsEditor" : true,
-        "docControls" : true,
-        "zoomButtons" : true,
-        "debugButton" : true
+var alertedUnsupported = true,
+    reservedNames = {   // All IDs in the panel are reserved, we include the empty
+        "" : true       // string so that elements with no name will be given one
     },
     alphabetic = new RegExp('[A-Za-z]', 'g'),
     invalid = new RegExp('[^A-Za-z0-9-_]','g'),
@@ -29,15 +16,23 @@ function ConsoleProxy () {
     self.error = null;
     self.output = null;
 }
-ConsoleProxy.prototype.log = function (message) {
-    var self = this;
-    self.logs.push(String(message));
+ConsoleProxy.prototype.log = function () {
+    var self = this,
+        i,
+        result = "";
+    for (i = 0; i < arguments.length; i += 1) {
+        if (i > 0) {
+            result += " ";
+        }
+        result += String(arguments[i]);
+    }
+    self.logs.push(result);
 };
 ConsoleProxy.prototype.logError = function (e) {
     var self = this;
     self.error = {
         'message' : String(e.message),
-        'line' : String(e.line)
+        'line' : String(e.line - 1)
     };
 };
 ConsoleProxy.prototype.setOutput = function (o) {
@@ -124,16 +119,15 @@ function extractColor(e, attr) {
                         e[attr].gray + ',' +
                         e[attr].gray + ')';
     } else if (e[attr].typename === 'CMYKColor') {
-        // TODO: provide an rgb backup in the string
-        if (alertedCMYK === false) {
-            alert('hanpuku does not yet support CMYK Color Mode.');
-            alertedCMYK = true;
-        }
+        return 'rgb(' + Math.floor(0.0255 * (100 - e[attr].cyan) * (100 - e[attr].black)) +
+                  ',' + Math.floor(0.0255 * (100 - e[attr].magenta) * (100 - e[attr].black)) +
+                  ',' + Math.floor(0.0255 * (100 - e[attr].yellow) * (100 - e[attr].black)) + ')';
         
-        return 'device-cmyk(' + e[attr].cyan + ',' +
-                                e[attr].magenta + ',' +
-                                e[attr].yellow + ',' +
-                                e[attr].black + ')';
+        // TODO: switch to this once Chrome supports it
+        //return 'device-cmyk(' + e[attr].cyan + ',' +
+        //                        e[attr].magenta + ',' +
+        //                        e[attr].yellow + ',' +
+        //                        e[attr].black + ')';
     } else if (e[attr].typename === 'NoColor') {
         return 'none';
     }else {

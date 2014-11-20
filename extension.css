@@ -16,6 +16,7 @@ button, select, optgroup, option {
 }
 .halo {
     padding:4px;
+    opacity: 0.75;
 }
 .controls {
     position: absolute;
@@ -35,6 +36,16 @@ button, select, optgroup, option {
     position:absolute;
     right:16px;
     bottom:16px;
+}
+#messageOverlay {
+    position:absolute;
+    left:16px;
+    top:76px;
+    width: auto;
+    height: auto;
+}
+#messageOverlay > p {
+    margin: 4px;
 }
 
 #examplesView #examplesButtons {

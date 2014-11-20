@@ -142,8 +142,9 @@ ExamplesManager.prototype.loadBlock = function () {
     var self = this,
         d;
     if (self.importableStuff !== null){
-        CODE.loadSampleJS(self.importableStuff.script);
+        CODE.loadSampleJS(self.importableStuff.script);        
         CODE.loadSampleCSS(self.importableStuff.style);
+        
         for (d = 0; d < self.importableStuff.dataFiles.length; d += 1) {
             DATA.loadSampleDataFile(self.importableStuff.dataFiles[d]);
         }

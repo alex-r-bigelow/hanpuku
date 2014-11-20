@@ -15,8 +15,8 @@
       <span style="float:right">
         <input type="checkbox" id="advancedMode" onchange="EXTENSION.advancedMode();" checked style="visibility: hidden"><!--Show Advanced Tools-->
         &emsp;
-        <button onclick="DOM.docToDom();">Refresh From Document</button>
-        <button onclick="DOM.domToDoc(); DOM.docToDom();">Apply</button>
+        <button id="refreshButton" onclick="DOM.docToDom();">Refresh From Document</button>
+        <button id="applyButton" onclick="DOM.domToDoc(); DOM.docToDom();">Apply</button>
       </span>
       
     </div>
@@ -70,7 +70,7 @@
         <textarea id="jsTextEditor" wrap="off"></textarea>
         <div id="jsEditorControls" class="halo controls">
           <button onclick="ejQuery('#jsFileInput').click();">Load Script...</button>
-          <button onclick="CODE.runJS();">Run</button>
+          <button id="runButton" onclick="CODE.runJS();">Run</button>
           <input id="jsFileInput" type="file" onchange="CODE.loadJSFile();" style="visibility:hidden"/>
         </div>
       </div>
@@ -88,6 +88,9 @@
     <div id="debugButtons" class="halo">
       Debugging:
       <button onclick="location.reload();">Reload Extension</button>
+    </div>
+    
+    <div id="messageOverlay" class="halo" onclick="EXTENSION.clearMessages()">
     </div>
   </body>
 </html>

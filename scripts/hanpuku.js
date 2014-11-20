@@ -92,7 +92,7 @@
         
         for (i = 0; i < pointTypes.length; i += 1) {
             if (pointTypes[i].toUpperCase() !== pointTypes[i]) {
-                throw 'no support for relative point ' + pointTypes[i] + ' yet';
+                throw 'Hanpuku Error: no support for relative point ' + pointTypes[i] + ' yet';
             }
             
             if (i === 0) {
@@ -100,7 +100,7 @@
                     coords = parsePairList(coordList[i]);
                     d += "M" + coords[0];
                 } else {
-                    throw 'paths must start with M';
+                    throw 'Hanpuku Error: paths must start with M';
                 }
             } else if (pointTypes[i] === 'C') {
                 coords = parsePairList(coordList[i]);
@@ -119,8 +119,10 @@
                 d += "C" + coords[0] + ',' +
                            coords[0] + ',' +
                            coords[1];
+            } else if (pointTypes[i] === 'M' ) {
+                throw 'Hanpuku Error: no support yet for disjoint paths';
             } else {
-                throw 'no support yet for path point ' + pointTypes[i];
+                throw 'Hanpuku Error: no support yet for path point ' + pointTypes[i];
             }
         }
         

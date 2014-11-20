@@ -7,15 +7,23 @@ function ConsoleProxy () {
     self.error = null;
     self.output = null;
 }
-ConsoleProxy.prototype.log = function (message) {
-    var self = this;
-    self.logs.push(String(message));
+ConsoleProxy.prototype.log = function () {
+    var self = this,
+        i,
+        result = "";
+    for (i = 0; i < arguments.length; i += 1) {
+        if (i > 0) {
+            result += " ";
+        }
+        result += String(arguments[i]);
+    }
+    self.logs.push(result);
 };
 ConsoleProxy.prototype.logError = function (e) {
     var self = this;
     self.error = {
         'message' : String(e.message),
-        'line' : String(e.line)
+        'line' : String(e.line - 1)
     };
 };
 ConsoleProxy.prototype.setOutput = function (o) {
@@ -51,6 +59,8 @@ function phrogz(name)
 }
 
 function applyColor(iC,dC) {
+    var red, green, blue, black;
+    
     if (dC.split('(').length < 2) {
         alert(dC);
     }
@@ -58,9 +68,41 @@ function applyColor(iC,dC) {
     dC = dC.split(')')[0];
     dC = dC.split(',');
     
-    iC.red = Number(dC[0]);
-    iC.green = Number(dC[1]);
-    iC.blue = Number(dC[2]);
+    red = Number(dC[0]);
+    green = Number(dC[1]);
+    blue = Number(dC[2]);
+    black = 1;
+    
+    if (activeDoc.documentColorSpace === DocumentColorSpace.RGB) {
+        iC.red = red;
+        iC.green = green;
+        iC.blue = blue;
+    } else {
+        // TODO: support CMYK directly when Chrome supports it?
+        red /= 255;
+        green /= 255;
+        blue /= 255;
+        
+        if (red > green && red > blue) {
+            black = 1 - red;
+        } else if (green > red && green > blue) {
+            black = 1 - green;
+        } else {
+            black = 1 - blue;
+        }
+        
+        iC.black = 100 * black;
+        
+        if (black === 1) {
+            iC.cyan = 0;
+            iC.magenta = 0;
+            iC.yellow = 0;
+        } else {
+            iC.cyan = 100 * (1 - red - black) / (1 - black);
+            iC.magenta = 100 * (1 - green - black) / (1 - black);
+            iC.yellow = 100 * (1 - blue - black) / (1 - black);
+        }
+    }
 }
 
 function applyPath(iPath, dPath) {

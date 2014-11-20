@@ -11,21 +11,25 @@ CodeManager.prototype.loadSampleJSFile = function (url, docName) {
             codeString = 'var doc = d3.select("#' + docName + '");\n' + codeString;
         }
         ejQuery('#jsTextEditor').val(codeString);
+        EXTENSION.displayMessage('Updated JS');
     });
 };
 CodeManager.prototype.loadSampleJS = function (codeString) {
     ejQuery('#jsTextEditor').val(codeString);
+    EXTENSION.displayMessage('Updated JS');
 };
 CodeManager.prototype.loadJSFile = function () {
     var newFile = ejQuery('#jsFileInput')[0].files[0],
         fileReader = new FileReader();
     fileReader.onload = function (e) {
         ejQuery('#jsTextEditor').val(e.target.result);
+        EXTENSION.displayMessage('Updated JS');
     };
     fileReader.readAsText(newFile);
 };
 CodeManager.prototype.runJS = function () {
     DOM.runScript(ejQuery('#jsTextEditor').val());
+    EXTENSION.displayMessage('Finished Running JS Script');
 };
 
 CodeManager.prototype.updateCSS = function () {
@@ -41,6 +45,7 @@ CodeManager.prototype.loadCSSFile = function () {
         fileReader = new FileReader();
     fileReader.onload = function (e) {
         ejQuery('#cssTextEditor').val(e.target.result);
+        EXTENSION.displayMessage('Updated CSS');
         self.updateCSS();
     };
     fileReader.readAsText(newFile);
@@ -49,12 +54,14 @@ CodeManager.prototype.loadSampleCSSFile = function (url) {
     var self = this;
     ejQuery.get(url, function (codeString) {
         ejQuery('#cssTextEditor').val(codeString);
+        EXTENSION.displayMessage('Updated CSS');
         self.updateCSS();
     });
 };
 CodeManager.prototype.loadSampleCSS = function (codeString) {
     var self = this;
     ejQuery('#cssTextEditor').val(codeString);
+    EXTENSION.displayMessage('Updated CSS');
     self.updateCSS();
 };
 CodeManager.prototype.editCSS = function () {
@@ -63,4 +70,10 @@ CodeManager.prototype.editCSS = function () {
     self.cssTypingTimer = setTimeout(function () {
         self.updateCSS();
     }, TYPING_INTERVAL);
+};
+CodeManager.prototype.disableUI = function () {
+    ejQuery('#runButton').attr('disabled', true);
+};
+CodeManager.prototype.enableUI = function () {
+    ejQuery('#runButton').attr('disabled', false);
 };
