@@ -1,6 +1,6 @@
-# iD3 #
+# hanpuku #
 
-iD3 is an interface between d3.js and Adobe Illustrator, enabling a more flexible
+Hanpuku is an interface between d3.js and Adobe Illustrator, enabling a more flexible
 data visualization workflow. Data bindings no longer disappear when you edit a d3-generated
 graphic in Illustrator; those bindings now survive custom edits, and even
 get saved inside native .ai files.
@@ -51,7 +51,7 @@ you've done lots of hand-crafted awesomeness, you don't have to start over from 
 - Fix Isolation Mode bug
 - Add CMYK shim
 - Support text
-- More iD3-specific Examples
+- More hanpuku-specific Examples
 
 #### Medium priority
 - Regex search/replace in text editors (esp. data)

@@ -32,7 +32,7 @@ DomManager.DOM_LIBS = [
     'lib/jquery-1.11.0.min.js',
     'lib/d3.min.js',
     'lib/topojson.js',
-    'scripts/iD3.js',
+    'scripts/hanpuku.js',
     'lib/phrogz.js'
 ];
 DomManager.JSX_LIBS = [

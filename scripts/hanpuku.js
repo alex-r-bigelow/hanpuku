@@ -248,7 +248,7 @@
             // for text when I actually convert
             e.setAttribute('transform','matrix(' + m.join(',') + ')');
         } else {
-            throw 'iD3 doesn\'t yet support tag ' + e.tagName;
+            throw 'hanpuku doesn\'t yet support tag ' + e.tagName;
         }
         
         // Do we need to change the actual element? Copy its attributes and d3-assigned

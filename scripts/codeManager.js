@@ -5,6 +5,14 @@ function CodeManager () {
         
     self.cssTypingTimer = undefined;
 }
+CodeManager.prototype.loadSampleJSFile = function (url, docName) {
+    ejQuery.get(url, function (codeString) {
+        if (docName) {
+            codeString = 'var doc = d3.select("#' + docName + '");\n' + codeString;
+        }
+        ejQuery('#jsTextEditor').val(codeString);
+    });
+};
 CodeManager.prototype.loadSampleJS = function (codeString) {
     ejQuery('#jsTextEditor').val(codeString);
 };
@@ -36,6 +44,13 @@ CodeManager.prototype.loadCSSFile = function () {
         self.updateCSS();
     };
     fileReader.readAsText(newFile);
+};
+CodeManager.prototype.loadSampleCSSFile = function (url) {
+    var self = this;
+    ejQuery.get(url, function (codeString) {
+        ejQuery('#cssTextEditor').val(codeString);
+        self.updateCSS();
+    });
 };
 CodeManager.prototype.loadSampleCSS = function (codeString) {
     var self = this;

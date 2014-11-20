@@ -126,7 +126,7 @@ function extractColor(e, attr) {
     } else if (e[attr].typename === 'CMYKColor') {
         // TODO: provide an rgb backup in the string
         if (alertedCMYK === false) {
-            alert('iD3 does not yet support CMYK Color Mode.');
+            alert('hanpuku does not yet support CMYK Color Mode.');
             alertedCMYK = true;
         }
         
@@ -138,7 +138,7 @@ function extractColor(e, attr) {
         return 'none';
     }else {
         if (alertedUnsupported === false) {
-            alert('iD3 does not yet support ' + e[attr].typename);
+            alert('hanpuku does not yet support ' + e[attr].typename);
             alertedUnsupported = true;
         }
         return 'rgb(0,0,0)';

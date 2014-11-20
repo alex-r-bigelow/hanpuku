@@ -7,7 +7,7 @@
         <div id="quickies">
             <h2 class="dontmove">Quick Links</h2>
             <ul>
-                <li><h3><a href="samples.html">iD3 Examples</a></h3></li>
+                <li><h3><a href="samples.html">Hanpuku Examples</a></h3></li>
                 <li><h3><a href="http://bl.ocks.org/mbostock">Mike Bostock's d3 Examples</a></h3>
                 <small>(May need a little hacking to work)</small></li>
                 <li><h3><a href="https://github.com/mbostock/d3/wiki/Gallery">d3 Example Gallery</a></h3>
@@ -17,7 +17,7 @@
         </div>
         <div id="column">
             <h2></h2>
-            <p>iD3 is an interface between d3.js and Adobe Illustrator, enabling a more flexible
+            <p>Hanpuku is an interface between d3.js and Adobe Illustrator, enabling a more flexible
             data visualization workflow. Data bindings no longer disappear when you edit a d3-generated
             graphic in Illustrator; those bindings now survive custom edits, and even
             get saved inside native .ai files.</p>
@@ -51,17 +51,17 @@
             Your document won't change until you tell it to.</p>
             <p>Of course, feel free to try hacking the javascript or CSS if you're feeling adventurous.
             Remember, nothing will change in your actual document until you click the "Apply" button,
-            so feel free to explore! The iD3 sample library is still pretty small, but most
+            so feel free to explore! The hanpuku sample library is still pretty small, but most
             of <a href="http://bl.ocks.org/mbostock">Mike Bostock's d3 Examples</a> can be used
             with only a few minor changes.</p>
             
             <h2>For programmers - Things to be aware of</h2>
             <p>There are several quirks for d3 code that are introduced by integrating
-            d3.js with Illustrator. iD3 includes a DOM, rendered using Adobe's built-in,
-            Google Chrome-based extension engine. The "Refresh From Document" button clears the DOM in iD3, and reverts
+            d3.js with Illustrator. Hanpuku includes a DOM, rendered using Adobe's built-in,
+            Google Chrome-based extension engine. The "Refresh From Document" button clears the DOM in hanpuku, and reverts
             the widget back to the current state of the Illustrator document. "Apply"
-            maps any changes that have been made to the iD3 DOM to the currently active Illustrator document,
-            and then updates the iD3 DOM to match the Illustrator document's state.</p>
+            maps any changes that have been made to the hanpuku DOM to the currently active Illustrator document,
+            and then updates the hanpuku DOM to match the Illustrator document's state.</p>
             <p>These cycles between a real DOM and an Illustrator document have some nuances
             and speed bumps. Some functionality has been added to d3, and some additional
             global variables exist (see the list below). Some incompatibilities also exist
@@ -75,17 +75,17 @@
             time, here are the ones that are included:</p>
             <ul>
                 <li>d3.js</li>
-                <li>iD3.js (adds functionality listed below)</li>
+                <li>hanpuku.js (adds functionality listed below)</li>
                 <li>topojson.js</li>
                 <li>jQuery</li>
             </ul>
-            <p>Beyond this, iD3 currently only supports a single javascript file (in the JS tab). I plan to
+            <p>Beyond this, hanpuku currently only supports a single javascript file (in the JS tab). I plan to
             organize this a little better in the future as well.</p>
             
             <h2>Added functionality, weird quirks</h2>
             <ul>
                 <li><h3>DOM Structure</h3><br/>
-                    <p>A fresh iD3 DOM will always contain an inline SVG element whose id matches the
+                    <p>A fresh hanpuku DOM will always contain an inline SVG element whose id matches the
                     file name of the current Illustrator document. Any changes outside this
                     SVG element will be ignored (if, for example, you add buttons to control
                     an interactive visualization, they will be lost after clicking "Apply").
@@ -96,7 +96,7 @@
                         <li>g elements representing each layer<br/></li>
                     </ul>
                     <p>Every element's id in the DOM will be the same as the object's
-                    name in Illustrator's Layers widget, however, iD3 may modify
+                    name in Illustrator's Layers widget, however, hanpuku may modify
                     these names to ensure that all ids are unique and compatible with HTML.</p>
                     <p>You can manipulate the .artboard elements, and your changes
                     will be reflected in the document, however, Illustrator does not have a mechanism
@@ -112,7 +112,7 @@
                 </li>
                 <li><h3>Additional d3 Functions: Cubic Interpolated Paths</h3><br/>
                     <p>Illustrator only supports cubic-interpolated path elements. On clicking the "Apply"
-                    button, iD3 must convert every SVG primitive in
+                    button, hanpuku must convert every SVG primitive in
                     its DOM to cubic-interpolated paths; while class and style attributes will be
                     preserved in the converted path element, its identity as a circle, rect, or non-cubic path
                     will be lost. To allow free manipulation of primitives in Illustrator, these
@@ -156,11 +156,11 @@
                 <li><h3>Additional d3 Functions: Absolute Coordinates</h3><br/>
                     <p>Illustrator only supports global coordinates (i.e. SVG-style nested transformations on
                     various groups can not be used). This is very problematic for perhaps the majority of
-                    existing d3 code; nested transformations are used extensively. iD3 masks this process
+                    existing d3 code; nested transformations are used extensively. Hanpuku masks this process
                     from its DOM; when refreshing the DOM from the existing document, old tranformation tags
                     and local coordinates are reapplied where they previously existed.</p>
                     <p>That said, some nuances can still exist, especially if you plan on manipulating
-                    drawn objects that did not previously have these attributes. To make iD3 code more
+                    drawn objects that did not previously have these attributes. To make hanpuku code more
                     flexible to this, and to allow Illustrator-style edits with code,
                     we have monkey-patched these functions onto d3 selections:</p>
                     <ul>
@@ -204,7 +204,7 @@
                     <p>Adobe is famous for its abilities to handle text well, and SVG is notorious for not handling
                     it well. Translating between the two is very complex, and while it is at the top of my feature
                     list, it may take some time.</p>
-                    <p>In the mean time, iD3 ignores text in the document, and does not yet add new text from the
+                    <p>In the mean time, hanpuku ignores text in the document, and does not yet add new text from the
                     DOM (sorry, I really will get on this soon!)</p>
                 </li>
                 <li><h3>Colors and Opacity</h3>
@@ -212,7 +212,7 @@
                     CMYK colors in the DOM. On the flip side, Illustrator does not natively support web-style, hexidecimal
                     colors in documents. Furthermore, Illustrator does not support different opacity settings for stroke
                     and fill.</p>
-                    <p>iD3's current solution is to convert all colors to rgb(0-255,0-255,0-255) format, and the separate
+                    <p>Hanpuku's current solution is to convert all colors to rgb(0-255,0-255,0-255) format, and the separate
                     opacity CSS styles are used. Furthermore, CMYK Illustrator documents are not yet supported. These
                     compromises are obviously less than ideal, and will be addressed soon.</p>
                 </li>
@@ -229,7 +229,7 @@
                         <li>&lt;iframe&gt;</li>
                         <li>#document</li>
                     </ul>
-                    <p>As you can probably tell, the DOM you are manipulating is in an iframe; most of the iD3 extension
+                    <p>As you can probably tell, the DOM you are manipulating is in an iframe; most of the hanpuku extension
                     should be hidden from the immediate scope of your code. The d3 and jQuery objects will only reference
                     elements inside your DOM. To access this scope in the developer tools, select the about:blank frame
                     at the bottom:</p>

@@ -133,7 +133,7 @@
         "lib/phrogz.js",
         "lib/d3.min.js",
         "lib/htmlParser.js",
-        "scripts/iD3.js",
+        "scripts/hanpuku.js",
         "scripts/examplesManager.js",
         "scripts/domManager.js",
         "scripts/dataManager.js",
