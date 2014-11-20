@@ -10,6 +10,12 @@ a {
 a:hover {
     color: rgba(255,255,255,0.75);
 }
+p, li {
+    font-size: 10px;
+}
+li {
+    list-style-type: none;
+}
 h2 {
     -webkit-margin-before: 30px;
     -webkit-margin-after: 0px;
@@ -19,17 +25,11 @@ h2 {
 h2.dontmove {
     margin-left: 0px;
 }
-h3 {
+h3, h4 {
     -webkit-margin-before: 20px;
     margin-left: -20px;
     -webkit-margin-after: 0px;
     font-size: 12px;
-}
-p, li {
-    font-size: 10px;
-}
-li {
-    list-style-type: none;
 }
 
 div#column {

@@ -273,7 +273,9 @@ DataManager.prototype.render = function () {
     
     // Draw the selection list
     if (self.showSelection === true) {
-        nodes = graphicsList.selectAll('.selectionItems').data(SELECTED_IDS, function (d) { return d; });
+        // TODO
+        
+        /*nodes = graphicsList.selectAll('.selectionItems').data(ILLUSTRATOR.selectedIDs, function (d) { return d; });
         
         // Enter
         var iconPadding = DataManager.BAR_SIZE / 8;
@@ -313,7 +315,7 @@ DataManager.prototype.render = function () {
         
         // TODO: draw the link overlay
         
-        width = left + DataManager.LINK_GAP;
+        width = left + DataManager.LINK_GAP;*/
     }
     
     // Draw the data

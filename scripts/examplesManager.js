@@ -5,6 +5,8 @@ function ExamplesManager () {
     self.content = null;
     
     self.history = [];
+    self.loadingTimer = undefined;
+    self.importableStuff = null;
     
     self.iframe = ejQuery('#examplesBrowser')[0];
     self.iframe.onload = function () { self.pushUrl(); };
@@ -18,6 +20,9 @@ ExamplesManager.prototype.pushUrl = function () {
         currentIndex = self.history.indexOf(self.currentUrl),
         isForward = (self.history.length - 1 > currentIndex && self.history[currentIndex + 1] === newUrl),
         isBack = (currentIndex > 0 && self.history[currentIndex - 1] === newUrl);
+    
+    // page loaded properly
+    clearTimeout(self.loadingTimer);
     
     // suppress console messages from other sites
     //console.clear();
@@ -46,63 +51,104 @@ ExamplesManager.prototype.changeUrl = function () {
         if (!newUrl) {
             newUrl = 'examples/index.html';
         }
-        
         self.iframe.src = newUrl;
         // Changing src will fire onload, and consequently pushUrl
+        self.loadingTimer = setTimeout(function () {
+            // Something went wrong loading the page...
+            self.iframe.src = 'examples/error.html';
+        }, 5000);
     }
 };
 ExamplesManager.prototype.update = function () {
     var self = this;
+    
     // Update back / forward buttons
     ejQuery('#examplesBackButton').attr('disabled', self.history.indexOf(self.currentUrl) <= 0);
     ejQuery('#examplesForwardButton').attr('disabled', self.history.indexOf(self.currentUrl) >= self.history.length - 1);
     
-    // Can the new page be imported?
-    ejQuery.ajax({
-        type : "GET",
-        url : self.iframe.contentWindow.location.href,
-        dataType : "text",
-        success: function (scrapedPage) {
-            self.attemptToLoad(scrapedPage);
-            ejQuery('#examplesLoadButton').attr('disabled', !self.canLoad());
-        }
-    });
+    // Try to import from a bl.ocks.org page
+    self.importableStuff = null;
+    if (self.attemptExtraction() === false) {
+        ejQuery('#examplesLoadButton').attr('disabled', true);
+        ejQuery('#examplesLoadButton').html('Can\'t Import');
+    } else {
+        ejQuery('#examplesLoadButton').attr('disabled', false);
+        ejQuery('#examplesLoadButton').html('Import');
+    }
 };
-ExamplesManager.prototype.canLoad = function () {
+ExamplesManager.prototype.attemptExtraction = function () {
     var self = this;
-    return self.content !== null && self.content.extractables !== null;
-};
-ExamplesManager.prototype.attemptToLoad = function (scrapedPage) {
-    // TODO
-    /* var self = this,
-        temp, temp2, i, j;
     
-    try {
-        var parser = new DOMParser();
-        self.content = {
-            'dom' : ejQuery(parser.parseFromString(scrapedPage, 'text/html')),
-            'extractables' : null
+    // Inception fans, rejoice! We're about to extract information from
+    // an iframe inside an iframe...
+    var gist = self.iframe.contentWindow.gist;
+    if (gist === undefined) {
+        return false;
+    }
+    
+    var frame = self.iframe.contentDocument.getElementsByTagName('iframe')[0];
+    if (frame === undefined) {
+        return false;
+    }
+    
+    var extension,
+        scripts = frame.contentDocument.getElementsByTagName('script'),
+        styles = frame.contentDocument.getElementsByTagName('style'),
+        script = "",
+        style = "",
+        dataFiles = [],
+        f,
+        s;
+    
+    // Try to load up any data files
+    for (f in gist.files) {
+        if (gist.files.hasOwnProperty(f)) {
+            extension = gist.files[f].filename.split('.');
+            extension = extension[extension.length - 1].toLowerCase();
+            
+            if (DataManager.FORMAT_LOOKUP.hasOwnProperty(extension)) {
+                dataFiles.push(frame.src + gist.files[f].filename);
+            }
+        }
+    }
+    
+    // The script and style tags we want have no src or href attribute; get the
+    // first ones that match, if they exist
+    for (s = 0; s < scripts.length; s += 1) {
+        if (scripts[s].getAttribute('src') === null) {
+            script = scripts[s].innerText;
+            break;
+        }
+    }
+    for (s = 0; s < styles.length; s += 1) {
+        if (styles[s].getAttribute('href') === null) {
+            style = styles[s].innerText;
+            break;
+        }
+    }
+    
+    if (script !== '' || style !== '' || dataFiles.length > 0) {
+        self.importableStuff = {
+            'script' : script,
+            'style' : style,
+            'dataFiles' : dataFiles
         };
-    } catch (e) {
-        self.content = null;
-        return;
+        return true;
+    } else {
+        return false;
     }
-    
-    if (!self.content.dom) {
-        self.content = null;
-        return;
-    }
-    
-    
-    temp = self.content.dom.find('.gist-source code');
-    console.log(temp[0]);
-    for (i = 0; i < temp.length; i += 1) {
-        temp2 = temp[i].getElementsByTagName('code');
-    }
-    */
 };
-/*
+ExamplesManager.prototype.loadBlock = function () {
+    var self = this,
+        d;
+    if (self.importableStuff !== null){
+        CODE.loadSampleJS(self.importableStuff.script);
+        CODE.loadSampleCSS(self.importableStuff.style);
+        for (d = 0; d < self.importableStuff.dataFiles.length; d += 1) {
+            DATA.loadSampleDataFile(self.importableStuff.dataFiles[d]);
+        }
+    }
+};
 
-http://bl.ocks.org/mbostock/e48a00d4db5c3b042145
 
-*/
+// http://bl.ocks.org/mbostock/7607535

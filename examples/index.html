@@ -25,13 +25,19 @@
             <p>On the flip side, your custom Illustrator edits
             will also survive properly-written d3.js scripts: now, when your data changes after
             you've done lots of hand-crafted awesomeness, you don't have to start over from scratch!</p>
+            
+            <p>Another cool addition is that Illustrator and d3.js selections are merged; you can now
+            set attributes for stuff you have selected in Illustrator like a normal d3.js selection. You can
+            even filter the current Illustrator selection based on data, or perform complex selections right from
+            the code!</p>
+            
             <h2>Not a programmer?</h2>
             <p>Try loading an existing chart from our <a href="samples.html">sample library</a>, and press
             "Run" in the JS tab. To use your own data, follow these steps. Note that these steps still work
             even <strong>after</strong> you've changed stuff with Illustrator tools!
             </p>
             <ul>
-                <li>Press "Refresh From Document" (Illustrator doesn't yet have a clean way to automate this
+                <li>Click "Refresh From Document" (Illustrator doesn't yet have a clean way to automate this
                 when you change things in your document)</li>
                 <li>Load / paste / edit the data in the Data tab</li>
                 <li>Press "Run" in the JS tab (the same script should still be loaded)</li>
@@ -41,8 +47,8 @@
             only the position and fill of the dots are affected. If you change the shape of a few
             points and re-run the script with new data, your custom shapes will be preserved, though
             they may be moved or re-colored according to the data changes). If things <i>don't</i>
-            behave as you expect, the "Apply" button ensures that your document won't change
-            until you tell it to.</p>
+            behave as you expect, just click "Refresh From Document" instead of the "Apply" button.
+            Your document won't change until you tell it to.</p>
             <p>Of course, feel free to try hacking the javascript or CSS if you're feeling adventurous.
             Remember, nothing will change in your actual document until you click the "Apply" button,
             so feel free to explore! The iD3 sample library is still pretty small, but most
@@ -76,7 +82,7 @@
             <p>Beyond this, iD3 currently only supports a single javascript file (in the JS tab). I plan to
             organize this a little better in the future as well.</p>
             
-            <h2>Limitations, Added functionality</h2>
+            <h2>Added functionality, weird quirks</h2>
             <ul>
                 <li><h3>DOM Structure</h3><br/>
                     <p>A fresh iD3 DOM will always contain an inline SVG element whose id matches the
@@ -99,9 +105,10 @@
                     once "Apply" is clicked.</b></p>
                 </li>
                 <li><h3>Global variables</h3><br/>
-                    <p>You can both use and modify the selectedIDs variable. This is an array containing
-                    all the ids of elements that are selected in the current document. Any changes to
-                    this array will change the Illustrator selection when you click the "Apply" button.</p>
+                    <p>You can both use and modify the global <code>selection</code> variable. This is a
+                    regular d3.js selection object, pointing to all the elements that are selected in the
+                    current document. If you change <code>selection</code> to another d3.js selection,
+                    the current selection in Illustrator will be updated when you click the "Apply" button.</p>
                 </li>
                 <li><h3>Additional d3 Functions: Cubic Interpolated Paths</h3><br/>
                     <p>Illustrator only supports cubic-interpolated path elements. On clicking the "Apply"
@@ -116,25 +123,28 @@
                     they were circles, rectangles, or non-cubic paths:</p>
                     <ul>
                         <li>
-                            <p><strong>d3.selection.circleAttr(cx, cy, r);</strong> Equivalent to:<br/>
-                            d3.selection.attr('cx', cx)<br/>
-                            &emsp;.attr('cy', cy)<br/>
-                            &emsp;.attr('r', r);<br/>
+                            <h4><code>d3.selection.circleAttr(cx, cy, r);</code></h4>
+                            <p>Equivalent to:<br/>
+                            <code>d3.selection.attr('cx', cx)<br/>
+                            &emsp;&emsp;&emsp;&emsp;.attr('cy', cy)<br/>
+                            &emsp;&emsp;&emsp;&emsp;.attr('r', r);<br/></code>
                             if the selection actually contained &lt;circle&gt; elements, except these
                             commands change existing paths' geometry to be circles with these properties.</p>
                         </li>
                         <li>
-                            <p><strong>d3.selection.rectAttr(x, y, width, height);</strong> Equivalent to:<br/>
-                            d3.selection.attr('x', x)<br/>
-                            &emsp;.attr('y', y)<br/>
-                            &emsp;.attr('width', width)<br/>
-                            &emsp;.attr('height', height);<br/>
+                            <h4><code>d3.selection.rectAttr(x, y, width, height);</code></h4>
+                            <p>Equivalent to:<br/>
+                            <code>d3.selection.attr('x', x)<br/>
+                            &emsp;&emsp;&emsp;&emsp;.attr('y', y)<br/>
+                            &emsp;&emsp;&emsp;&emsp;.attr('width', width)<br/>
+                            &emsp;&emsp;&emsp;&emsp;.attr('height', height);<br/></code>
                             if the selection actually contained &lt;rect&gt; elements, except these
                             commands change existing paths' geometry to be rectangles with these properties.</p>
                         </li>
                         <li>
-                            <p><strong>d3.selection.pathAttr(d);</strong> Equivalent to:<br/>
-                            d3.selection.attr('d', d);<br/>
+                            <h4><code>d3.selection.pathAttr(d);</code></h4>
+                            <p>Equivalent to:<br/>
+                            <code>d3.selection.attr('d', d);<br/></code>
                             except the d parameter is immediately converted to cubic-interpolated control points.</p>
                         </li>
                     </ul>
@@ -155,8 +165,8 @@
                     we have monkey-patched these functions onto d3 selections:</p>
                     <ul>
                         <li>
-                            <p><strong>d3.selection.setGlobalPosition(x, y, anchor);</strong><br/>
-                            Aligns every element in the current selection to the specified global x,y coordinates,
+                            <h4><code>d3.selection.setGlobalPosition(x, y, anchor);</code></h4>
+                            <p>Aligns every element in the current selection to the specified global x,y coordinates,
                             where anchor is one of:
                             <ul>
                                 <li>d3.ANCHORS.TOP_LEFT</li>
@@ -171,19 +181,19 @@
                             </ul></p>
                         </li>
                         <li>
-                            <p><strong>d3.selection.setGlobalBBox(x, y, width, height);</strong><br/>
-                            Scales and translates every element in the current selection to fit exactly
+                            <h4><code>d3.selection.setGlobalBBox(x, y, width, height);</code></h4>
+                            <p>Scales and translates every element in the current selection to fit exactly
                             in the specified rectangle (in global coordinates).</p>
                         </li>
                         <li>
-                            <p><strong>d3.selection.setGlobalTransform(m);</strong><br/>
-                            Applies a transformation matrix to every element in the selection AFTER first centering
+                            <h4><code>d3.selection.setGlobalTransform(m);</code></h4>
+                            <p>Applies a transformation matrix to every element in the selection AFTER first centering
                             the element on the document's 0,0 coordinate. Its parameter, m, is a 6-element matrix in
                             SVG order, e.g. a matrix that translates 5px in x and 10px in y would be [1,0,0,1,5,10].</p>
                         </li>
                         <li>
-                            <p><strong>d3.selection.standardize();</strong><br/>
-                            Makes the current selection immediately compatible with Illustrator; i.e. transform tags
+                            <h4><code>d3.selection.standardize();</code></h4>
+                            <p>Makes the current selection immediately compatible with Illustrator; i.e. transform tags
                             are applied AND all primitives are immediately converted to cubic-interpolated paths.</p>
                         </li>
                     </ul>

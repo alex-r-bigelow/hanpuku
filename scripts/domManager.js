@@ -79,8 +79,7 @@ DomManager.prototype.initScope = function () {
     // Give it the basics
     self.iframeScope.window = self.iframe.contentWindow;
     self.iframeScope.document = self.iframe.contentDocument;
-    self.iframeScope.selectedIDs = SELECTED_IDS;
-    
+    self.iframeScope.selection = ILLUSTRATOR.getD3selection();
     for (s = 0; s < DomManager.DOM_LIBS.length; s += 1) {
         ejQuery.ajax({
             url : DomManager.DOM_LIBS[s],
@@ -137,6 +136,7 @@ DomManager.prototype.runScript = function (script, ignoreSelection)
     
     if (ignoreSelection !== true) {
         // restore the selection layer
+        ILLUSTRATOR.updateSelection(self.iframeScope.selection);
         self.updateSelectionLayer();
     }
 };
@@ -146,7 +146,7 @@ DomManager.prototype.updateSelectionLayer = function () {
     jQuery('#id3_selectionLayer').remove();
     var layer = d3.select('#' + self.docName).append('g')
                     .attr('id', 'id3_selectionLayer'),
-        selectionRect = layer.selectAll('path').data(SELECTED_IDS);
+        selectionRect = layer.selectAll('path').data(ILLUSTRATOR.selectedIDs);
     selectionRect.enter().append('path')
         .attr('fill', 'none')
         .attr('stroke-width', '5px')
@@ -410,7 +410,7 @@ DomManager.prototype.extractDocument = function () {
             itemType : 'document',
             artboards : [],
             layers : [],
-            selection : SELECTED_IDS
+            selection : ILLUSTRATOR.selectedIDs
         },
         s,
         z = 1,
@@ -460,7 +460,7 @@ DomManager.prototype.docToDom = function () {
             self.iframe.contentDocument.body.innerHTML = ""; // nuke everything so we start fresh
             
             // Clear out the javascript scope, load the relevant libraries, and init selectedIDs
-            SELECTED_IDS = result.selection;
+            ILLUSTRATOR.selectedIDs = result.selection;
             self.initScope();
             
             // Style the main svg element to match Illustrator's UI
@@ -520,8 +520,9 @@ DomManager.prototype.docToDom = function () {
                 }
             });
             
-            // Finally, add the selection layer
-            SELECTED_IDS = result.selection;
+            // Finally, add the selection layer, and update the javascript context
+            // (the original D3 selection will have been empty)
+            self.iframeScope.selection = ILLUSTRATOR.getD3selection();
             self.updateSelectionLayer();
         }
         EXTENSION.updateUI();
@@ -562,10 +563,10 @@ DomManager.prototype.addPath = function (parent, path) {
         .style('stroke', path.stroke)
         .style('stroke-width', path.strokeWidth)
         .style('opacity', path.opacity);
-    if (path.classNames !== null) {
+    if (path.classNames !== "null") {
         p.attr('class', path.classNames);
     }
-    if (path.reverseTransform !== null) {
+    if (path.reverseTransform !== "null") {
         p.attr('transform', path.reverseTransform);
     }
     d3.select('#' + path.name).datum(path.data);

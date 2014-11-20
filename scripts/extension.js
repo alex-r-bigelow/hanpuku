@@ -9,6 +9,8 @@
         // Load the libraries that JSX scripts need
         self.loadedJSXlibs = false;
         self.loadJSXlibs();
+        
+        self.selectedIDs = [];
     }
     /* Tools to interact with extendScript */
     IllustratorConnection.prototype.loadJSXlibs = function () {
@@ -83,6 +85,21 @@
         // TODO: when Illustrator adds more listeners, inject them here!
         self.connection.addEventListener('documentAfterActivate', updateFunc);
         self.connection.addEventListener('documentAfterDeactivate', updateFunc);
+    };
+    IllustratorConnection.prototype.getD3selection = function () {
+        var self = this;
+        if (self.selectedIDs.length === 0) {
+            return d3.select('givemeanemptyselection'); // definitely not a tag name...
+        } else {
+            return d3.selectAll('#' + self.selectedIDs.join(', #'));
+        }
+    };
+    IllustratorConnection.prototype.updateSelection = function (d3selection) {
+        var self = this;
+        self.selectedIDs = [];
+        if (d3selection instanceof d3.selection) {
+            d3selection.each(function () { self.selectedIDs.push(this.getAttribute('id')); });
+        }
     };
     
     function ExtensionManager() {
@@ -270,7 +287,7 @@
             }
         }
         self.advancedMode();
-        self.switchTab('Data');
+        self.switchTab('Examples');
     };
     ExtensionManager.prototype.switchTab = function (tabId) {
         var self = this,
@@ -351,7 +368,6 @@
     
     window.setupExtension = function () {
         extensionScope.TYPING_INTERVAL = 2000;
-        extensionScope.SELECTED_IDS = [];
         extensionScope.EXTENSION = new ExtensionManager();
         extensionScope.EXAMPLES = new ExamplesManager();
         extensionScope.ILLUSTRATOR = new IllustratorConnection();

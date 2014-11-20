@@ -46,10 +46,12 @@ you've done lots of hand-crafted awesomeness, you don't have to start over from 
 ### TODO:
 
 #### High priority
+- Import directly from Examples tab, disable when there is no document
+- Notification when files are loaded
 - Fix Isolation Mode bug
+- Add CMYK shim
 - Support text
 - More iD3-specific Examples
-- Import directly from Examples tab
 
 #### Medium priority
 - Regex search/replace in text editors (esp. data)
