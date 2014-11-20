@@ -39,7 +39,9 @@ DomManager.JSX_LIBS = [
     'lib/json2.js'
 ];
 DomManager.prototype.disableUI = function () {
+    var self = this;
     ejQuery('#zoomButtons button').attr('disabled', true);
+    self.iframe.contentDocument.body.innerHTML = "";
 };
 DomManager.prototype.enableUI = function () {
     ejQuery('#zoomButtons button').attr('disabled', false);

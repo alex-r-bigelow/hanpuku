@@ -211,6 +211,8 @@ function DataManager() {
     self.typingTimer = undefined;
     
     self.updatePanel();
+    PreviewDatum.TREE.toggleCollapse(); // Start with the Loaded Files level expanded
+    self.render();
 }
 DataManager.BAR_SIZE = 20;
 DataManager.X_WIDTH = 0.55; // the max aspect ratio for common monospace fonts

@@ -72,8 +72,8 @@ CodeManager.prototype.editCSS = function () {
     }, TYPING_INTERVAL);
 };
 CodeManager.prototype.disableUI = function () {
-    ejQuery('#runButton').attr('disabled', true);
+    ejQuery('#runButton').text('(Need a document to run)').attr('disabled', true);
 };
 CodeManager.prototype.enableUI = function () {
-    ejQuery('#runButton').attr('disabled', false);
+    ejQuery('#runButton').text('Run').attr('disabled', false);
 };

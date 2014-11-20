@@ -18,7 +18,7 @@
             
         </div>
         <div id="column">
-            <h2>Hanpuku 反復</h2>
+            <h2><img src="../img/colorIcon.png" class="logo" />Hanpuku</h2>
             <p>Hanpuku is an interface between d3.js and Adobe Illustrator, enabling a more flexible
             data visualization workflow. Data bindings no longer disappear when you edit a d3-generated
             graphic in Illustrator; those bindings now survive custom edits, and even
@@ -214,9 +214,11 @@
                     CMYK colors in the DOM. On the flip side, Illustrator does not natively support web-style, hexidecimal
                     colors in documents. Furthermore, Illustrator does not support different opacity settings for stroke
                     and fill.</p>
-                    <p>Hanpuku's current solution is to convert all colors to rgb(0-255,0-255,0-255) format, and the separate
-                    opacity CSS styles are used. Furthermore, CMYK Illustrator documents are not yet supported. These
-                    compromises are obviously less than ideal, and will be addressed soon.</p>
+                    <p>Hanpuku's current solution is to convert all colors to rgb(0-255,0-255,0-255) format, and opacities
+                    are stored separately. Note that this will do funny things to CMYK colors; for now, set your
+                    Document Color Mode (Edit Menu) to RGB Color for best results. The compromises are obviously less
+                    than ideal; the CMYK issues are waiting on Chrome supporting device-cmyk in CSS, but the
+                    opacity issues should be addressed relatively soon.</p>
                 </li>
                 <li><h3>Debugging</h3>
                     <p>I plan to embed Chrome's developer tools inside the widget when I can figure out how to do it
@@ -235,7 +237,7 @@
                     should be hidden from the immediate scope of your code. The d3 and jQuery objects will only reference
                     elements inside your DOM. To access this scope in the developer tools, select the about:blank frame
                     at the bottom:</p>
-                    <img src="debug.png"/>
+                    <img src="debug.png" class="screenshot"/>
                 </li>
             </ul>
         </div>

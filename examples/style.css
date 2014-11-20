@@ -38,7 +38,12 @@ div#column {
     top: 0px;
     width: 400px;
 }
-div#column img {
+div#column img.logo {
+    width: 14px;
+    margin-left: -28px;
+    padding-right: 14px;
+}
+div#column img.screenshot {
     width: 100%;
 }
 div#quickies {
