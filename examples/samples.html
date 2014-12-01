@@ -20,13 +20,27 @@
                     window.parent.DATA.loadSampleDataFile('examples/stock.tsv');
                     window.parent.CODE.loadSampleJSFile('examples/lineChart.js');
                     window.parent.CODE.loadSampleCSSFile('examples/lineChart.css');
+                } else if (name === 'streamgraph') {
+                    window.parent.DATA.loadSampleDataFile('examples/randomStream.js');
+                    window.parent.CODE.loadSampleJSFile('examples/streamgraph.js');
+                } else if (name === 'basicTree') {
+                    window.parent.DATA.loadSampleDataFile('examples/basicTree.csv');
+                    window.parent.CODE.loadSampleJSFile('examples/basicTree.js');
+                    window.parent.CODE.loadSampleCSSFile('examples/basicTree.css');
+                } else if (name === 'splom') {
+                    window.parent.DATA.loadSampleDataFile('examples/smallFlowers.tsv');
+                    window.parent.CODE.loadSampleJSFile('examples/splom.js');
+                    window.parent.CODE.loadSampleCSSFile('examples/splom.css');
                 }
             }
             
             var sampleNames = {
                     'scatterplot' : 'Scatterplot',
                     'groupedBars' : 'Grouped Bar Chart',
-                    'force' : 'Force-directed graph'
+                    'basicTree' : 'Basic Tree',
+                    'splom' : 'Scatterplot Matrix',
+                    'force' : 'Force-directed graph',
+                    'streamgraph' : 'Streamgraph'
                 },
                 resultText = "",
                 name;

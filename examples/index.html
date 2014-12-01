@@ -11,9 +11,9 @@
                 <li><h3><a href="samples.html">Hanpuku Examples</a></h3></li>
                 <li><h3><a href="http://bl.ocks.org/mbostock">Mike Bostock's d3 Examples</a></h3>
                 <small>(May need a little hacking to work)</small></li>
-                <li><h3><a href="#" onclick="window.parent.ILLUSTRATOR.openBrowser('https://github.com/mbostock/d3/wiki/Gallery')">d3 Example Gallery</a></h3>
+                <li><h3><a href="#" onclick="window.parent.ILLUSTRATOR.openBrowser('https://github.com/mbostock/d3/wiki/Gallery');">d3 Example Gallery</a></h3>
                 <small>(May need more than a little hacking to work)</small></li>
-                <li><h3><a href="#" onclick="window.parent.ILLUSTRATOR.openBrowser('https://github.com/yasashiku/hanpuku/issues')">Report a bug</a></h3></li>
+                <li><h3><a href="#" onclick="window.parent.ILLUSTRATOR.openBrowser('https://github.com/yasashiku/hanpuku/issues');">Report a bug</a></h3></li>
             </ul>
             
         </div>
@@ -38,13 +38,13 @@
             "Run" in the JS tab. To use your own data, follow these steps. Note that these steps still work
             even <strong>after</strong> you've changed stuff with Illustrator tools!
             </p>
-            <ul>
+            <ol>
                 <li>Click "Refresh From Document" (Illustrator doesn't yet have a clean way to automate this
                 when you change things in your document)</li>
                 <li>Load / paste / edit the data in the Data tab</li>
                 <li>Press "Run" in the JS tab (the same script should still be loaded)</li>
                 <li>If things updated as you expected, press "Apply"</li>
-            </ul>
+            </ol>
             <p>The scripts are written to affect only the data-relevant bits (in the scatterplot example,
             only the position and fill of the dots are affected. If you change the shape of a few
             points and re-run the script with new data, your custom shapes will be preserved, though
@@ -94,8 +94,8 @@
                     exist in the DOM, with its id matching the document name. Its immediate
                     children are:</p>
                     <ul>
-                        <li>rect elements of class "artboard"<br/></li>
-                        <li>g elements representing each layer<br/></li>
+                        <li>&lt;rect&gt; elements of class "artboard"<br/></li>
+                        <li>&lt;g&gt; elements representing each layer<br/></li>
                     </ul>
                     <p>Every element's id in the DOM will be the same as the object's
                     name in Illustrator's Layers widget, however, hanpuku may modify
@@ -103,8 +103,9 @@
                     <p>You can manipulate the .artboard elements, and your changes
                     will be reflected in the document, however, Illustrator does not have a mechanism
                     for embedding d3 data or transform or class attributes in Layer groups.
-                    <b>Any attributes applied to a Layer group will be lost
-                    once "Apply" is clicked.</b></p>
+                    </p>
+                    <p><i>Any attributes applied to a Layer group will be lost
+                    once "Apply" is clicked!</i></p>
                 </li>
                 <li><h3>Global variables</h3><br/>
                     <p>You can both use and modify the global <code>selection</code> variable. This is a

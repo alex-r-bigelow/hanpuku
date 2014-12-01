@@ -55,6 +55,8 @@
     /* Helper functions for converting circles, rectangles, paths, and any object
      * to cubic-interpolated paths with absolute coordinates (no nested transforms) */
     function pathToCubicPath(d, m) {
+        d = d.replace(/ /g, ',');
+        
         var pointTypes = d.match(pathSplitter),
             coordList = d.split(pathSplitter).splice(1),
             coords,
@@ -190,7 +192,7 @@
             transform = transform.split('(');
             stringMode = transform[0].trim().toLowerCase();
             params = transform[1].substring(0, transform[1].length - 1).split(',');
-                        
+            
             if (stringMode === 'translate') {
                 reverseTransform = 'translate(' + (-params[0]) + ',' + (-params[1]) + ')';
                 m = matMultiply(m, [1,0,0,1,Number(params[0]),Number(params[1])]);
@@ -246,9 +248,14 @@
                 elementToCubicPaths(e.childNodes[i], m, preserveReverseTransforms);
             }
         } else if (e.tagName === 'text') {
-            // I'll need to hack the transformation matrices
-            // for text when I actually convert
-            e.setAttribute('transform','matrix(' + m.join(',') + ')');
+            // I'll need to do better than this...
+            //e.setAttribute('transform', 'matrix(' + m.join(',') + ')');
+            a = [e.getAttribute('x'), e.getAttribute('y')];
+            a[0] = 0 ? a[0] === null : Number(a[0]);
+            a[1] = 0 ? a[1] === null : Number(a[1]);
+            a = matPoint(m, a[0], a[1]);
+            e.setAttribute('x', a[0]);
+            e.setAttribute('y', a[1]);
         } else {
             throw 'hanpuku doesn\'t yet support tag ' + e.tagName;
         }

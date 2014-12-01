@@ -34,14 +34,11 @@ d3.json("miserables.json", function(error, graph) {
 
   var node = nodeLayer.selectAll(".node")
       .data(graph.nodes, function (d) { return d.name; });
-  node.enter().append("circle")
-      .attr("class", "node")
-      .attr("r", 5)
+  var nodeEnter = node.enter().append("g")
+      .attr("class", "node");
+  nodeEnter.append('circle').attr("r", 5)
       .style("fill", function(d) { return color(d.group); });
   node.call(force.drag);
-
-  node.append("title")
-      .text(function(d) { return d.name; });
 
   force.on("tick", function() {
     link.attr("d", function(d) {

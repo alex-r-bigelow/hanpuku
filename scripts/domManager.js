@@ -31,7 +31,9 @@ DomManager.PADDING = 64;
 DomManager.DOM_LIBS = [
     'lib/jquery-1.11.0.min.js',
     'lib/d3.min.js',
+    "lib/queue.min.js",
     'lib/topojson.js',
+    'lib/colorbrewer.js',
     'scripts/hanpuku.js',
     'lib/phrogz.js'
 ];
@@ -102,6 +104,8 @@ DomManager.prototype.initScope = function () {
     self.runScript('jQuery = window.jQuery;', true);
     self.iframeScope.window.d3 = self.iframe.contentWindow.parent.d3;
     self.iframeScope.window.topojson = self.iframe.contentWindow.parent.topojson;
+    self.iframeScope.window.queue = self.iframe.contentWindow.parent.queue;
+    self.iframeScope.window.colorbrewer = self.iframe.contentWindow.parent.colorbrewer;
     /**
      * I also need to monkey patch the local d3's file loading schemes;
      * we've already loaded and parsed any relevant files in the Data tab
@@ -325,6 +329,7 @@ DomManager.prototype.extractPath = function (g, z) {
     if (output.data === undefined) {
         output.data = null;
     }
+    
     // Convert everything except the first entry
     // to a list of lists of point pairs
     // Also invert the y-coordinates
@@ -370,6 +375,47 @@ DomManager.prototype.extractPath = function (g, z) {
     
     return output;
 };
+DomManager.prototype.extractText = function (t, z) {
+    var self = this,
+        output = {
+            itemType : 'text',
+            name : t.getAttribute('id'),
+            zIndex : z,
+            data : d3.select('#' + t.getAttribute('id')).data()[0],
+            classNames : t.getAttribute('class') === null ? "" : t.getAttribute('class'),
+            reverseTransform : t.getAttribute('id3_reverseTransform') === null ? "" : t.getAttribute('id3_reverseTransform')
+        },
+        i;
+    if (output.data === undefined) {
+        output.data = null;
+    }
+    output.contents = "";
+    
+    i = d3.select('#' + output.name).style('text-anchor');
+    if (i === null || i === 'start') {
+        output.justification = 'LEFT';
+    } else if (i === 'middle') {
+        output.justification = 'CENTER';
+    } else if (i === 'end') {
+        output.justification = 'RIGHT';
+    } else {
+        output.justification = 'LEFT';
+    }
+    
+    
+    for (i = 0; i < t.childNodes.length; i += 1) {
+        output.contents += t.childNodes[i].textContent;
+        if (i < t.childNodes.length - 1) {
+            output.contents += '\n';
+        }
+    }
+    
+    output.anchor = [t.getAttribute('x'), t.getAttribute('y')];
+    output.anchor[0] = 0 ? output.anchor[0] === null : output.anchor[0];
+    output.anchor[1] = 0 ? output.anchor[1] === null : -output.anchor[1];
+    
+    return output;
+};
 DomManager.prototype.extractGroup = function (g, z, iType) {
     var self = this,
         output = {
@@ -377,7 +423,8 @@ DomManager.prototype.extractGroup = function (g, z, iType) {
             name : g.getAttribute('id'),
             zIndex : z,
             groups : [],
-            paths : []
+            paths : [],
+            text : []
         },
         s,
         z2 = 1;
@@ -396,7 +443,7 @@ DomManager.prototype.extractGroup = function (g, z, iType) {
         } else if (g.childNodes[s].tagName === 'path') {
             output.paths.push(self.extractPath(g.childNodes[s], z2));
         } else if (g.childNodes[s].tagName === 'text') {
-            // TODO
+            output.text.push(self.extractText(g.childNodes[s], z2));
         } else {
             throw g.childNodes[s].tagName + " is not supported.";
         }
@@ -445,6 +492,7 @@ DomManager.prototype.extractDocument = function () {
             z += 1;
         }
     }
+    
     return output;
 };
 DomManager.prototype.domToDoc = function () {
@@ -521,7 +569,7 @@ DomManager.prototype.docToDom = function () {
             // transform tags, even though the native Illustrator positions were previously
             // baked in.
             svg.standardize(undefined, true);
-            jQuery('svg g, svg path').each(function () {
+            jQuery('svg g, svg path, svg text').each(function () {
                 if (this.hasAttribute('id3_reverseTransform')) {
                     this.setAttribute('transform',this.getAttribute('id3_reverseTransform'));
                     this.removeAttribute('id3_reverseTransform');
@@ -582,12 +630,54 @@ DomManager.prototype.addPath = function (parent, path) {
     }
     d3.select('#' + path.name).datum(path.data);
 };
+DomManager.prototype.addTextLines = function (container, text) {
+    var lines = text.split(/\n/),
+        lineHeight = 1.1, // ems
+        l;
+    for (l = 0; l < lines.length; l += 1) {
+        container.append('tspan')
+            .attr('x', 0)
+            .attr('y', l*lineHeight + 'em')
+            .text(lines[l]);
+    }
+};
+DomManager.prototype.addText = function (parent, text) {
+    var self = this,
+        t = parent.append('text')
+        .attr('id', text.name)
+        .attr('x', text.anchor[0])
+        .attr('y', text.anchor[1]),
+        container;
+    
+    if (text.justification === 'LEFT') {
+        t.attr('text-anchor', 'start');
+    } else if (text.justification === 'CENTER') {
+        t.attr('text-anchor', 'middle');
+    } else if (text.justification === 'RIGHT') {
+        t.attr('text-anchor', 'end');
+    } else {
+        t.attr('text-anchor', 'start');
+    }
+    
+    if (text.classNames !== 'null') {
+        t.attr('class', text.classNames);
+    }
+    if (text.reverseTransform !== 'null') {
+        t.attr('transform', text.reverseTransform);
+    }
+    
+    container = d3.select('#' + text.name);
+    container.datum(text.data);
+    
+    self.addTextLines(container, text.contents);
+};
 DomManager.prototype.addGroup = function (parent, group) {
     var self = this,
         g = parent.append('g')
         .attr('id', group.name),
         c,
-        p;
+        p,
+        t;
     if (group.classNames !== null) {
         g.attr('class', group.classNames);
     }
@@ -605,5 +695,9 @@ DomManager.prototype.addGroup = function (parent, group) {
     group.paths = group.paths.sort(phrogz('zIndex'));
     for (p = 0; p < group.paths.length; p += 1) {
         self.addPath(g, group.paths[p]);
+    }
+    group.text = group.text.sort(phrogz('zIndex'));
+    for (t = 0; t < group.text.length; t += 1) {
+        self.addText(g, group.text[t]);
     }
 };

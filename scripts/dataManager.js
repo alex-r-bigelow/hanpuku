@@ -36,7 +36,7 @@ DataFile.prototype.evaluate = function () {
 };
 
 function OrphanFile () {
-    DataFile.call(this, 'default.json', 'text/json', '{}');
+    DataFile.call(this, 'default', 'text/json', '{}');
     var self = this;
     
     self.embed = true;
@@ -322,7 +322,12 @@ DataManager.prototype.render = function () {
     
     // Draw the data
     dataList.attr('transform', 'translate(' + width + ',0)');
-    nodes = dataList.selectAll('.dataNode').data(PreviewDatum.VISIBLE_DATA, function (d) { return PreviewDatum.GET_BY_INDEX(d).key; });
+    nodes = dataList.selectAll('.dataNode').data(PreviewDatum.VISIBLE_DATA, function (d) {
+        if (d >= PreviewDatum.ALL_DATA.length) {
+            return -1;
+        }
+        return PreviewDatum.GET_BY_INDEX(d).key;
+    });
     
     // Enter
     nodeEnter = nodes.enter().append('g')
@@ -376,7 +381,9 @@ DataManager.prototype.render = function () {
                 return 'matrix(0,1,-1,0,0,' + DataManager.BAR_SIZE + ')'; // rotate, then translate
             }
         })
-        .attr('fill', EXTENSION.textColor);
+        .attr('fill', EXTENSION.textColor)
+        .attr('stroke', 'rgba(0,0,0,0.001)')
+        .attr('stroke-width', '2px');
     nodes.selectAll('text').text(function (i) {
         var d = PreviewDatum.GET_BY_INDEX(i),
             result = d.name;
@@ -446,7 +453,7 @@ DataManager.prototype.updatePanel = function () {
             editor.val(f.raw);
             //embedBox.prop('disabled', f instanceof OrphanFile);
             //embedBox.prop('checked', true);
-            dataTypeSelect.prop('disabled', f instanceof OrphanFile);
+            //dataTypeSelect.prop('disabled', false);
             dataTypeSelect.val(f.type);
         }
         optionText += '>' + f.name + '</option>';
@@ -485,13 +492,13 @@ DataManager.prototype.switchFile = function () {
 };
 DataManager.prototype.changeEmbed = function () {
     var self = this;
-    self.getFile(self.currentFile).embed = jQuery('#embedFileCheckBox').prop('checked');
+    self.getFile(self.currentFile).embed = ejQuery('#embedFileCheckBox').prop('checked');
     self.updatePanel();
 };
 DataManager.prototype.changeType = function () {
     var self = this,
         current = self.getFile(self.currentFile),
-        newType = jQuery('#dataTypeSelect').val();
+        newType = ejQuery('#dataTypeSelect').val();
     current.type = newType;
     current.evaluate();
     self.updatePanel();
