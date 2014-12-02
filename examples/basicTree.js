@@ -19,11 +19,16 @@ svgEnter.append('g')
 
 d3.csv("basicTree.csv", function(error, links) {
   var graph = {
-    nodes : [],
-    links : []
-  };
-  console.log(links);
+        nodes : [],
+        links : []
+      },
+      nodesByName = {};
+  
   // Create nodes for each unique source and target.
+  function nodeByName(name) {
+    return nodesByName[name] || (nodesByName[name] = {name: name});
+  }
+  
   links.forEach(function(link) {
     var parent = link.source = nodeByName(link.source),
         child = link.target = nodeByName(link.target);
@@ -49,8 +54,4 @@ d3.csv("basicTree.csv", function(error, links) {
   nodeItems.circleAttr(function(d) { return d.y; },
                       function(d) { return d.x; },
                       4.5);
-
-  function nodeByName(name) {
-    return nodesByName[name] || (nodesByName[name] = {name: name});
-  }
 });

@@ -12,6 +12,10 @@
         
         self.selectedIDs = [];
     }
+    IllustratorConnection.JSX_LIBS = [
+        'lib/json2.js',
+        'lib/jsxShims.js'
+    ];
     /* Tools to interact with extendScript */
     IllustratorConnection.prototype.loadJSXlibs = function () {
         var self = this,
@@ -26,9 +30,9 @@
                         throw "Error Loading JSX";
                     }
                     i += 1;
-                    if (i < DomManager.JSX_LIBS.length) {
+                    if (i < IllustratorConnection.JSX_LIBS.length) {
                         ejQuery.ajax({
-                            url: DomManager.JSX_LIBS[i],
+                            url: IllustratorConnection.JSX_LIBS[i],
                             success: successFunction
                         });
                     } else {
@@ -37,8 +41,9 @@
                 });
             };
         ejQuery.ajax({
-            url: DomManager.JSX_LIBS[i],
-            success: successFunction
+            url: IllustratorConnection.JSX_LIBS[i],
+            success: successFunction,
+            cache: false
         });
     };
     IllustratorConnection.prototype.runJSX = function (input, path, callback) {
@@ -102,7 +107,11 @@
         var self = this;
         self.selectedIDs = [];
         if (d3selection instanceof d3.selection) {
-            d3selection.each(function () { self.selectedIDs.push(this.getAttribute('id')); });
+            d3selection.each(function () {
+                if (this.parentNode !== null) {
+                    self.selectedIDs.push(this.getAttribute('id'));
+                }
+            });
         }
     };
     
@@ -138,6 +147,7 @@
     ExtensionManager.ANIMATION_DELAY = 500;
     ExtensionManager.EXTENSION_SCRIPTS = [
         "lib/jquery-1.11.0.min.js",
+        "lib/json-circular.js",
         "lib/CSInterface.js",
         "lib/phrogz.js",
         "lib/d3.min.js",

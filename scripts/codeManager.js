@@ -6,12 +6,16 @@ function CodeManager () {
     self.cssTypingTimer = undefined;
 }
 CodeManager.prototype.loadSampleJSFile = function (url, docName) {
-    ejQuery.get(url, function (codeString) {
-        if (docName) {
-            codeString = 'var doc = d3.select("#' + docName + '");\n' + codeString;
-        }
-        ejQuery('#jsTextEditor').val(codeString);
-        EXTENSION.displayMessage('Updated JS');
+    ejQuery.ajax({
+        url : url,
+        success : function (codeString) {
+            if (docName) {
+                codeString = 'var doc = d3.select("#' + docName + '");\n' + codeString;
+            }
+            ejQuery('#jsTextEditor').val(codeString);
+            EXTENSION.displayMessage('Updated JS');
+        },
+        cache: false
     });
 };
 CodeManager.prototype.loadSampleJS = function (codeString) {
@@ -28,8 +32,9 @@ CodeManager.prototype.loadJSFile = function () {
     fileReader.readAsText(newFile);
 };
 CodeManager.prototype.runJS = function () {
-    DOM.runScript(ejQuery('#jsTextEditor').val());
-    EXTENSION.displayMessage('Finished Running JS Script');
+    if (DOM.runScript(ejQuery('#jsTextEditor').val()) === true) {
+        EXTENSION.displayMessage('JS Script finished successfully.');
+    }
 };
 
 CodeManager.prototype.updateCSS = function () {
@@ -52,10 +57,14 @@ CodeManager.prototype.loadCSSFile = function () {
 };
 CodeManager.prototype.loadSampleCSSFile = function (url) {
     var self = this;
-    ejQuery.get(url, function (codeString) {
-        ejQuery('#cssTextEditor').val(codeString);
-        EXTENSION.displayMessage('Updated CSS');
-        self.updateCSS();
+    ejQuery.ajax({
+        url: url,
+        success: function (codeString) {
+            ejQuery('#cssTextEditor').val(codeString);
+            EXTENSION.displayMessage('Updated CSS');
+            self.updateCSS();
+        },
+        cache: false
     });
 };
 CodeManager.prototype.loadSampleCSS = function (codeString) {

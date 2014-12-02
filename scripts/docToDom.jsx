@@ -1,4 +1,4 @@
-var alertedUnsupported = true,
+var alertedUnsupported = false,
     reservedNames = {   // All IDs in the panel are reserved, we include the empty
         "" : true       // string so that elements with no name will be given one
     },
@@ -9,46 +9,6 @@ var alertedUnsupported = true,
         "id3_classNames",
         "id3_reverseTransform"
     ];
-
-function ConsoleProxy () {
-    var self = this;
-    self.logs = [];
-    self.error = null;
-    self.output = null;
-}
-ConsoleProxy.prototype.log = function () {
-    var self = this,
-        i,
-        result = "";
-    for (i = 0; i < arguments.length; i += 1) {
-        if (i > 0) {
-            result += " ";
-        }
-        result += String(arguments[i]);
-    }
-    self.logs.push(result);
-};
-ConsoleProxy.prototype.logError = function (e) {
-    var self = this;
-    self.error = {
-        'message' : String(e.message),
-        'line' : String(e.line - 1)
-    };
-};
-ConsoleProxy.prototype.setOutput = function (o) {
-    var self = this;
-    self.output = o;
-};
-ConsoleProxy.prototype.jsonPacket = function () {
-    var self = this;
-    return JSON.stringify({
-        'logs' : self.logs,
-        'error' : self.error,
-        'output' : self.output
-    });
-};
-
-var console = new ConsoleProxy();
 
 function standardize(activeDoc) {
     var nameLookup = {};
@@ -98,7 +58,6 @@ function standardize(activeDoc) {
     
     standardizeItems(activeDoc.artboards, 'artboards');
     standardizeItems(activeDoc.layers, 'layers');
-    
     standardizeItems(activeDoc.pathItems, 'native');
     standardizeItems(activeDoc.groupItems, 'native');
     standardizeItems(activeDoc.textFrames, 'text');
@@ -133,7 +92,9 @@ function extractColor(e, attr) {
         return 'none';
     }else {
         if (alertedUnsupported === false) {
-            alert('hanpuku does not yet support ' + e[attr].typename);
+            console.logError({
+                'message' : 'hanpuku does not yet support ' + e[attr].typename,
+                'line' : 70});
             alertedUnsupported = true;
         }
         return 'rgb(0,0,0)';
@@ -150,7 +111,7 @@ function extractPath (p) {
         opacity : p.opacity / 100,
         closed : p.closed,
         points : [],
-        data : JSON.parse(p.tags.getByName('id3_data').value),
+        data : p.tags.getByName('id3_data').value,
         classNames : p.tags.getByName('id3_classNames').value,
         reverseTransform : p.tags.getByName('id3_reverseTransform').value
     },
@@ -195,7 +156,7 @@ function extractText(t) {
         name : t.name,
         contents : t.contents,
         anchor : t.position,
-        data : JSON.parse(t.tags.getByName('id3_data').value),
+        data : t.tags.getByName('id3_data').value,
         classNames : t.tags.getByName('id3_classNames').value,
         reverseTransform : t.tags.getByName('id3_reverseTransform').value
     };
@@ -244,7 +205,7 @@ function extractGroup(g, iType) {
     }
     
     if (iType === 'group') {
-        output.data = JSON.parse(g.tags.getByName('id3_data').value);
+        output.data = g.tags.getByName('id3_data').value;
         output.classNames = g.tags.getByName('id3_classNames').value;
         output.reverseTransform = g.tags.getByName('id3_reverseTransform').value;
     }
@@ -275,9 +236,9 @@ function extractDocument() {
             left, right, top, bottom,
             a, l, s;
         
-        /*if (activeDoc.activeLayer.name === 'Isolation Mode') {
-            alert('isolation!');
-        }*/
+        if (activeDoc.activeLayer.name === 'Isolation Mode') {
+            return "Isolation Mode Error";
+        }
         
         standardize(activeDoc);
         

@@ -22,15 +22,15 @@ DataFile.prototype.evaluate = function () {
         } else if (self.type === 'text/json') {
             self.parsed = JSON.parse(self.raw);
         } else if (self.type === 'text/csv') {
-            self.parsed = d3._csv.parse(self.raw);
+            self.parsed = ed3.csv.parse(self.raw);
         } else if (self.type === 'text/tab-separated-values') {
-            self.parsed = d3._tsv.parse(self.raw);
+            self.parsed = ed3.tsv.parse(self.raw);
         } else {
             throw new Error("Attempted to parse unsupported data type: " + self.type);
         }
         self.valid = true;
     } catch(e) {
-        self.parsed = {};
+        self.parsed = {"error_type" : e.name};
         self.parsed["ERROR: Couldn't parse " + self.name + " as " + self.type] = e.stack.split('\n');
     }
 };

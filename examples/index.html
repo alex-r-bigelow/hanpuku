@@ -91,7 +91,7 @@
                     file name of the current Illustrator document. Any changes outside this
                     SVG element will be ignored (if, for example, you add buttons to control
                     an interactive visualization, they will be lost after clicking "Apply").
-                    exist in the DOM, with its id matching the document name. Its immediate
+                    Its immediate
                     children are:</p>
                     <ul>
                         <li>&lt;rect&gt; elements of class "artboard"<br/></li>
@@ -204,11 +204,14 @@
                     will be called with two parameters: the data element, and its index.</p>
                 </li>
                 <li><h3>Text</h3>
-                    <p>Adobe is famous for its abilities to handle text well, and SVG is notorious for not handling
+                    <p>Adobe is famous for its abilities to handle text well, and SVG is notorious for <i>not</i> handling
                     it well. Translating between the two is very complex, and while it is at the top of my feature
                     list, it may take some time.</p>
-                    <p>In the mean time, hanpuku ignores text in the document, and does not yet add new text from the
-                    DOM (sorry, I really will get on this soon!)</p>
+                    <p>For now, text support is disabled; some of the code is there, but it's so limited and has
+                    so many bugs, I felt that for now it would be best to leave it out.</p>
+                    <p>When text is supported, hanpuku will try to touch text
+                    as little as possible (it may not display properly in the DOM preview, but <i>should</i> remain
+                    relatively intact in your Illustrator document).</p>
                 </li>
                 <li><h3>Colors and Opacity</h3>
                     <p>Currently, most browsers (including Adobe's internal Chrome engine) do not yet support

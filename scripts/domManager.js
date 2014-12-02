@@ -25,6 +25,7 @@ function DomManager (targetDiv) {
     self.docName = undefined;
     self.viewBounds = undefined;
     self.nameLookup = undefined;
+    self.lastNameLookup = undefined;
     self.copyNumber = 0;
 }
 DomManager.PADDING = 64;
@@ -37,9 +38,17 @@ DomManager.DOM_LIBS = [
     'scripts/hanpuku.js',
     'lib/phrogz.js'
 ];
-DomManager.JSX_LIBS = [
-    'lib/json2.js'
-];
+DomManager.getElementType = function (e) {
+    if (e.tagName === 'g') {
+        if (e.parentNode.tagName === 'svg') {
+            return 'layer';
+        } else {
+            return 'group';
+        }
+    } else {
+        return e.tagName;
+    }
+};
 DomManager.prototype.disableUI = function () {
     var self = this;
     ejQuery('#zoomButtons button').attr('disabled', true);
@@ -76,11 +85,16 @@ DomManager.prototype.initScope = function () {
         },
         loadFunc = function () {
             var url = arguments[0],
-                callback = arguments.length === 3 ? arguments[2] : arguments[1];
-            if (DATA.hasFile(url) === true) {
-                callback(undefined, DATA.getFile(url).parsed);
+                callback = arguments.length === 3 ? arguments[2] : arguments[1],
+                file = DATA.getFile(url);
+            if (file === undefined) {
+                EXTENSION.displayMessage("<p style='color:#f00;'>" + url + " has not been loaded in the Data tab.</p>");
+                //callback(url + " has not been loaded in the Data tab.", undefined);
+            } else if (file.parsed.error_type !== undefined) {
+                EXTENSION.displayMessage("<p style='color:#f00;'>Error parsing " + url + "; see the Data tab for details.</p>");
+                //callback("Error parsing " + url + "; see the Data tab for details.", undefined);
             } else {
-                callback(url + " has not been loaded in the Data tab.", undefined);
+                callback(undefined, file.parsed);
             }
         };
     // Clear out old variables
@@ -137,7 +151,14 @@ DomManager.prototype.runScript = function (script, ignoreSelection)
     
     // execute script in private context - not for security, but
     // for a cleaner scope that feels more like coding in a normal browser
-    (new Function( "with(this) { " + script + "}")).call(self.iframeScope);
+    try {
+        (new Function( "with(this) { " + script + "}")).call(self.iframeScope);
+    } catch (e) {
+        EXTENSION.displayMessage('<p style="color:#f00;">' +
+            String(e.stack).split('\n').join('</p><p style="color:#f00;">') +
+            "</p>");
+        return false;
+    }
     
     // if we ran a script that appended an SVG (most bl.ocks.org examples do this),
     // we need to convert it to a layer group and add an artboard
@@ -151,6 +172,8 @@ DomManager.prototype.runScript = function (script, ignoreSelection)
         ILLUSTRATOR.updateSelection(self.iframeScope.selection);
         self.updateSelectionLayer();
     }
+    
+    return true;
 };
 DomManager.prototype.updateSelectionLayer = function () {
     var self = this;
@@ -298,7 +321,10 @@ DomManager.prototype.enforceUniqueIds = function (e) {
         self.copyNumber += 1;
     }
     e.setAttribute('id', newId);
-    self.nameLookup[newId] = e;
+    self.nameLookup[newId] = {
+        name : newId,
+        itemType : DomManager.getElementType(e)
+    };
     
     if (e.tagName === 'g' || e.tagName === 'svg') {
         children = e.childNodes;
@@ -329,6 +355,7 @@ DomManager.prototype.extractPath = function (g, z) {
     if (output.data === undefined) {
         output.data = null;
     }
+    output.data = JsonCircular.stringify(output.data);
     
     // Convert everything except the first entry
     // to a list of lists of point pairs
@@ -389,6 +416,7 @@ DomManager.prototype.extractText = function (t, z) {
     if (output.data === undefined) {
         output.data = null;
     }
+    output.data = JsonCircular.stringify(output.data);
     output.contents = "";
     
     i = d3.select('#' + output.name).style('text-anchor');
@@ -434,6 +462,7 @@ DomManager.prototype.extractGroup = function (g, z, iType) {
         if (output.data === undefined) {
             output.data = null;
         }
+        output.data = JsonCircular.stringify(output.data);
         output.classNames = g.getAttribute('class') === null ? "" : g.getAttribute('class');
         output.reverseTransform = g.getAttribute('id3_reverseTransform') === null ? "" : g.getAttribute('id3_reverseTransform');
     }
@@ -454,6 +483,7 @@ DomManager.prototype.extractGroup = function (g, z, iType) {
 DomManager.prototype.standardize = function () {
     var self = this;
     
+    self.lastNameLookup = self.nameLookup;
     self.nameLookup = {};
     
     self.enforceUniqueIds(jQuery('svg')[0]);
@@ -465,7 +495,8 @@ DomManager.prototype.extractDocument = function () {
             itemType : 'document',
             artboards : [],
             layers : [],
-            selection : ILLUSTRATOR.selectedIDs
+            selection : ILLUSTRATOR.selectedIDs,
+            exit : []
         },
         s,
         z = 1,
@@ -493,13 +524,21 @@ DomManager.prototype.extractDocument = function () {
         }
     }
     
+    for (s in self.lastNameLookup) {
+        if (self.lastNameLookup.hasOwnProperty(s)) {
+            if (self.nameLookup.hasOwnProperty(s) === false) {
+                output.exit.push(self.lastNameLookup[s]);
+            }
+        }
+    }
+    
     return output;
 };
 DomManager.prototype.domToDoc = function () {
     // Throw away all the selection rectangles
     var self = this;
     jQuery('#id3_selectionLayer').remove();
-    ILLUSTRATOR.runJSX(JSON.stringify(self.extractDocument()), 'scripts/domToDoc.jsx', function (result) {});
+    ILLUSTRATOR.runJSX(self.extractDocument(), 'scripts/domToDoc.jsx', function (result) {});
 };
 
 /**
@@ -508,8 +547,14 @@ DomManager.prototype.domToDoc = function () {
  *
  **/
 DomManager.prototype.docToDom = function () {
-    var self = this;
+    var self = this,
+        last = 0;
+    
     ILLUSTRATOR.runJSX(null, 'scripts/docToDom.jsx', function (result) {
+        if (result === "Isolation Mode Error") {
+            EXTENSION.displayMessage('<p style="color:#f00;">Can\'t operate in Isolation Mode (an Illustrator bug)</p>');
+            result = null;
+        }
         if (result !== null) {
             // Set up the document
             self.docName = result.name;
@@ -567,14 +612,18 @@ DomManager.prototype.docToDom = function () {
             // set the new, double-reversed transforms as the regular transform property.
             // This way, everything in d3-land looks like nothing happened to the
             // transform tags, even though the native Illustrator positions were previously
-            // baked in.
-            svg.standardize(undefined, true);
+            // baked in. This also collects all the ids in the original document so that
+            // we can construct the exit array when we go back
+            
+            self.standardize();
+            
             jQuery('svg g, svg path, svg text').each(function () {
                 if (this.hasAttribute('id3_reverseTransform')) {
                     this.setAttribute('transform',this.getAttribute('id3_reverseTransform'));
                     this.removeAttribute('id3_reverseTransform');
                 }
             });
+            
             
             // Finally, add the selection layer, and update the javascript context
             // (the original D3 selection will have been empty)
@@ -628,7 +677,7 @@ DomManager.prototype.addPath = function (parent, path) {
     if (path.reverseTransform !== "null") {
         p.attr('transform', path.reverseTransform);
     }
-    d3.select('#' + path.name).datum(path.data);
+    d3.select('#' + path.name).datum(JsonCircular.parse(JSON.parse(path.data)));
 };
 DomManager.prototype.addTextLines = function (container, text) {
     var lines = text.split(/\n/),
@@ -667,7 +716,7 @@ DomManager.prototype.addText = function (parent, text) {
     }
     
     container = d3.select('#' + text.name);
-    container.datum(text.data);
+    container.datum(JsonCircular.parse(JSON.parse(text.data)));
     
     self.addTextLines(container, text.contents);
 };
@@ -685,7 +734,7 @@ DomManager.prototype.addGroup = function (parent, group) {
         g.attr('transform', group.reverseTransform);
     }
     if (group.hasOwnProperty('data')) {
-        d3.select('#' + group.name).datum(group.data);
+        d3.select('#' + group.name).datum(JsonCircular.parse(JSON.parse(group.data)));
     }
     
     group.groups = group.groups.sort(phrogz('zIndex'));

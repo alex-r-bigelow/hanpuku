@@ -36,9 +36,9 @@
 ### TODO:
 
 #### High priority
-- Fix Isolation Mode bug
+- Circular data in the Data preview...? This probably needs a redesign, especially if we
+  want to deal with embedding data files inside documents later...
 - Fix Selection overlay bug
-- Guard against circular data
 - Inconsistent z-index sorting bug
 - Support arc (and disjoint?) paths
 - Regex search/replace in text editors (esp. data)
