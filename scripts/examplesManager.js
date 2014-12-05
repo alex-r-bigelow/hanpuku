@@ -10,10 +10,13 @@ function ExamplesManager () {
     
     self.iframe = ejQuery('#examplesBrowser')[0];
     self.iframe.onload = function () { self.pushUrl(); };
+}
+ExamplesManager.prototype.init = function () {
+    var self = this;
     
     self.changeUrl();
     self.update();
-}
+};
 ExamplesManager.prototype.pushUrl = function () {
     var self = this,
         newUrl = self.iframe.contentWindow.location.href,

@@ -6,11 +6,11 @@
  * d3.js code and CSS operate on.
  */
 
-function DomManager (targetDiv) {
+function DomManager () {
     var self = this;
     
     // Set up our iframe
-    targetDiv = document.getElementById(targetDiv);
+    targetDiv = document.getElementById('domPreviewContent');
     targetDiv.innerHTML = "";
     self.iframe = document.createElement('iframe');
     targetDiv.appendChild(self.iframe);
@@ -38,6 +38,7 @@ DomManager.DOM_LIBS = [
     'scripts/hanpuku.js',
     'lib/phrogz.js'
 ];
+
 DomManager.getElementType = function (e) {
     if (e.tagName === 'g') {
         if (e.parentNode.tagName === 'svg') {
@@ -49,12 +50,15 @@ DomManager.getElementType = function (e) {
         return e.tagName;
     }
 };
+DomManager.prototype.init = function () {
+    
+};
 DomManager.prototype.disableUI = function () {
     var self = this;
     ejQuery('#zoomButtons button').attr('disabled', true);
     self.iframe.contentDocument.body.innerHTML = "";
 };
-DomManager.prototype.enableUI = function () {
+DomManager.prototype.onRefresh = function () {
     ejQuery('#zoomButtons button').attr('disabled', false);
 };
 DomManager.prototype.zoomIn = function () {
@@ -146,7 +150,7 @@ DomManager.prototype.runScript = function (script, ignoreSelection)
     
     if (ignoreSelection !== true) {
         // remove our selection layer
-        jQuery('#id3_selectionLayer').remove();
+        jQuery('#hanpuku_selectionLayer').remove();
     }
     
     // execute script in private context - not for security, but
@@ -178,9 +182,9 @@ DomManager.prototype.runScript = function (script, ignoreSelection)
 DomManager.prototype.updateSelectionLayer = function () {
     var self = this;
     
-    jQuery('#id3_selectionLayer').remove();
+    jQuery('#hanpuku_selectionLayer').remove();
     var layer = d3.select('#' + self.docName).append('g')
-                    .attr('id', 'id3_selectionLayer'),
+                    .attr('id', 'hanpuku_selectionLayer'),
         selectionRect = layer.selectAll('path').data(ILLUSTRATOR.selectedIDs);
     selectionRect.enter().append('path')
         .attr('fill', 'none')
@@ -350,7 +354,7 @@ DomManager.prototype.extractPath = function (g, z) {
             closed : d.substr(-1) === 'Z',
             data : d3.select('#' + g.getAttribute('id')).data()[0],
             classNames : g.getAttribute('class') === null ? "" : g.getAttribute('class'),
-            reverseTransform : g.getAttribute('id3_reverseTransform') === null ? "" : g.getAttribute('id3_reverseTransform')
+            reverseTransform : g.getAttribute('hanpuku_reverseTransform') === null ? "" : g.getAttribute('hanpuku_reverseTransform')
         };
     if (output.data === undefined) {
         output.data = null;
@@ -410,7 +414,7 @@ DomManager.prototype.extractText = function (t, z) {
             zIndex : z,
             data : d3.select('#' + t.getAttribute('id')).data()[0],
             classNames : t.getAttribute('class') === null ? "" : t.getAttribute('class'),
-            reverseTransform : t.getAttribute('id3_reverseTransform') === null ? "" : t.getAttribute('id3_reverseTransform')
+            reverseTransform : t.getAttribute('hanpuku_reverseTransform') === null ? "" : t.getAttribute('hanpuku_reverseTransform')
         },
         i;
     if (output.data === undefined) {
@@ -464,7 +468,7 @@ DomManager.prototype.extractGroup = function (g, z, iType) {
         }
         output.data = JsonCircular.stringify(output.data);
         output.classNames = g.getAttribute('class') === null ? "" : g.getAttribute('class');
-        output.reverseTransform = g.getAttribute('id3_reverseTransform') === null ? "" : g.getAttribute('id3_reverseTransform');
+        output.reverseTransform = g.getAttribute('hanpuku_reverseTransform') === null ? "" : g.getAttribute('hanpuku_reverseTransform');
     }
     for (s = 0; s < g.childNodes.length; s += 1) {
         if (g.childNodes[s].tagName === 'g') {
@@ -537,7 +541,7 @@ DomManager.prototype.extractDocument = function () {
 DomManager.prototype.domToDoc = function () {
     // Throw away all the selection rectangles
     var self = this;
-    jQuery('#id3_selectionLayer').remove();
+    jQuery('#hanpuku_selectionLayer').remove();
     ILLUSTRATOR.runJSX(self.extractDocument(), 'scripts/domToDoc.jsx', function (result) {});
 };
 
@@ -618,9 +622,9 @@ DomManager.prototype.docToDom = function () {
             self.standardize();
             
             jQuery('svg g, svg path, svg text').each(function () {
-                if (this.hasAttribute('id3_reverseTransform')) {
-                    this.setAttribute('transform',this.getAttribute('id3_reverseTransform'));
-                    this.removeAttribute('id3_reverseTransform');
+                if (this.hasAttribute('hanpuku_reverseTransform')) {
+                    this.setAttribute('transform',this.getAttribute('hanpuku_reverseTransform'));
+                    this.removeAttribute('hanpuku_reverseTransform');
                 }
             });
             
@@ -633,7 +637,7 @@ DomManager.prototype.docToDom = function () {
             self.docName = undefined;
             self.viewBounds = undefined;
         }
-        EXTENSION.updateUI();
+        EXTENSION.notifyRefresh();
     });
 };
 DomManager.prototype.extractPathString = function (path) {

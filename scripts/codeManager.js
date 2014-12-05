@@ -5,6 +5,9 @@ function CodeManager () {
         
     self.cssTypingTimer = undefined;
 }
+CodeManager.prototype.init = function () {
+    
+};
 CodeManager.prototype.loadSampleJSFile = function (url, docName) {
     ejQuery.ajax({
         url : url,
@@ -83,6 +86,6 @@ CodeManager.prototype.editCSS = function () {
 CodeManager.prototype.disableUI = function () {
     ejQuery('#runButton').text('(Need a document to run)').attr('disabled', true);
 };
-CodeManager.prototype.enableUI = function () {
+CodeManager.prototype.onRefresh = function () {
     ejQuery('#runButton').text('Run').attr('disabled', false);
 };

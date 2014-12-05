@@ -15,8 +15,8 @@
       <span style="float:right">
         <input type="checkbox" id="advancedMode" onchange="EXTENSION.advancedMode();" checked style="visibility: hidden"><!--Show Advanced Tools-->
         &emsp;
-        <button id="refreshButton" onclick="DOM.docToDom();">Refresh From Document</button>
-        <button id="applyButton" onclick="DOM.domToDoc(); DOM.docToDom();">Apply</button>
+        <button id="refreshButton" onclick="ILLUSTRATOR.refresh();">Refresh From Document</button>
+        <button id="applyButton" onclick="ILLUSTRATOR.apply();">Apply</button>
       </span>
       
     </div>
@@ -85,12 +85,12 @@
       
     </div>
     
+    <div id="messageOverlay" class="halo" onclick="EXTENSION.clearMessages()">
+    </div>
+    
     <div id="debugButtons" class="halo">
       Debugging:
       <button onclick="location.reload();">Reload Extension</button>
-    </div>
-    
-    <div id="messageOverlay" class="halo" onclick="EXTENSION.clearMessages()">
     </div>
   </body>
 </html>

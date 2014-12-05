@@ -83,15 +83,15 @@ function applyPath(iPath, dPath) {
 
     var anchorList = [],
         i = iPath.tags.add();
-    i.name = 'id3_data';
+    i.name = 'hanpuku_data';
     i.value = JSON.stringify(dPath.data);
     
     i = iPath.tags.add();
-    i.name = 'id3_classNames';
+    i.name = 'hanpuku_classNames';
     i.value = dPath.classNames;
     
     i = iPath.tags.add();
-    i.name = 'id3_reverseTransform';
+    i.name = 'hanpuku_reverseTransform';
     i.value = dPath.reverseTransform;
     
     for (i = 0; i < dPath.points.length; i += 1) {
@@ -165,15 +165,15 @@ function applyText(iText, dText) {
     }
     
     i = iText.tags.add();
-    i.name = 'id3_data';
+    i.name = 'hanpuku_data';
     i.value = JSON.stringify(dText.data);
     
     i = iText.tags.add();
-    i.name = 'id3_classNames';
+    i.name = 'hanpuku_classNames';
     i.value = dText.classNames;
     
     i = iText.tags.add();
-    i.name = 'id3_reverseTransform';
+    i.name = 'hanpuku_reverseTransform';
     i.value = dText.reverseTransform;
     
     if (doc.selection.indexOf(dText.name) !== -1) {
@@ -192,15 +192,15 @@ function applyGroup(iGroup, dGroup)
     iGroup.name = dGroup.name;
     if (dGroup.itemType === 'group') {
         i = iGroup.tags.add();
-        i.name = 'id3_data';
+        i.name = 'hanpuku_data';
         i.value = JSON.stringify(dGroup.data);
         
         i = iGroup.tags.add();
-        i.name = 'id3_classNames';
+        i.name = 'hanpuku_classNames';
         i.value = dGroup.classNames;
         
         i = iGroup.tags.add();
-        i.name = 'id3_reverseTransform';
+        i.name = 'hanpuku_reverseTransform';
         i.value = dGroup.reverseTransform;
     }
     
