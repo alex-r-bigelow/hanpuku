@@ -35,7 +35,7 @@ DomManager.DOM_LIBS = [
     "lib/queue.min.js",
     'lib/topojson.js',
     'lib/colorbrewer.js',
-    'scripts/hanpuku.js',
+    'lib/hanpuku.js',
     'lib/phrogz.js'
 ];
 
@@ -407,8 +407,7 @@ DomManager.prototype.extractPath = function (g, z) {
     return output;
 };
 DomManager.prototype.extractText = function (t, z) {
-    var self = this,
-        output = {
+    var output = {
             itemType : 'text',
             name : t.getAttribute('id'),
             zIndex : z,
@@ -551,8 +550,7 @@ DomManager.prototype.domToDoc = function () {
  *
  **/
 DomManager.prototype.docToDom = function () {
-    var self = this,
-        last = 0;
+    var self = this;
     
     ILLUSTRATOR.runJSX(null, 'scripts/docToDom.jsx', function (result) {
         if (result === "Isolation Mode Error") {

@@ -57,20 +57,22 @@ Datum.INIT = function () {
         childKey,
         childDatum;
     
+    Datum.ALL['DATA.allFiles'] = root;
+    Datum.BFS.push('DATA.allFiles');
+    
     // Populate the queue with files
     for (childName in DATA.allFiles) {
-        if (DATA.allFiles.hasOwnProperty(childName)) {
-            
+        if (DATA.allFiles.hasOwnProperty(childName) && childName !== 'hanpuku_key') {
             DATA.allFiles[childName].evaluate();
             childKey = 'DATA.allFiles["' + childName + '"].parsed';
             
             Datum.ALL[childKey] = new Datum(root,
                                             childKey,
-                                            childName,
+                                            DATA.allFiles[childName].name,
                                             DATA.allFiles[childName].parsed,
                                             false);
             Datum.ALL[childKey].isError = !DATA.allFiles[childName].valid;
-            
+            root.children.push(Datum.ALL[childKey]);
             Datum.BFS.push(childKey);
             queue.push(DATA.allFiles[childName].parsed);
         }
@@ -83,32 +85,16 @@ Datum.INIT = function () {
      */
     while (queue.length > 0) {
         data = queue.splice(0,1)[0];
-        datum = Datum.ALL[data.hanpuku_key];
         
-        if (datum.objType === Datum.ARRAY) {
-            for (childName = 0; childName < data.length; childName += 1) {
-                childKey = datum.key + '[' + childName + ']';
-                
-                if (data.hasOwnProperty('hanpuku_key')) {
-                    childDatum = Datum.ALL[childKey];
-                } else {
-                    childDatum = new Datum(datum,
-                                           childKey,
-                                           childName,
-                                           data[childName]);
-                    Datum.ALL[childKey] = childDatum;
-                    datum.children[childName] = childDatum;
-                    queue.push(data[childName]);
-                }
-                
-                Datum.BFS.push(childKey);
-            }
-        } else if (datum.objType === Datum.OBJECT) {
-            for (childName in data) {
-                    if (data.hasOwnProperty(childName)) {
-                        childKey = datum.key + '["' + childName + '"]';
+        // Recurse if relevant
+        if (data.hasOwnProperty('hanpuku_key')) {
+            datum = Datum.ALL[data.hanpuku_key];
+            
+            if (datum.objType === Datum.ARRAY) {
+                for (childName = 0; childName < data.length; childName += 1) {
+                    childKey = datum.key + '[' + childName + ']';
                     
-                    if (data.hasOwnProperty('hanpuku_key')) {
+                    if (data[childName].hasOwnProperty('hanpuku_key')) {
                         childDatum = Datum.ALL[childKey];
                     } else {
                         childDatum = new Datum(datum,
@@ -121,6 +107,26 @@ Datum.INIT = function () {
                     }
                     
                     Datum.BFS.push(childKey);
+                }
+            } else if (datum.objType === Datum.OBJECT) {
+                for (childName in data) {
+                    if (data.hasOwnProperty(childName) && childName !== 'hanpuku_key') {
+                        childKey = datum.key + '["' + childName + '"]';
+                        
+                        if (data[childName].hasOwnProperty('hanpuku_key')) {
+                            childDatum = Datum.ALL[childKey];
+                        } else {
+                            childDatum = new Datum(datum,
+                                                   childKey,
+                                                   childName,
+                                                   data[childName]);
+                            Datum.ALL[childKey] = childDatum;
+                            datum.children[childName] = childDatum;
+                            queue.push(data[childName]);
+                        }
+                        
+                        Datum.BFS.push(childKey);
+                    }
                 }
             }
         }
@@ -137,12 +143,12 @@ Datum.PURGE_TEMPORARY_KEYS = function (data) {
         
         if (data instanceof Array) {
             for (i = 0; i < data.length; i += 1) {
-                datum.PURGE_TEMPORARY_KEYS(data[i]);
+                Datum.PURGE_TEMPORARY_KEYS(data[i]);
             }
         } else {
             for (i in data) {
                 if (data.hasOwnProperty(i)) {
-                    datum.PURGE_TEMPORARY_KEYS(data[i]);
+                    Datum.PURGE_TEMPORARY_KEYS(data[i]);
                 }
             }
         }
@@ -163,6 +169,7 @@ function DataRow (parent, datum, rowNumber, depth, isClone) {
     var self = this,
         alias;
     
+    self.parent = parent;
     self.datum = datum;
     self.rowNumber = rowNumber;
     self.depth = depth;
@@ -189,9 +196,7 @@ function DataRow (parent, datum, rowNumber, depth, isClone) {
 }
 DataRow.ALL = [];
 DataRow.KEY_TO_ROW = {};
-DataRow.LAST_EXPANSIONS = {
-    'DATA.allFiles' : true
-};
+DataRow.LAST_EXPANSIONS = null;
 
 DataRow.INIT = function () {
     var queue,
@@ -203,7 +208,14 @@ DataRow.INIT = function () {
         alias;
     
     // Store which keys were expanded before
-    DataRow.LAST_EXPANSIONS = {};
+    if (DataRow.LAST_EXPANSIONS === null) {
+        // Start out with files visible
+        DataRow.LAST_EXPANSIONS = {
+            'DATA.allFiles' : true
+        };
+    } else {
+        DataRow.LAST_EXPANSIONS = {};
+    }
     for (i = 0; i < DataRow.ALL.length; i += 1) {
         DataRow.LAST_EXPANSIONS[DataRow.ALL[i].key] = true;
     }
@@ -212,7 +224,7 @@ DataRow.INIT = function () {
     DataRow.KEY_TO_ROW = {};
     DataRow.KEY_TO_ROW[self.key] = 0;
     
-    DataRow.ALL = [new DataRow(Datum.ALL[0], 0, 0)];
+    DataRow.ALL = [new DataRow(null, Datum.ALL['DATA.allFiles'], 0, 0)];
     
     // Create all the expanded nodes breadth-first
     queue = [DataRow.ALL[0]];
@@ -224,9 +236,9 @@ DataRow.INIT = function () {
                 for (childIndex = 0; childIndex < row.datum.children.length; childIndex += 1) {
                     if (DataRow.KEY_TO_ROW.hasOwnProperty(row.datum.key)) {
                         // This is a clone of another row we can already see...
-                        childRow = new DataRow(row.datum.children[childIndex], DataRow.ALL.length, row.depth + 1, true);
+                        childRow = new DataRow(row, row.datum.children[childIndex], DataRow.ALL.length, row.depth + 1, true);
                     } else {
-                        childRow = new DataRow(row.datum.children[childIndex], DataRow.ALL.length, row.depth + 1);
+                        childRow = new DataRow(row, row.datum.children[childIndex], DataRow.ALL.length, row.depth + 1);
                         queue.push(childRow);
                     }
                     DataRow.ALL.push(childRow);
@@ -236,9 +248,9 @@ DataRow.INIT = function () {
                     if (row.datum.children.hasOwnProperty(childIndex)) {
                         if (DataRow.KEY_TO_ROW.hasOwnProperty(row.datum.key)) {
                             // This is a clone of another row we can already see...
-                            childRow = new DataRow(row.datum.children[childIndex], DataRow.ALL.length, row.depth + 1, true);
+                            childRow = new DataRow(row, row.datum.children[childIndex], DataRow.ALL.length, row.depth + 1, true);
                         } else {
-                            childRow = new DataRow(row.datum.children[childIndex], DataRow.ALL.length, row.depth + 1);
+                            childRow = new DataRow(row, row.datum.children[childIndex], DataRow.ALL.length, row.depth + 1);
                             queue.push(childRow);
                         }
                         DataRow.ALL.push(childRow);
@@ -280,6 +292,7 @@ DataRow.INIT = function () {
 function MappingManager () {
     var self = this;
     
+    self.staleDatum = true;
     self.showSelection = false;
 }
 MappingManager.BAR_SIZE = 20;
@@ -295,11 +308,9 @@ MappingManager.prototype.disableUI = function () {
 };
 MappingManager.prototype.onNewData = function () {
     var self = this;
-    console.log('a');
-    Datum.INIT();
-    console.log('b');
+    
+    self.staleDatum = true;
     self.onRefresh();
-    console.log('c');
 };
 MappingManager.prototype.toggleCollapse = function (row) {
     var self = this;
@@ -318,6 +329,10 @@ MappingManager.prototype.onRefresh = function () {
         height = 0,
         nodes,
         nodesEnter;
+    
+    if (self.staleDatum === true) {
+        Datum.INIT();
+    }
     
     // Update the rows
     DataRow.INIT();
@@ -383,7 +398,8 @@ MappingManager.prototype.onRefresh = function () {
     
     // Draw the data
     dataList.attr('transform', 'translate(' + width + ',0)');
-    nodes = dataList.selectAll('.dataNode').data(DataRow.ALL, function (row) { return row.datum.key; });
+    console.log(DataRow.ALL, dataList.selectAll('.dataNode'));
+    nodes = dataList.selectAll('.dataNode').data(DataRow.ALL, function (row) { console.log(row.datum.key); return row.datum.key; });
     
     // Enter
     nodesEnter = nodes.enter().append('g')

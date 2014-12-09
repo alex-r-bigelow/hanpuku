@@ -322,13 +322,13 @@
             self.disableUI();
             DOM.disableUI();
             CODE.disableUI();
-            //MAP.disableUI();
+            MAP.disableUI();
             // DATA.disableUI();   I'll start caring when we embed files
         } else {
             self.onRefresh();
             DOM.onRefresh();
             CODE.onRefresh();
-            //MAP.onRefresh();
+            MAP.onRefresh();
             // DATA.refresh();
         }
     };
@@ -340,7 +340,7 @@
     };
     
     ExtensionManager.prototype.notifyNewData = function () {
-        //MAP.onNewData();
+        MAP.onNewData();
     };
     
     ExtensionManager.prototype.notifyHighlightChange = function () {
@@ -373,7 +373,7 @@
         extensionScope.EXAMPLES.init();
         extensionScope.ILLUSTRATOR.init();
         extensionScope.DATA.init();
-        //extensionScope.MAP.init();
+        extensionScope.MAP.init();
         extensionScope.DOM.init();
         extensionScope.CODE.init();
         
