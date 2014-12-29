@@ -145,6 +145,7 @@
         self.oppositeTextColor = useWhite ? '#000' : '#fff';
         self.fontFamily = i.baseFontFamily;
         self.fontSize = i.baseFontSize;
+        self.largeFontSize = self.fontSize + 2;
         
         self.backgroundColor = 'rgba(' + Math.floor(background.red) + ',' +
                                 Math.floor(background.green) + ',' +
@@ -178,7 +179,7 @@
         ejQuery('button, select').css('background-color', self.buttonColor);
         ejQuery('textarea').css('background-color', self.textBackgroundColor)
                            .css('color', self.textColor)
-                           .css('font-size', self.fontSize);
+                           .css('font-size', self.largeFontSize);
         ejQuery('#dataPreview').css('background-color', self.bodyColor);
         
         

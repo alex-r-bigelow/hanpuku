@@ -43,7 +43,7 @@
 - Support arc (and disjoint?) paths
 - Regex search/replace in text editors (esp. data)
 - Better text support (lots of bugs! I think a Chrome bug prevents using the x coordinate on text elements that have tspan in them...)
-- More hanpuku-specific Examples
+- More examples
 
 #### Medium priority
 - Replace textareas with ace editors
@@ -69,3 +69,4 @@
 - Investigate what it would take to make an Inkscape clone
 - It would be cool to convert between canvas elements / bitmaps...
 - Test on Windows
+- Tangelo integration / streaming support

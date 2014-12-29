@@ -112,6 +112,7 @@ IllustratorConnection.prototype.updateSelection = function (d3selection) {
 };
 IllustratorConnection.prototype.refresh = function () {
     DOM.docToDom();
+    EXTENSION.notifyRefresh();
 };
 IllustratorConnection.prototype.apply = function () {
     DOM.domToDoc();
