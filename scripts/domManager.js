@@ -419,9 +419,9 @@ DomManager.prototype.extractText = function (t, z) {
             zIndex : z,
             data : d3.select('#' + t.getAttribute('id')).data()[0],
             classNames : t.getAttribute('class') === null ? "" : t.getAttribute('class'),
-            forwardTransform : t.getAttribute('transform'),
+            forwardMatrix : t.getAttribute('transform'),
+            textTransforms : JsonCircular.parse(t.getAttribute('hanpuku_textTransforms')),
             contents : t.textContent,
-            justification : t.getAttribute('hanpuku_textAnchor') === null ? "" : t.getAttribute('hanpuku_textAnchor'),
             kerning : t.getAttribute('dx') === null ? "" : t.getAttribute('dx'),
             baselineShift : t.getAttribute('dy') === null ? "" : t.getAttribute('dy'),
             rotate : t.getAttribute('rotate') === null ? "" : t.getAttribute('rotate')
@@ -441,9 +441,6 @@ DomManager.prototype.extractText = function (t, z) {
         output.justification = 'LEFT';
     }
     
-    output.anchor = [t.getAttribute('x'), t.getAttribute('y')];
-    output.anchor[0] = 0 ? output.anchor[0] === null : output.anchor[0];
-    output.anchor[1] = 0 ? output.anchor[1] === null : output.anchor[1];
     return output;
 };
 DomManager.prototype.extractGroup = function (g, z, iType) {

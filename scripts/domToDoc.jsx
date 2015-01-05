@@ -110,8 +110,7 @@ function applyPath(iPath, dPath) {
 }
 
 function applyText(iText, dText) {
-    var transform,
-        params,
+    var forward,
         m,
         i,
         j,
@@ -120,25 +119,6 @@ function applyText(iText, dText) {
     iText.name = dText.name;
     iText.contents = dText.contents;
     
-    if (dText.forwardTransform && dText.forwardTransform !== "null") {
-        transform = dText.forwardTransform.split('(');
-        params = transform[1].substring(0, transform[1].length - 1).split(',');
-        
-        // We'll always get a matrix transltion
-        m = app.getIdentityMatrix();
-        m.mValueA = Number(params[0]);
-        m.mValueB = Number(params[1]);
-        m.mValueC = Number(params[2]);
-        m.mValueD = Number(params[3]);
-        m.mValueTX = Number(params[4]);
-        m.mValueTY = -Number(params[5]);
-        
-        iText.transform(m);
-    }
-    
-    //iText.left = Number(dText.anchor[0]) - (iText.anchor[0] - iText.left);
-    //iText.top = Number(dText.anchor[1]) - (iText.anchor[1] - iText.top);
-    
     if (dText.justification === 'CENTER') {
         j = Justification.CENTER;
     } else if (dText.justification === 'RIGHT') {
@@ -146,6 +126,9 @@ function applyText(iText, dText) {
     } else {
         j = Justification.LEFT;
     }
+    
+    //iText.left = Number(dText.anchor[0]) - (iText.anchor[0] - iText.left);
+    //iText.top = Number(dText.anchor[1]) - (iText.anchor[1] - iText.top);
     
     if (iText.contents.length > 0) {
         // For some reason, paragraphs gives length of 1 when there's an
@@ -172,6 +155,10 @@ function applyText(iText, dText) {
             }
         }
     }
+    
+    iText.resize(dText.textTransforms.sx*100, dText.textTransforms.sy*100, true, true, true, true, true, Transformation.DOCUMENTORIGIN);
+    iText.rotate(-dText.textTransforms.theta*180/Math.PI, true, true, true, true, Transformation.DOCUMENTORIGIN);
+    iText.translate(dText.textTransforms.x, dText.textTransforms.y);
     
     i = iText.tags.add();
     i.name = 'hanpuku_data';
