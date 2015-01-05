@@ -42,6 +42,7 @@
         "lib/topojson.js",
         "lib/colorbrewer.js",
         "lib/htmlParser.js",
+        "lib/convertUnits.js",
         "lib/hanpuku.js",
         "scripts/examplesManager.js",
         "scripts/illustratorConnection.js",
@@ -334,10 +335,10 @@
         }
     };
     ExtensionManager.prototype.disableUI = function () {
-        ejQuery('#refreshButton, #applyButton').attr('disabled', true);
+        ejQuery('#applyButton').attr('disabled', true);
     };
     ExtensionManager.prototype.onRefresh = function () {
-        ejQuery('#refreshButton, #applyButton').attr('disabled', false);
+        ejQuery('#applyButton').attr('disabled', false);
     };
     
     ExtensionManager.prototype.notifyNewData = function () {

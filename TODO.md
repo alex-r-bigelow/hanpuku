@@ -44,6 +44,7 @@
 - Regex search/replace in text editors (esp. data)
 - Better text support (lots of bugs! I think a Chrome bug prevents using the x coordinate on text elements that have tspan in them...)
 - More examples
+- Add hanpuku.js support for <line> elements
 
 #### Medium priority
 - Replace textareas with ace editors
@@ -51,6 +52,7 @@
 - Export as/to web page tool
 - Embed data, js, css files inside the .ai file (preserve layer-level properties while I'm at it)
 - Load multiple js, css files, distinguish between js libraries and scripts (run the former immediately)
+- Support SVG Polygon, Polyline
 - Support Gradients, CMYK color, stroke properties (dashes, cap, etc.), Masks
 
 #### Low priority (probably next paper)

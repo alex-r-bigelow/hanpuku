@@ -12,13 +12,22 @@ function DataFile(name, type, raw) {
     self.evaluate();
 }
 DataFile.prototype.evaluate = function () {
-    var self = this;
+    var self = this,
+        temp;
     self.parsed = null;
     self.valid = false;
     
     try {
         if (self.type === 'text/js') {
             self.parsed = eval(self.raw);
+            temp = typeof self.parsed;
+            if (temp !== "object" || self.parsed === null) {
+                temp = "The script generated an invalid object of type " + temp +
+                       " and value " + String(self.parsed) + ". You should end the " +
+                       "script with an object or array followed by a semicolon.";
+                self.parsed = null;
+                throw new Error(temp);
+            }
         } else if (self.type === 'text/json') {
             self.parsed = JSON.parse(self.raw);
         } else if (self.type === 'text/csv') {

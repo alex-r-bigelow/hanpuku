@@ -11,7 +11,7 @@ var diagonal = d3.svg.diagonal()
     .projection(function(d) { return [d.y, d.x]; });
 
 // Get our container, apply the margin if it's the first time
-var svg = d3.select('#Layer_1').selectAll('.basicTre').data([0]);
+var svg = d3.select('#Layer_1').selectAll('.basicTree').data([0]);
 var svgEnter = svg.enter();
 svgEnter.append('g')
    .attr('class', 'basicTree')

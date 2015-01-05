@@ -31,16 +31,21 @@
                     window.parent.DATA.loadSampleDataFile('examples/smallFlowers.tsv');
                     window.parent.CODE.loadSampleJSFile('examples/splom.js');
                     window.parent.CODE.loadSampleCSSFile('examples/splom.css');
+                } else if (name === 'hierarchicalEdgeBundling') {
+                    window.parent.DATA.loadSampleDataFile('examples/flare.json');
+                    window.parent.CODE.loadSampleJSFile('examples/hierarchicalEdgeBundling.js');
+                    window.parent.CODE.loadSampleCSSFile('examples/hierarchicalEdgeBundling.css');
                 }
             }
             
             var sampleNames = {
                     'scatterplot' : 'Scatterplot',
                     'groupedBars' : 'Grouped Bar Chart',
-                    //'basicTree' : 'Basic Tree',
-                    //'splom' : 'Scatterplot Matrix',
+                    'basicTree' : 'Basic Tree',
+                    'splom' : 'Scatterplot Matrix',
                     'force' : 'Force-directed graph',
-                    'streamgraph' : 'Streamgraph'
+                    'streamgraph' : 'Streamgraph',
+                    'hierarchicalEdgeBundling' : 'Hierarchical Edge Bundling'
                 },
                 resultText = "",
                 name;

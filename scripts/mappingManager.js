@@ -135,24 +135,10 @@ Datum.INIT = function () {
     }
     
     // Finally, we need to go back and throw away all the temporary hanpuku_key tags we added to data items
-    Datum.PURGE_TEMPORARY_KEYS(DATA.allFiles);
-};
-Datum.PURGE_TEMPORARY_KEYS = function (data) {
-    var i;
-    
-    if (typeof data === 'object') {
-        delete data.hanpuku_key;
-        
-        if (data instanceof Array) {
-            for (i = 0; i < data.length; i += 1) {
-                Datum.PURGE_TEMPORARY_KEYS(data[i]);
-            }
-        } else {
-            for (i in data) {
-                if (data.hasOwnProperty(i)) {
-                    Datum.PURGE_TEMPORARY_KEYS(data[i]);
-                }
-            }
+    for (key in Datum.ALL) {
+        if (Datum.ALL.hasOwnProperty(key)) {
+            data = Datum.ALL[key].getValue();
+            delete data.hanpuku_key;
         }
     }
 };
@@ -306,10 +292,7 @@ DataRow.prototype.initPosition = function (depth) {
         }
     }
 };
-DataRow.prototype.setHiddenPosition = function (rowNumber) {
-    var self = this;
-    self.rowNumber = rowNumber;
-};
+
 DataRow.prototype.isExpandable = function () {
     var self = this;
     if (self.isClone === true) {
@@ -403,7 +386,7 @@ MappingManager.prototype.onRefresh = function () {
     
     nodes = dataList.selectAll('.dataNode')
         .data(DataRow.ALL, function (row) { return row.datum.key; });
-    console.log('update',DataRow.ALL.length);
+    
     // Enter
     nodesEnter = nodes.enter().append('g')
         .attr('class','dataNode');

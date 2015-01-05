@@ -117,14 +117,27 @@
                     <p>Illustrator only supports cubic-interpolated path elements. On clicking the "Apply"
                     button, hanpuku must convert every SVG primitive in
                     its DOM to cubic-interpolated paths; while class and style attributes will be
-                    preserved in the converted path element, its identity as a circle, rect, or non-cubic path
+                    preserved in the converted path element, its identity as a line, circle, rect, or non-cubic path
                     will be lost. To allow free manipulation of primitives in Illustrator, these
                     semantics can not be hidden from the d3 code.</p>
-                    <p>In some situations, this can make for confusing or even impossible update code; to
-                    mitigate this, we have monkey-patched
+                    <p>Note that this may break some rules in CSS stylesheets that expect specifically
+                    line, circle, or rect elements &mdash; at the moment, the best way around this is to
+                    simply avoid explicit references to these tags in CSS selectors.</p>
+                    <p>In some situations, this can also make for confusing or even impossible update code; to
+                    mitigate this a little, we have monkey-patched
                     these functions onto d3 selections that allow you to manipulate paths as if
-                    they were circles, rectangles, or non-cubic paths:</p>
+                    they were lines, circles, rectangles, or non-cubic paths:</p>
                     <ul>
+                        <li>
+                            <h4><code>d3.selection.lineAttr(x1, y1, x2, y2);</code></h4>
+                            <p>Equivalent to:<br/>
+                            <code>d3.selection.attr('x1', x1)<br/>
+                            &emsp;&emsp;&emsp;&emsp;.attr('y1', y1)<br/>
+                            &emsp;&emsp;&emsp;&emsp;.attr('x2', x2)<br/>
+                            &emsp;&emsp;&emsp;&emsp;.attr('y2', y2);<br/></code>
+                            if the selection actually contained &lt;line&gt; elements, except these
+                            commands change existing paths' geometry to be straight line segments with these properties.</p>
+                        </li>
                         <li>
                             <h4><code>d3.selection.circleAttr(cx, cy, r);</code></h4>
                             <p>Equivalent to:<br/>
@@ -205,13 +218,42 @@
                 </li>
                 <li><h3>Text</h3>
                     <p>Adobe is famous for its abilities to handle text well, and SVG is notorious for <i>not</i> handling
-                    it well. Translating between the two is very complex, and while it is at the top of my feature
-                    list, it may take some time.</p>
-                    <p>For now, text support is disabled; some of the code is there, but it's so limited and has
-                    so many bugs, I felt that for now it would be best to leave it out.</p>
-                    <p>When text is supported, hanpuku will try to touch text
-                    as little as possible (it may not display properly in the DOM preview, but <i>should</i> remain
-                    relatively intact in your Illustrator document).</p>
+                    it well. Translating between the two is very complex, and has lots of side effects that hanpuku can't
+                    mask.</p>
+                    <p>Text blocks are constructed completely differently in SVG and Illustrator; Illustrator principally
+                    tries to guide text through bounded, connected frames, and also has an unbounded, anchor-based way of
+                    storing text that supports manual breaks. Fonts and styles are essentially stored per-character.</p>
+                    <p>SVG stores text in unbounded text elements and nested tspan
+                    elements; line breaks must be explicitly created using separate tspan elements that each have their
+                    own anchor, and tspan elements are also used to indicate sections of text with varying styles &mdash;
+                    tspan elements do not necessarily imply line breaks.</p>
+                    <ul>
+                        <li><h4>No tspan elements</h4>
+                        <p>Hanpuku interprets SVG text elements that contain <i>no</i> tspan elements as equivalent to
+                        Illustrator's anchor-based, unbounded text. Newlines in Illustrator are converted to "\n"
+                        in SVG that <i>will not render correctly in the DOM preview</i>, though they will be preserved
+                        on the return trip to Illustrator (incidentally, \n characters in this type of SVG text will be
+                        handled as expected in Illustrator).</p>
+                        <p>Additionally, <i>textLength, lengthAdjust, and additional x and y attributes will be
+                        discarded</i>. Only the first x and y coordinates will be used and preserved. Per-character
+                        attributes, such as dy (baseline shift), dx (kerning), and rotate (per-character rotation)
+                        are converted to full lists of the same length as the string in pt, em, and deg, respectively.</p></li>
+                        
+                        <li><h4>tspan elements</h4>
+                        <p>Hanpuku does not yet support any other text interpretation than the scenario described above, though future
+                        support for translating tspan elements into connected Illustrator text frames is being considered.
+                        For now, <i>all tspan
+                        elements will be ignored, including their attributes</i>, and all the contents of an SVG text
+                        element will be consolidated into a
+                        single string.</p>
+                        <p>It should also be noted that non-anchor-based Illustrator text is currently ignored, and will not
+                        be available in the DOM (similar to other incompatible Illustrator objects such as blend elements).</p>
+                        </li>
+                        
+                        <li><h4>Text on a path</h4>
+                        <p>Though more parallels seem to exist here than other for other ways of representing text, text
+                        on a path is not supported at this time.</p></li>
+                    </ul>
                 </li>
                 <li><h3>Colors and Opacity</h3>
                     <p>Currently, most browsers (including Adobe's internal Chrome engine) do not yet support

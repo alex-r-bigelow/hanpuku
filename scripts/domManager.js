@@ -158,6 +158,7 @@ DomManager.prototype.runScript = function (script, ignoreSelection)
     try {
         (new Function( "with(this) { " + script + "}")).call(self.iframeScope);
     } catch (e) {
+        console.warn(e.stack);
         EXTENSION.displayMessage('<p style="color:#f00;">' +
             String(e.stack).split('\n').join('</p><p style="color:#f00;">') +
             "</p>");
@@ -289,7 +290,7 @@ DomManager.prototype.unifySvgTags = function (svgNode) {
  **/
 DomManager.SHORTHAND_REGEX = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
 DomManager.HEX_PARSING_REGEX = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i;
-DomManager.prototype.Color = function (s) {
+DomManager.prototype.color = function (s) {
     if (s[0] === '#') {
         // Stolen from http://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
         // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
@@ -342,20 +343,25 @@ DomManager.prototype.extractPath = function (g, z) {
     var self = this,
         d = g.getAttribute('d');
         coordList = d.split(DomManager.PATH_SPLITTER).splice(1),
+        computedStyle = window.getComputedStyle(g),
         output = {
             itemType : 'path',
             name : g.getAttribute('id'),
             zIndex : z,
-            fill : self.Color(window.getComputedStyle(g).fill),
-            stroke : self.Color(window.getComputedStyle(g).stroke),
-            strokeWidth : parseFloat(window.getComputedStyle(g).strokeWidth),
-            opacity : parseFloat(window.getComputedStyle(g).opacity),
+            fill : self.color(computedStyle.fill),
+            stroke : self.color(computedStyle.stroke),
+            strokeWidth : parseFloat(computedStyle.strokeWidth),
+            opacity : parseFloat(computedStyle.opacity),
             points : [],
             closed : d.substr(-1) === 'Z',
             data : d3.select('#' + g.getAttribute('id')).data()[0],
             classNames : g.getAttribute('class') === null ? "" : g.getAttribute('class'),
             reverseTransform : g.getAttribute('hanpuku_reverseTransform') === null ? "" : g.getAttribute('hanpuku_reverseTransform')
         };
+    if (computedStyle.display === "none" || computedStyle.visibility === "hidden") {
+        output.fill = 'none';
+        output.stroke = 'none';
+    }
     if (output.data === undefined) {
         output.data = null;
     }
@@ -413,19 +419,21 @@ DomManager.prototype.extractText = function (t, z) {
             zIndex : z,
             data : d3.select('#' + t.getAttribute('id')).data()[0],
             classNames : t.getAttribute('class') === null ? "" : t.getAttribute('class'),
-            reverseTransform : t.getAttribute('hanpuku_reverseTransform') === null ? "" : t.getAttribute('hanpuku_reverseTransform')
+            forwardTransform : t.getAttribute('transform'),
+            contents : t.textContent,
+            justification : t.getAttribute('hanpuku_textAnchor') === null ? "" : t.getAttribute('hanpuku_textAnchor'),
+            kerning : t.getAttribute('dx') === null ? "" : t.getAttribute('dx'),
+            baselineShift : t.getAttribute('dy') === null ? "" : t.getAttribute('dy'),
+            rotate : t.getAttribute('rotate') === null ? "" : t.getAttribute('rotate')
         },
         i;
     if (output.data === undefined) {
         output.data = null;
     }
     output.data = JsonCircular.stringify(output.data);
-    output.contents = "";
     
     i = d3.select('#' + output.name).style('text-anchor');
-    if (i === null || i === 'start') {
-        output.justification = 'LEFT';
-    } else if (i === 'middle') {
+    if (i === 'middle') {
         output.justification = 'CENTER';
     } else if (i === 'end') {
         output.justification = 'RIGHT';
@@ -433,18 +441,9 @@ DomManager.prototype.extractText = function (t, z) {
         output.justification = 'LEFT';
     }
     
-    
-    for (i = 0; i < t.childNodes.length; i += 1) {
-        output.contents += t.childNodes[i].textContent;
-        if (i < t.childNodes.length - 1) {
-            output.contents += '\n';
-        }
-    }
-    
     output.anchor = [t.getAttribute('x'), t.getAttribute('y')];
     output.anchor[0] = 0 ? output.anchor[0] === null : output.anchor[0];
-    output.anchor[1] = 0 ? output.anchor[1] === null : -output.anchor[1];
-    
+    output.anchor[1] = 0 ? output.anchor[1] === null : output.anchor[1];
     return output;
 };
 DomManager.prototype.extractGroup = function (g, z, iType) {
@@ -484,13 +483,20 @@ DomManager.prototype.extractGroup = function (g, z, iType) {
     return output;
 };
 DomManager.prototype.standardize = function () {
-    var self = this;
+    var self = this,
+        currentZoom = jQuery('#' + self.docName).css('zoom');    
     
     self.lastNameLookup = self.nameLookup;
     self.nameLookup = {};
     
     self.enforceUniqueIds(jQuery('svg')[0]);
+    
+    // Temporarily set the zoom to 100%
+    jQuery('#' + self.docName).css('zoom', 1.0);
+    
     d3.selectAll('svg').standardize(undefined, true);
+    
+    jQuery('#' + self.docName).css('zoom', currentZoom);
 };
 DomManager.prototype.extractDocument = function () {
     var self = this,

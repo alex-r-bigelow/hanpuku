@@ -8,6 +8,9 @@ button, select, optgroup, option {
     font-size: inherit;
     border: none;
 }
+input[type="file"] {
+    width: 1em;
+}
 
 #extensionControls button {
     margin:2px;

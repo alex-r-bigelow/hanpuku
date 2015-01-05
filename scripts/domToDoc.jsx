@@ -111,23 +111,16 @@ function applyPath(iPath, dPath) {
 
 function applyText(iText, dText) {
     var transform,
-        stringMode,
         params,
         m,
         i,
-        j;
+        j,
+        currentShift;
     
     iText.name = dText.name;
-    
     iText.contents = dText.contents;
     
-    // TODO: fix text rotation (if I wait to apply the transform until now
-    // everything gets flipped... but if I do it before, then I can't rotate
-    // the text at all...)
-    
-    // TODO: need to support leading (SVG dy), among other things
-    
-    /*if (dText.forwardTransform && dText.forwardTransform !== "null") {
+    if (dText.forwardTransform && dText.forwardTransform !== "null") {
         transform = dText.forwardTransform.split('(');
         params = transform[1].substring(0, transform[1].length - 1).split(',');
         
@@ -137,18 +130,16 @@ function applyText(iText, dText) {
         m.mValueB = Number(params[1]);
         m.mValueC = Number(params[2]);
         m.mValueD = Number(params[3]);
-        m.mValueTX = 0;
-        m.mValueTY = 0;
+        m.mValueTX = Number(params[4]);
+        m.mValueTY = -Number(params[5]);
         
-        //iText.transform(m);
-    }*/
+        iText.transform(m);
+    }
     
-    iText.left = Number(dText.anchor[0]) - (iText.anchor[0] - iText.left);
-    iText.top = Number(dText.anchor[1]) - (iText.anchor[1] - iText.top);
+    //iText.left = Number(dText.anchor[0]) - (iText.anchor[0] - iText.left);
+    //iText.top = Number(dText.anchor[1]) - (iText.anchor[1] - iText.top);
     
-    if (dText.justification === 'LEFT') {
-        j = Justification.LEFT;
-    } else if (dText.justification === 'CENTER') {
+    if (dText.justification === 'CENTER') {
         j = Justification.CENTER;
     } else if (dText.justification === 'RIGHT') {
         j = Justification.RIGHT;
@@ -162,6 +153,24 @@ function applyText(iText, dText) {
         for (i = 0; i < iText.paragraphs.length; i += 1) {
             iText.paragraphs[i].justification = j;
         }
+        
+        // Apply per-character kerning, tracking, baseline shift, and rotation
+        dText.kerning = dText.kerning.split(/,| /);
+        dText.baselineShift = dText.baselineShift.split(/,| /);
+        dText.rotate = dText.rotate.split(/,| /);
+        currentShift = 0;
+        for (i = 0; i < iText.characters.length; i += 1) {
+            if (dText.kerning.length > i) {
+                iText.characters[i].kerning = 1000*parseFloat(dText.kerning[i]);    // We need thousandths of an em
+            }
+            if (dText.baselineShift.length > i) {
+                currentShift -= parseFloat(dText.baselineShift[i]); // Already in pt
+                iText.characters[i].characterAttributes.baselineShift = currentShift;
+            }
+            if (dText.rotate.length > i) {
+                iText.characters[i].characterAttributes.rotation = parseFloat(dText.rotate[i]);  // Already in degrees
+            }
+        }
     }
     
     i = iText.tags.add();
@@ -172,10 +181,6 @@ function applyText(iText, dText) {
     i.name = 'hanpuku_classNames';
     i.value = dText.classNames;
     
-    i = iText.tags.add();
-    i.name = 'hanpuku_reverseTransform';
-    i.value = dText.reverseTransform;
-    
     if (doc.selection.indexOf(dText.name) !== -1) {
         iText.selected = true;
     }
@@ -184,7 +189,7 @@ function applyText(iText, dText) {
 function applyGroup(iGroup, dGroup)
 {
     //var itemOrder = dGroup.groups.concat(dGroup.paths, dGroup.text).sort(phrogz('zIndex')),
-    var itemOrder = dGroup.groups.concat(dGroup.paths).sort(phrogz('zIndex')),
+    var itemOrder = dGroup.groups.concat(dGroup.paths).concat(dGroup.text).sort(phrogz('zIndex')),
         i,
         newItem;
     
@@ -220,14 +225,14 @@ function applyGroup(iGroup, dGroup)
                 newItem = iGroup.pathItems.add();
             }
             applyPath(newItem, itemOrder[i]);
-        } /*else if (itemOrder[i].itemType === 'text') {
+        } else if (itemOrder[i].itemType === 'text') {
             try {
                 newItem = iGroup.textFrames.getByName(itemOrder[i].name);
             } catch (e) {
                 newItem = iGroup.textFrames.add();
             }
             applyText(newItem, itemOrder[i]);
-        }*/
+        }
         newItem.zOrder(ZOrderMethod.BRINGTOFRONT);
     }
     
