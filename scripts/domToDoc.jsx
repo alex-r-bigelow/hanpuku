@@ -21,7 +21,7 @@ function applyColor(iC,dC) {
     var red, green, blue, black;
     
     if (dC.split('(').length < 2) {
-        alert(dC);
+        console.warn("Bad color:" + String(dC));
     }
     dC = dC.split('(')[1];
     dC = dC.split(')')[0];
@@ -110,7 +110,7 @@ function applyPath(iPath, dPath) {
 }
 
 function applyText(iText, dText) {
-    var forward,
+    var transform,
         m,
         i,
         j,
@@ -119,6 +119,21 @@ function applyText(iText, dText) {
     iText.name = dText.name;
     iText.contents = dText.contents;
     
+    // Fonts
+    
+    // TODO: This is non-trivial! Somehow need to find the closest named font...
+    // app.textFonts.getByName('HelveticaNeue-UltraLightItalic'), or iterate
+    // the array and check other properties (e.g.:
+    // app.textFonts[301].family === 'Helvetica Neue'
+    // app.textFonts[301].name === 'HelveticaNeue-UltraLightItalic'
+    // app.textFonts[301].style === 'UltraLight Italic')
+    
+    // from the DOM, we get dText.fontFamily, dText.fontSize,
+    // dText.fontStyle (normal, italic, oblique)
+    // dText.fontVariant (normal, small-caps)
+    // dText.fontWeight (normal, bold, bolder, lighter, 100-900)
+    
+    // Justification
     if (dText.justification === 'CENTER') {
         j = Justification.CENTER;
     } else if (dText.justification === 'RIGHT') {
@@ -126,40 +141,44 @@ function applyText(iText, dText) {
     } else {
         j = Justification.LEFT;
     }
+    iText.textRange.justification = j;
     
-    //iText.left = Number(dText.anchor[0]) - (iText.anchor[0] - iText.left);
-    //iText.top = Number(dText.anchor[1]) - (iText.anchor[1] - iText.top);
+    // Colors
+    if (dText.fill === 'none') {
+        iText.filled = false;
+    } else {
+        applyColor(iText.textRange.characterAttributes.fillColor, dText.fill);
+    }
+    if (dText.stroke === 'none') {
+        iText.stroked = false;
+    } else {
+        applyColor(iText.textRange.characterAttributes.strokeColor, dText.stroke);
+    }
     
-    if (iText.contents.length > 0) {
-        // For some reason, paragraphs gives length of 1 when there's an
-        // empty string, but trying to interact with it causes errors...
-        for (i = 0; i < iText.paragraphs.length; i += 1) {
-            iText.paragraphs[i].justification = j;
+    // Apply per-character kerning, tracking, baseline shift, and rotation
+    dText.kerning = dText.kerning.split(/,| /);
+    dText.baselineShift = dText.baselineShift.split(/,| /);
+    dText.rotate = dText.rotate.split(/,| /);
+    currentShift = 0;
+    for (i = 0; i < iText.characters.length; i += 1) {
+        if (dText.kerning.length > i) {
+            iText.characters[i].kerning = 1000*parseFloat(dText.kerning[i]);    // We need thousandths of an em
         }
-        
-        // Apply per-character kerning, tracking, baseline shift, and rotation
-        dText.kerning = dText.kerning.split(/,| /);
-        dText.baselineShift = dText.baselineShift.split(/,| /);
-        dText.rotate = dText.rotate.split(/,| /);
-        currentShift = 0;
-        for (i = 0; i < iText.characters.length; i += 1) {
-            if (dText.kerning.length > i) {
-                iText.characters[i].kerning = 1000*parseFloat(dText.kerning[i]);    // We need thousandths of an em
-            }
-            if (dText.baselineShift.length > i) {
-                currentShift -= parseFloat(dText.baselineShift[i]); // Already in pt
-                iText.characters[i].characterAttributes.baselineShift = currentShift;
-            }
-            if (dText.rotate.length > i) {
-                iText.characters[i].characterAttributes.rotation = parseFloat(dText.rotate[i]);  // Already in degrees
-            }
+        if (dText.baselineShift.length > i) {
+            currentShift -= parseFloat(dText.baselineShift[i]); // Already in pt
+            iText.characters[i].characterAttributes.baselineShift = currentShift;
+        }
+        if (dText.rotate.length > i) {
+            iText.characters[i].characterAttributes.rotation = parseFloat(dText.rotate[i]);  // Already in degrees
         }
     }
     
+    // Transformations (this took FOREVER to figure out!! be exceedingly cautions if touching!)
     iText.resize(dText.textTransforms.sx*100, dText.textTransforms.sy*100, true, true, true, true, true, Transformation.DOCUMENTORIGIN);
     iText.rotate(-dText.textTransforms.theta*180/Math.PI, true, true, true, true, Transformation.DOCUMENTORIGIN);
     iText.translate(dText.textTransforms.x, dText.textTransforms.y);
     
+    // Data, classes, original SVG transform and anchor
     i = iText.tags.add();
     i.name = 'hanpuku_data';
     i.value = JSON.stringify(dText.data);

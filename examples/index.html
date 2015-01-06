@@ -234,7 +234,10 @@
                         in SVG that <i>will not render correctly in the DOM preview</i>, though they will be preserved
                         on the return trip to Illustrator (incidentally, \n characters in this type of SVG text will be
                         handled as expected in Illustrator).</p>
-                        <p>Additionally, <i>textLength, lengthAdjust, and additional x and y attributes will be
+                        <p>Unlike paths, Illustrator does not have native text coordinates; while hanpuku maintains its
+                        pattern and makes the SVG x and y attributes global, it also adds three attributes to text elements:
+                        hanpuku_scale_x, hanpuku_scale_y, and hanpuku_rotation.</p>
+                        <p><i>textLength, lengthAdjust, and additional x and y attributes are
                         discarded</i>. Only the first x and y coordinates will be used and preserved. Per-character
                         attributes, such as dy (baseline shift), dx (kerning), and rotate (per-character rotation)
                         are converted to full lists of the same length as the string in pt, em, and deg, respectively.</p></li>

@@ -7,13 +7,22 @@
  */
 
 function DomManager () {
-    var self = this;
+    var self = this,
+        element;
     
     // Set up our iframe
     targetDiv = document.getElementById('domPreviewContent');
     targetDiv.innerHTML = "";
     self.iframe = document.createElement('iframe');
     targetDiv.appendChild(self.iframe);
+    
+    // Some initial CSS styles to make it feel more like
+    // Illustrator's raw canvas
+    element = self.iframe.contentDocument.createElement('style');
+    element.setAttribute('type', 'text/css');
+    element.setAttribute('id', 'illustratorFeel');
+    self.iframe.contentDocument.head.appendChild(element);
+    element.innerText = "text { font-family: 'Myriad Pro'; font-size: 12px; }";
     
     // Give it a CSS header element for user-injected CSS:
     element = self.iframe.contentDocument.createElement('style');
@@ -413,7 +422,9 @@ DomManager.prototype.extractPath = function (g, z) {
     return output;
 };
 DomManager.prototype.extractText = function (t, z) {
-    var output = {
+    var self = this,
+        computedStyle = window.getComputedStyle(t),
+        output = {
             itemType : 'text',
             name : t.getAttribute('id'),
             zIndex : z,
@@ -424,7 +435,12 @@ DomManager.prototype.extractText = function (t, z) {
             contents : t.textContent,
             kerning : t.getAttribute('dx') === null ? "" : t.getAttribute('dx'),
             baselineShift : t.getAttribute('dy') === null ? "" : t.getAttribute('dy'),
-            rotate : t.getAttribute('rotate') === null ? "" : t.getAttribute('rotate')
+            rotate : t.getAttribute('rotate') === null ? "" : t.getAttribute('rotate'),
+            fontFamily : computedStyle.fontFamily,
+            fontWeight : computedStyle.fontWeight,
+            fontSize : computedStyle.fontSize,
+            fill : self.color(computedStyle.fill),
+            stroke : self.color(computedStyle.stroke)
         },
         i;
     if (output.data === undefined) {
