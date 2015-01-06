@@ -174,11 +174,11 @@ function applyText(iText, dText) {
     }
     
     // Transformations (this took FOREVER to figure out!! be exceedingly cautions if touching!)
-    iText.resize(dText.textTransforms.sx*100, dText.textTransforms.sy*100, true, true, true, true, true, Transformation.DOCUMENTORIGIN);
-    iText.rotate(-dText.textTransforms.theta*180/Math.PI, true, true, true, true, Transformation.DOCUMENTORIGIN);
-    iText.translate(dText.textTransforms.x, dText.textTransforms.y);
+    iText.resize(dText.scaleX*100, dText.scaleY*100, true, true, true, true, true, Transformation.DOCUMENTORIGIN);
+    iText.rotate(dText.theta*180/Math.PI, true, true, true, true, Transformation.DOCUMENTORIGIN);
+    iText.translate(dText.x, dText.y);
     
-    // Data, classes, original SVG transform and anchor
+    // Data, classes, reverse transform, and original Illustrator Matrix
     i = iText.tags.add();
     i.name = 'hanpuku_data';
     i.value = JSON.stringify(dText.data);
@@ -186,6 +186,10 @@ function applyText(iText, dText) {
     i = iText.tags.add();
     i.name = 'hanpuku_classNames';
     i.value = dText.classNames;
+    
+    i = iText.tags.add();
+    i.name = 'hanpuku_reverseTransform';
+    i.value = dText.reverseTransform;
     
     if (doc.selection.indexOf(dText.name) !== -1) {
         iText.selected = true;
