@@ -40,7 +40,7 @@
   want to deal with embedding data files inside documents later...
 - Fix Selection overlay bug
 - Inconsistent z-index sorting bug
-- Support arc (and disjoint?) paths
+- Support arc, disjoint, and shortcut paths (also fix Q / T inaccuracies)
 - Regex search/replace in text editors (esp. data)
 - Better text support (lots of bugs! I think a Chrome bug prevents using the x coordinate on text elements that have tspan in them...)
 - More examples

@@ -155,7 +155,8 @@ DomManager.prototype.initScope = function () {
 };
 DomManager.prototype.runScript = function (script, ignoreSelection)
 {
-    var self = this;
+    var self = this,
+        error;
     
     if (ignoreSelection !== true) {
         // remove our selection layer
@@ -164,13 +165,11 @@ DomManager.prototype.runScript = function (script, ignoreSelection)
     
     // execute script in private context - not for security, but
     // for a cleaner scope that feels more like coding in a normal browser
-    try {
-        (new Function( "with(this) { " + script + "}")).call(self.iframeScope);
-    } catch (e) {
-        console.warn(e.stack);
-        EXTENSION.displayMessage('<p style="color:#f00;">' +
-            String(e.stack).split('\n').join('</p><p style="color:#f00;">') +
-            "</p>");
+    error = (new Function( "try{ with(this) { " + script +
+                "} } catch(e) { var temp = e.stack.split('\\n'); " +
+                "return [temp[0], temp[1].split(':')[2]]; } return null;")).call(self.iframeScope);
+    if (error !== null) {
+        EXTENSION.displayMessage('<p style="color:#f00;">' + error[0] + ' on line' + error[1] + '</p>');
         return false;
     }
     

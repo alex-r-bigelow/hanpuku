@@ -18,13 +18,13 @@ var line = d3.svg.line.radial()
     .angle(function(d) { return d.x / 180 * Math.PI; });
 
 // Get our containers, or init them if it's the first time
-var svg = d3.select('#Layer_1').selectAll('.hierarchicalEdgeBundling').data([0]),
-    linkLayer = svg.selectAll('.linkLayer').data([0]),
-    nodeLayer = svg.selectAll('.nodeLayer').data([0]);
+var svg = d3.select('#Layer_1').selectAll('.hierarchicalEdgeBundling').data([0]);
 
 svg.enter().append('g')
    .attr('class', 'hierarchicalEdgeBundling')
    .attr("transform", "translate(" + radius + "," + radius + ")");
+var linkLayer = svg.selectAll('.linkLayer').data([0]),
+    nodeLayer = svg.selectAll('.nodeLayer').data([0]);
 linkLayer.enter().append("g");
 nodeLayer.enter().append("g");
 
@@ -32,7 +32,7 @@ nodeLayer.enter().append("g");
 var link = linkLayer.selectAll(".link"),
     node = nodeLayer.selectAll(".node");
 
-d3.json("flare.json", function(error, classes) {
+d3.json("readme-flare-imports.json", function(error, classes) {
   var nodes = cluster.nodes(packageHierarchy(classes)),
       links = packageImports(nodes);
 

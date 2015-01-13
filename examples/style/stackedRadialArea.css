@@ -1,0 +1,19 @@
+
+
+body {
+  font: 10px sans-serif;
+}
+
+.axis line {
+  stroke: #000;
+}
+
+.axis path {
+  fill: none;
+  stroke: #000;
+}
+
+.axis + .axis g text {
+  display: none;
+}
+

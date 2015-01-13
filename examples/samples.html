@@ -5,36 +5,40 @@
         <script type="application/javascript">
             function loadSample(name) {
                 if (name === 'force') {
-                    window.parent.DATA.loadSampleDataFile('examples/miserables.json');
-                    window.parent.CODE.loadSampleJSFile('examples/force.js');
-                    window.parent.CODE.loadSampleCSSFile('examples/force.css');
+                    window.parent.DATA.loadSampleDataFile('examples/data/miserables.json');
+                    window.parent.CODE.loadSampleJSFile('examples/scripts/force.js');
+                    window.parent.CODE.loadSampleCSSFile('examples/style/force.css');
                 } else if (name === 'scatterplot') {
-                    window.parent.DATA.loadSampleDataFile('examples/flowers.tsv');
-                    window.parent.CODE.loadSampleJSFile('examples/scatterplot.js', window.parent.DOM.docName);
-                    window.parent.CODE.loadSampleCSSFile('examples/scatterplot.css');
+                    window.parent.DATA.loadSampleDataFile('examples/data/flowers.tsv');
+                    window.parent.CODE.loadSampleJSFile('examples/scripts/scatterplot.js', window.parent.DOM.docName);
+                    window.parent.CODE.loadSampleCSSFile('examples/style/scatterplot.css');
                 } else if (name === 'groupedBars') {
-                    window.parent.DATA.loadSampleDataFile('examples/statePopulation.csv');
-                    window.parent.CODE.loadSampleJSFile('examples/groupedBars.js');
-                    window.parent.CODE.loadSampleCSSFile('examples/groupedBars.css');
+                    window.parent.DATA.loadSampleDataFile('examples/data/statePopulation.csv');
+                    window.parent.CODE.loadSampleJSFile('examples/scripts/groupedBars.js');
+                    window.parent.CODE.loadSampleCSSFile('examples/style/groupedBars.css');
                 } else if (name === 'lineChart') {
-                    window.parent.DATA.loadSampleDataFile('examples/stock.tsv');
-                    window.parent.CODE.loadSampleJSFile('examples/lineChart.js');
-                    window.parent.CODE.loadSampleCSSFile('examples/lineChart.css');
+                    window.parent.DATA.loadSampleDataFile('examples/data/stock.tsv');
+                    window.parent.CODE.loadSampleJSFile('examples/scripts/lineChart.js');
+                    window.parent.CODE.loadSampleCSSFile('examples/style/lineChart.css');
                 } else if (name === 'streamgraph') {
-                    window.parent.DATA.loadSampleDataFile('examples/randomStream.js');
-                    window.parent.CODE.loadSampleJSFile('examples/streamgraph.js');
+                    window.parent.DATA.loadSampleDataFile('examples/data/randomStream.js');
+                    window.parent.CODE.loadSampleJSFile('examples/scripts/streamgraph.js');
                 } else if (name === 'basicTree') {
-                    window.parent.DATA.loadSampleDataFile('examples/basicTree.csv');
-                    window.parent.CODE.loadSampleJSFile('examples/basicTree.js');
-                    window.parent.CODE.loadSampleCSSFile('examples/basicTree.css');
+                    window.parent.DATA.loadSampleDataFile('examples/data/basicTree.csv');
+                    window.parent.CODE.loadSampleJSFile('examples/scripts/basicTree.js');
+                    window.parent.CODE.loadSampleCSSFile('examples/style/basicTree.css');
                 } else if (name === 'splom') {
-                    window.parent.DATA.loadSampleDataFile('examples/smallFlowers.tsv');
-                    window.parent.CODE.loadSampleJSFile('examples/splom.js');
-                    window.parent.CODE.loadSampleCSSFile('examples/splom.css');
+                    window.parent.DATA.loadSampleDataFile('examples/data/smallFlowers.tsv');
+                    window.parent.CODE.loadSampleJSFile('examples/scripts/splom.js');
+                    window.parent.CODE.loadSampleCSSFile('examples/style/splom.css');
                 } else if (name === 'hierarchicalEdgeBundling') {
-                    window.parent.DATA.loadSampleDataFile('examples/flare.json');
-                    window.parent.CODE.loadSampleJSFile('examples/hierarchicalEdgeBundling.js');
-                    window.parent.CODE.loadSampleCSSFile('examples/hierarchicalEdgeBundling.css');
+                    window.parent.DATA.loadSampleDataFile('examples/data/readme-flare-imports.json');
+                    window.parent.CODE.loadSampleJSFile('examples/scripts/hierarchicalEdgeBundling.js');
+                    window.parent.CODE.loadSampleCSSFile('examples/style/hierarchicalEdgeBundling.css');
+                } else if (name === 'stackedRadialArea') {
+                    window.parent.DATA.loadSampleDataFile('examples/data/stackedRadialArea.csv');
+                    window.parent.CODE.loadSampleJSFile('examples/scripts/stackedRadialArea.js');
+                    window.parent.CODE.loadSampleCSSFile('examples/style/stackedRadialArea.css');
                 }
             }
             
@@ -45,7 +49,8 @@
                     'splom' : 'Scatterplot Matrix',
                     'force' : 'Force-directed graph',
                     'streamgraph' : 'Streamgraph',
-                    'hierarchicalEdgeBundling' : 'Hierarchical Edge Bundling'
+                    'hierarchicalEdgeBundling' : 'Hierarchical Edge Bundling',
+                    'stackedRadialArea' : 'Stacked Radial Area'
                 },
                 resultText = "",
                 name;
