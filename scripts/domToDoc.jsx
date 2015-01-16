@@ -64,55 +64,88 @@ function applyColor(iC,dC) {
     }
 }
 
-function applyPath(iPath, dPath) {
-    iPath.name = dPath.name;
-    
-    if (dPath.fill === 'none') {
-        iPath.filled = false;
+function applyVisualAttributes(iItem, dItem) {
+    if (dItem.fill === 'none') {
+        iItem.filled = false;
     } else {
-        applyColor(iPath.fillColor, dPath.fill);
+        applyColor(iItem.fillColor, dItem.fill);
     }
     
-    if (dPath.stroke === 'none') {
-        iPath.stroked = false;
+    if (dItem.stroke === 'none') {
+        iItem.stroked = false;
     } else {
-        applyColor(iPath.strokeColor, dPath.stroke);
+        applyColor(iItem.strokeColor, dItem.stroke);
     }
-    iPath.strokeWidth = dPath.strokeWidth;
-    iPath.opacity = dPath.opacity*100;
+    iItem.strokeWidth = dItem.strokeWidth;
+    iItem.opacity = dItem.opacity*100;
+}
 
-    var anchorList = [],
-        i = iPath.tags.add();
+function applyHanpukuTags(iItem, dItem) {
+    var i = iItem.tags.add();
     i.name = 'hanpuku_data';
-    i.value = JSON.stringify(dPath.data);
+    i.value = JSON.stringify(dItem.data);
     
-    i = iPath.tags.add();
+    i = iItem.tags.add();
     i.name = 'hanpuku_classNames';
-    i.value = dPath.classNames;
+    i.value = dItem.classNames;
     
-    i = iPath.tags.add();
+    i = iItem.tags.add();
     i.name = 'hanpuku_reverseTransform';
-    i.value = dPath.reverseTransform;
+    i.value = dItem.reverseTransform;
     
-    for (i = 0; i < dPath.points.length; i += 1) {
-        anchorList.push(dPath.points[i].anchor);
-    }
-    iPath.setEntirePath(anchorList);
-    for (i = 0; i < dPath.points.length; i += 1) {
-        iPath.pathPoints[i].leftDirection = dPath.points[i].leftDirection;
-        iPath.pathPoints[i].rightDirection = dPath.points[i].rightDirection;
-    }
-    iPath.closed = dPath.closed;
-    
-    if (doc.selection.indexOf(dPath.name) !== -1) {
-        iPath.selected = true;
+    if (doc.selection.indexOf(dItem.name) !== -1) {
+        iItem.selected = true;
     }
 }
 
+function setPathPoints(iPath, segment) {
+    var anchorList = [];
+    
+    for (i = 0; i < segment.points.length; i += 1) {
+        anchorList.push(segment.points[i].anchor);
+    }
+    iPath.setEntirePath(anchorList);
+    for (i = 0; i < segment.points.length; i += 1) {
+        iPath.pathPoints[i].leftDirection = segment.points[i].leftDirection;
+        iPath.pathPoints[i].rightDirection = segment.points[i].rightDirection;
+    }
+    iPath.closed = segment.closed;
+}
+
+function applyPath(iPath, dPath) {
+    iPath.name = dPath.name;
+    
+    setPathPoints(iPath, dPath.segments[0]);
+    
+    applyVisualAttributes(iPath, dPath);
+    applyHanpukuTags(iPath, dPath);
+}
+
+function applyCompoundPath(iCompPath, dCompPath) {
+    var i,
+        segment;
+    
+    iCompPath.name = dCompPath.name;
+    if (iCompPath.pathItems !== undefined) {
+        // Because compound paths use the same settings across all
+        // child elements, I can simply start fresh - nothing should
+        // get nuked by doing this
+        iCompPath.pathItems.removeAll();
+    }
+    for (i = 0; i < dCompPath.segments.length; i += 1) {
+        segment = iCompPath.pathItems.add();
+        setPathPoints(segment, dCompPath.segments[i]);
+    }
+    
+    // The compound path doesn't possess any visual styles of its own;
+    // instead, Illustrator propagates style changes to one pathItem to all
+    // of them
+    applyVisualAttributes(iCompPath.pathItems[0], dCompPath);
+    applyHanpukuTags(iCompPath, dCompPath);
+}
+
 function applyText(iText, dText) {
-    var transform,
-        m,
-        i,
+    var i,
         j,
         currentShift;
     
@@ -143,18 +176,6 @@ function applyText(iText, dText) {
     }
     iText.textRange.justification = j;
     
-    // Colors
-    if (dText.fill === 'none') {
-        iText.filled = false;
-    } else {
-        applyColor(iText.textRange.characterAttributes.fillColor, dText.fill);
-    }
-    if (dText.stroke === 'none') {
-        iText.stroked = false;
-    } else {
-        applyColor(iText.textRange.characterAttributes.strokeColor, dText.stroke);
-    }
-    
     // Apply per-character kerning, tracking, baseline shift, and rotation
     dText.kerning = dText.kerning.split(/,| /);
     dText.baselineShift = dText.baselineShift.split(/,| /);
@@ -173,27 +194,14 @@ function applyText(iText, dText) {
         }
     }
     
-    // Transformations (this took FOREVER to figure out!! be exceedingly cautions if touching!)
+    // Transformations (this took FOREVER to figure out!! be exceedingly cautious if touching!)
     iText.resize(dText.scaleX*100, dText.scaleY*100, true, true, true, true, true, Transformation.DOCUMENTORIGIN);
     iText.rotate(dText.theta*180/Math.PI, true, true, true, true, Transformation.DOCUMENTORIGIN);
     iText.translate(dText.x, dText.y);
     
-    // Data, classes, reverse transform, and original Illustrator Matrix
-    i = iText.tags.add();
-    i.name = 'hanpuku_data';
-    i.value = JSON.stringify(dText.data);
-    
-    i = iText.tags.add();
-    i.name = 'hanpuku_classNames';
-    i.value = dText.classNames;
-    
-    i = iText.tags.add();
-    i.name = 'hanpuku_reverseTransform';
-    i.value = dText.reverseTransform;
-    
-    if (doc.selection.indexOf(dText.name) !== -1) {
-        iText.selected = true;
-    }
+    // Generic attributes
+    applyVisualAttributes(iText, dText);
+    applyHanpukuTags(iText, dText);
 }
 
 function applyGroup(iGroup, dGroup)
@@ -203,21 +211,7 @@ function applyGroup(iGroup, dGroup)
         i,
         newItem;
     
-    // Update the parent's tags (Layers don't support tags :-( TODO: hack them into activeDoc.XMPString?))
     iGroup.name = dGroup.name;
-    if (dGroup.itemType === 'group') {
-        i = iGroup.tags.add();
-        i.name = 'hanpuku_data';
-        i.value = JSON.stringify(dGroup.data);
-        
-        i = iGroup.tags.add();
-        i.name = 'hanpuku_classNames';
-        i.value = dGroup.classNames;
-        
-        i = iGroup.tags.add();
-        i.name = 'hanpuku_reverseTransform';
-        i.value = dGroup.reverseTransform;
-    }
     
     // Modify / add needed groups, paths, and text items in order
     for (i = 0; i < itemOrder.length; i += 1) {
@@ -229,12 +223,33 @@ function applyGroup(iGroup, dGroup)
             }
             applyGroup(newItem, itemOrder[i]);
         } else if (itemOrder[i].itemType === 'path') {
-            try {
-                newItem = iGroup.pathItems.getByName(itemOrder[i].name);
-            } catch (e) {
-                newItem = iGroup.pathItems.add();
+            if (itemOrder[i].segments.length > 1) {
+                // This is a compound path
+                try {
+                    newItem = iGroup.compoundPathItems.getByName(itemOrder[i].name);
+                } catch (e) {
+                    try {
+                        // If this used to be a regular path, delete the old one
+                        newItem = iGroup.pathItems.getByName(itemOrder[i].name);
+                        newItem.remove();
+                    } catch (e) {}
+                    newItem = iGroup.compoundPathItems.add();
+                }
+                applyCompoundPath(newItem, itemOrder[i]);
+            } else {
+                // This is a regular path
+                try {
+                    newItem = iGroup.pathItems.getByName(itemOrder[i].name);
+                } catch (e) {
+                    try {
+                        // If this used to be a compound path, delete the old one
+                        newItem = iGroup.compoundPathItems.getByName(itemOrder[i].name);
+                        newItem.remove();
+                    } catch (e) {}
+                    newItem = iGroup.pathItems.add();
+                }
+                applyPath(newItem, itemOrder[i]);
             }
-            applyPath(newItem, itemOrder[i]);
         } else if (itemOrder[i].itemType === 'text') {
             try {
                 newItem = iGroup.textFrames.getByName(itemOrder[i].name);
@@ -246,9 +261,9 @@ function applyGroup(iGroup, dGroup)
         newItem.zOrder(ZOrderMethod.BRINGTOFRONT);
     }
     
-    // Finally, check if the parent is selected
-    if (doc.selection.indexOf(dGroup.name) !== -1) {
-        iGroup.selected = true;
+    // Generic attributes (Layers don't support tags :-( TODO: hack them into activeDoc.XMPString?))
+    if (dGroup.itemType === 'group') {
+        applyHanpukuTags(iGroup, dGroup);
     }
 }
 
@@ -290,9 +305,7 @@ function applyDocument()
     for (a = 0; a < doc.exit.length; a += 1) {
         try {
             activeDoc[ITEM_CONTAINERS[doc.exit[a].itemType]].getByName(doc.exit[a].name).remove();
-        } catch (e) {
-            // Do nothing
-        }
+        } catch (e) {}
     }
 }
 

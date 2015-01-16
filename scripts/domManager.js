@@ -350,7 +350,6 @@ DomManager.PATH_SPLITTER = new RegExp('[MmZzLlHhVvCcSsQqTtAa]', 'g');
 DomManager.prototype.extractPath = function (g, z) {
     var self = this,
         d = g.getAttribute('d');
-        coordList = d.split(DomManager.PATH_SPLITTER).splice(1),
         computedStyle = window.getComputedStyle(g),
         output = {
             itemType : 'path',
@@ -360,8 +359,7 @@ DomManager.prototype.extractPath = function (g, z) {
             stroke : self.color(computedStyle.stroke),
             strokeWidth : parseFloat(computedStyle.strokeWidth),
             opacity : parseFloat(computedStyle.opacity),
-            points : [],
-            closed : d.substr(-1) === 'Z',
+            segments : [],
             data : d3.select('#' + g.getAttribute('id')).data()[0],
             classNames : g.getAttribute('class') === null ? "" : g.getAttribute('class'),
             reverseTransform : g.getAttribute('hanpuku_reverseTransform') === null ? "" : g.getAttribute('hanpuku_reverseTransform')
@@ -375,49 +373,61 @@ DomManager.prototype.extractPath = function (g, z) {
     }
     output.data = JsonCircular.stringify(output.data);
     
-    // Convert everything except the first entry
-    // to a list of lists of point pairs
-    // Also invert the y-coordinates
-    if (output.closed === true) {
-        coordList = coordList.splice(0,coordList.length-1); // throw away Z coordinate entries
-    }
-    // The first point only has one coordinate pair
-    coordList[0] = coordList[0].split(',');
-    coordList[0][0] = Number(coordList[0][0]);
-    coordList[0][1] = -Number(coordList[0][1]);
+    // standardize() puts spaces around commands, and delimits parameters by single commas...
+    d = d.split(' ');
     
-    // The rest have three
-    var i, j;
-    for (i = 1; i < coordList.length; i += 1) {
-        coordList[i] = coordList[i].split(',');
-        temp = [];
-        for (j = 0; j < coordList[i].length; j += 2) {
-            temp.push([Number(coordList[i][j]), -Number(coordList[i][j+1])]);
+    var currentSegment = null,
+        lastParams,
+        nextParams,
+        i = 0;
+    while (i < d.length) {
+        if (d[i] === 'Z') {
+            // End of a segment; nuke the last cubic anchor (standardize() guarantees it will be the same anchor as
+            // the first), and set the first anchor's left direction instead
+            currentSegment.closed = true;
+            currentSegment.points[0].leftDirection = [lastParams[2],
+                                                      lastParams[3]];
+            i += 1;
+        } else if (d[i] === 'M') {
+            // Start a new segment
+            if (currentSegment !== null) {
+                output.segments.push(currentSegment);
+            }
+            nextParams = d[i+1].split(',');
+            nextParams[0] = Number(nextParams[0]);
+            nextParams[1] = -Number(nextParams[1]);
+            currentSegment = {
+                points : [{
+                    anchor : nextParams,
+                    leftDirection : nextParams,   // We'll assume the segment is not closed (overridden if Z is encountered)
+                    rightDirection : nextParams   // If this doesn't get overridden, later just use the anchor
+                }],
+                closed : false
+            };
+            i += 2;
+        } else {
+            // Normal segment
+            nextParams = d[i+1].split(',');
+            nextParams[0] = Number(nextParams[0]);
+            nextParams[1] = -Number(nextParams[1]);
+            nextParams[2] = Number(nextParams[2]);
+            nextParams[3] = -Number(nextParams[3]);
+            nextParams[4] = Number(nextParams[4]);
+            nextParams[5] = -Number(nextParams[5]);
+            currentSegment.points[currentSegment.points.length - 1].
+                rightDirection = [nextParams[0],nextParams[1]];
+            currentSegment.points.push({
+                anchor : [nextParams[4], nextParams[5]],
+                leftDirection : [nextParams[2], nextParams[3]],
+                rightDirection : [nextParams[4], nextParams[5]]   // If this doesn't get overridden, later just use the anchor
+            });
+            i += 2;
         }
-        coordList[i] = temp;
+        lastParams = nextParams;
     }
-    
-    // First point ##,##
-    output.points.push({
-        anchor : coordList[0],
-        leftDirection : coordList[coordList.length-1][2],
-        rightDirection : coordList[1][0]
-    });
-    // Middle points [[##,##],[##,##],[##,##]]
-    for (i = 1; i < coordList.length - 1; i += 1) {
-        output.points.push({
-            anchor : coordList[i][2],
-            leftDirection : coordList[i][1],
-            rightDirection : coordList[i+1][0]
-        });
+    if (currentSegment !== null) {
+        output.segments.push(currentSegment);
     }
-    // Last point
-    output.points.push({
-        anchor : coordList[coordList.length-1][2],
-        leftDirection : coordList[coordList.length-1][1],
-        rightDirection : coordList[0]
-    });
-    
     return output;
 };
 DomManager.prototype.extractText = function (t, z) {
@@ -443,7 +453,9 @@ DomManager.prototype.extractText = function (t, z) {
             fontWeight : computedStyle.fontWeight,
             fontSize : computedStyle.fontSize,
             fill : self.color(computedStyle.fill),
-            stroke : self.color(computedStyle.stroke)
+            stroke : self.color(computedStyle.stroke),
+            strokeWidth : parseFloat(computedStyle.strokeWidth),
+            opacity : parseFloat(computedStyle.opacity)
         },
         i;
     if (output.data === undefined) {

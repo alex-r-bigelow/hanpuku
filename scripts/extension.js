@@ -351,7 +351,7 @@
     };
     
     ExtensionManager.prototype.debug = function () {
-        //CODE.loadSampleJSFile('examples/scripts/test.js', 'test.js');
+        CODE.loadSampleJSFile('examples/scripts/test.js', 'test.js');
     };
     
     window.setupExtension = function () {
