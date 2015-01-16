@@ -67,7 +67,7 @@
             <p>These cycles between a real DOM and an Illustrator document have some nuances
             and speed bumps. Some functionality has been added to d3, and some additional
             global variables exist (see the list below). Some incompatibilities also exist
-            in the conversion; hopefully this will get smoother with future updates, and
+            in the conversion; hopefully this will get smoother with future updates, and as
             Adobe's extension API expands.</p>
             <p>In the mean time, I have listed all the difficulties you are likely to
             encounter in the conversion.</p>
@@ -89,8 +89,9 @@
                 <li><h3>DOM Structure</h3><br/>
                     <p>A fresh hanpuku DOM will always contain an inline SVG element whose id matches the
                     file name of the current Illustrator document. Any changes outside this
-                    SVG element will be ignored (if, for example, you add buttons to control
-                    an interactive visualization, they will be lost after clicking "Apply").
+                    SVG element will be ignored (if, for example, you add HTML buttons outside the SVG element to control
+                    an interactive visualization, they will be lost after clicking "Apply" &mdash; of course, you can
+                    always restore them in your script if they are created with d3 enter() code).
                     Its immediate
                     children are:</p>
                     <ul>

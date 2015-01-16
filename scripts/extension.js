@@ -128,7 +128,7 @@
                 if (xmlhttp.status === 200 || xmlhttp.status === 0) {
                 eval.apply(extensionScope, [xmlhttp.responseText]);
                 } else {
-                    throw 'Error ' + xmlhttp.status + ' loading library: ' + scriptName;
+                    throw new Error('Error ' + xmlhttp.status + ' loading library: ' + scriptName);
                 }
             }
         };
@@ -351,7 +351,7 @@
     };
     
     ExtensionManager.prototype.debug = function () {
-        CODE.loadSampleJSFile('examples/scripts/test.js', 'test.js');
+        //CODE.loadSampleJSFile('examples/scripts/test.js', 'test.js');
     };
     
     window.setupExtension = function () {
