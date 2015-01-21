@@ -723,25 +723,14 @@ DomManager.prototype.addPath = function (parent, path) {
     }
     d3.select('#' + path.name).datum(JsonCircular.parse(JSON.parse(path.data)));
 };
-DomManager.prototype.addTextLines = function (container, text) {
-    var lines = text.split(/\n/),
-        lineHeight = 1.1, // ems
-        l;
-    for (l = 0; l < lines.length; l += 1) {
-        container.append('tspan')
-            .attr('x', 0)
-            .attr('y', l*lineHeight + 'em')
-            .text(lines[l]);
-    }
-};
 DomManager.prototype.addText = function (parent, text) {
     var self = this,
         t = parent.append('text')
         .attr('id', text.name)
-        .attr('x', text.anchor[0])
-        .attr('y', text.anchor[1]),
+        .text(text.contents),   // I deliberately don't support line breaks (the SVG will display improperly - see the documentation)
         container;
     
+    // Justification
     if (text.justification === 'LEFT') {
         t.attr('text-anchor', 'start');
     } else if (text.justification === 'CENTER') {
@@ -759,10 +748,25 @@ DomManager.prototype.addText = function (parent, text) {
         t.attr('transform', text.reverseTransform);
     }
     
+    // Kerning
+    if (text.kerning !== "") {
+        t.attr('dx', text.kerning);
+    }
+    
+    // Baseline shift
+    if (text.baselineShift !== "") {
+        t.attr('dy', text.baselineShift);
+    }
+    
+    // Rotate
+    if (text.rotate !== "") {
+        t.attr('rotate', text.rotate);
+    }
+    
+    // TODO: transform!
+    
     container = d3.select('#' + text.name);
     container.datum(JsonCircular.parse(JSON.parse(text.data)));
-    
-    self.addTextLines(container, text.contents);
 };
 DomManager.prototype.addGroup = function (parent, group) {
     var self = this,

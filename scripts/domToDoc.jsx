@@ -186,9 +186,9 @@ function applyText(iText, dText) {
     iText.textRange.justification = j;
     
     // Apply per-character kerning, tracking, baseline shift, and rotation
-    dText.kerning = dText.kerning.split(/,| /);
-    dText.baselineShift = dText.baselineShift.split(/,| /);
-    dText.rotate = dText.rotate.split(/,| /);
+    dText.kerning = dText.kerning.split(/,|\s+/);
+    dText.baselineShift = dText.baselineShift.split(/,|\s+/);
+    dText.rotate = dText.rotate.split(/,|\s+/);
     currentShift = 0;
     for (i = 0; i < iText.characters.length; i += 1) {
         if (dText.kerning.length > i) {
