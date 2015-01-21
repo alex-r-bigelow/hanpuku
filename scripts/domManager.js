@@ -166,10 +166,10 @@ DomManager.prototype.runScript = function (script, ignoreSelection)
     // execute script in private context - not for security, but
     // for a cleaner scope that feels more like coding in a normal browser
     error = (new Function( "try{ with(this) { " + script +
-                "} } catch(e) { var temp = e.stack.split('\\n'); " +
+                "} } catch(e) { console.warn(e.stack); var temp = e.stack.split('\\n'); " +
                 "return [temp[0], temp[1].split(':')[2]]; } return null;")).call(self.iframeScope);
     if (error !== null) {
-        EXTENSION.displayMessage('<p style="color:#f00;">' + error[0] + ' on line' + error[1] + '</p>');
+        EXTENSION.displayMessage('<p style="color:#f00;">' + error[0] + ' on line ' + error[1] + '</p>');
         return false;
     }
     
@@ -396,6 +396,7 @@ DomManager.prototype.extractPath = function (g, z) {
             nextParams = d[i+1].split(',');
             nextParams[0] = Number(nextParams[0]);
             nextParams[1] = -Number(nextParams[1]);
+            
             currentSegment = {
                 points : [{
                     anchor : nextParams,
@@ -672,29 +673,36 @@ DomManager.prototype.docToDom = function () {
         EXTENSION.notifyRefresh();
     });
 };
-DomManager.prototype.extractPathString = function (path) {
+DomManager.prototype.extractPathString = function (segments) {
     var p,
-        point = path.points[0],
-        nextPoint,
-        d = "M" + point.anchor[0] + "," + point.anchor[1];
+        point,
+        d = "";
     
-    for (p = 0; p < path.points.length; p += 1) {
-        point = path.points[p];
-        if (p === path.points.length - 1) {
-            if (path.closed !== true) {
-                break;
-            }
-            nextPoint = path.points[0];
-        } else {
-            nextPoint = path.points[p + 1];
-        }
+    for (s = 0; s < segments.length; s += 1) {
+        point = segments[s].points[0];
+        d += "M " + point.anchor[0] + "," + point.anchor[1];
         
-        d += "C" + point.rightDirection[0] + "," + point.rightDirection[1] + "," +
-                   nextPoint.leftDirection[0] + "," + nextPoint.leftDirection[1] + "," +
-                   nextPoint.anchor[0] + "," + nextPoint.anchor[1];
+        for (p = 1; p < segments[s].points.length; p += 1) {
+            point = segments[s].points[p];
+            
+            d += " C " + segments[s].points[p-1].rightDirection[0] + "," +
+                       segments[s].points[p-1].rightDirection[1] + "," +
+                       point.leftDirection[0] + "," + point.leftDirection[1] + "," +
+                       point.anchor[0] + "," + point.anchor[1];
+        }
+        if (segments[s].closed === true) {
+            d += " C " + segments[s].points[segments[s].points.length-1].rightDirection[0] + "," +
+                       segments[s].points[segments[s].points.length-1].rightDirection[1] + "," +
+                       segments[s].points[0].leftDirection[0] + "," +
+                       segments[s].points[0].leftDirection[1] + "," +
+                       segments[s].points[0].anchor[0] + "," +
+                       segments[s].points[0].anchor[1];
+            d += " Z ";
+        }
     }
-    if (path.closed === true) {
-        d += "Z";
+    if (d.search('NaN') !== -1) {
+        console.log(segments, d);
+        throw "hi";
     }
     return d;
 };
@@ -702,7 +710,7 @@ DomManager.prototype.addPath = function (parent, path) {
     var self = this,
         p = parent.append('path')
         .attr('id', path.name)
-        .attr('d', self.extractPathString(path))
+        .attr('d', self.extractPathString(path.segments))
         .style('fill', path.fill)
         .style('stroke', path.stroke)
         .style('stroke-width', path.strokeWidth)

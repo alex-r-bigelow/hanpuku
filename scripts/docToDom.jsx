@@ -70,6 +70,11 @@ function extractColor(e, attr) {
     // device-cmyk(c,m,y,k) to the SVG element's style
     // with an rgb backup. For now, I stupidly convert
     // everything to RGB
+    if (attr === 'fillColor' && e.filled === false) {
+        return 'none';
+    } else if (attr === 'strokeColor' && e.stroked === false) {
+        return 'none';
+    }
     if (e[attr].typename === 'RGBColor') {
         return 'rgb(' + e[attr].red + ',' +
                         e[attr].green + ',' +
@@ -101,6 +106,41 @@ function extractColor(e, attr) {
     }
 }
 
+function extractZPosition(e) {
+    try {
+        return e.zOrderPosition;
+    } catch(e) {
+        // TODO: there's a bug in Illustrator that causes an Internal error
+        // if you attempt to get the zOrderPosition of an object inside a group
+        return 100;
+    }
+}
+
+function extractPathSegment(p) {
+    var result = {
+            points : [],
+            closed : p.closed
+        },
+        pt,
+        controlPoint;
+    
+    for (pt = 0; pt < p.pathPoints.length; pt += 1) {
+        result.points.push({
+            anchor : p.pathPoints[pt].anchor,
+            leftDirection : p.pathPoints[pt].leftDirection,
+            rightDirection : p.pathPoints[pt].rightDirection
+        });
+        for (controlPoint in result.points[pt]) {
+            if (result.points[pt].hasOwnProperty(controlPoint)) {
+                // Illustrator has inverted Y coordinates
+                result.points[pt][controlPoint][1] = -result.points[pt][controlPoint][1];
+            }
+        }
+    }
+    
+    return result;
+}
+
 function extractPath (p) {
     var output = {
         itemType : 'path',
@@ -109,42 +149,34 @@ function extractPath (p) {
         stroke : extractColor(p, 'strokeColor'),
         strokeWidth : p.strokeWidth,
         opacity : p.opacity / 100,
-        closed : p.closed,
-        points : [],
+        segments : [extractPathSegment(p)],
         data : p.tags.getByName('hanpuku_data').value,
         classNames : p.tags.getByName('hanpuku_classNames').value,
-        reverseTransform : p.tags.getByName('hanpuku_reverseTransform').value
-    },
-        pt,
-        controlPoint;
+        reverseTransform : p.tags.getByName('hanpuku_reverseTransform').value,
+        zIndex : extractZPosition(p)
+    };
     
-    try {
-        output.zIndex = p.zOrderPosition;
-    } catch(e) {
-        // TODO: there's a bug in Illustrator that causes an Internal error
-        // if you attempt to get the zOrderPosition of an object inside a group
-        output.zIndex = 100;
-    }
+    return output;
+}
+
+function extractCompoundPath (p) {
+    var s,
+        output = {
+        itemType : 'path',
+        name : p.name,
+        fill : extractColor(p.pathItems[0], 'fillColor'),
+        stroke : extractColor(p.pathItems[0], 'strokeColor'),
+        strokeWidth : p.pathItems[0].strokeWidth,
+        opacity : p.pathItems[0].opacity / 100,
+        segments : [],
+        data : p.tags.getByName('hanpuku_data').value,
+        classNames : p.tags.getByName('hanpuku_classNames').value,
+        reverseTransform : p.tags.getByName('hanpuku_reverseTransform').value,
+        zIndex : extractZPosition(p)
+    };
     
-    if (p.filled === false) {
-        output.fill = 'none';
-    }
-    if (p.stroked === false) {
-        output.stroke = 'none';
-    }
-    
-    for (pt = 0; pt < p.pathPoints.length; pt += 1) {
-        output.points.push({
-            anchor : p.pathPoints[pt].anchor,
-            leftDirection : p.pathPoints[pt].leftDirection,
-            rightDirection : p.pathPoints[pt].rightDirection
-        });
-        for (controlPoint in output.points[pt]) {
-            if (output.points[pt].hasOwnProperty(controlPoint)) {
-                // Illustrator has inverted Y coordinates
-                output.points[pt][controlPoint][1] = -output.points[pt][controlPoint][1];
-            }
-        }
+    for (s = 0; s < p.pathItems.length; s += 1) {
+        output.segments.push(extractPathSegment(p.pathItems[s]));
     }
     
     return output;
@@ -154,20 +186,17 @@ function extractText(t) {
     var output = {
         itemType : 'text',
         name : t.name,
+        fill : extractColor(t, 'fillColor'),
+        stroke : extractColor(t, 'strokeColor'),
+        strokeWidth : p.strokeWidth,
+        opacity : p.opacity / 100,
         contents : t.contents,
         anchor : t.position,
         data : t.tags.getByName('hanpuku_data').value,
         classNames : t.tags.getByName('hanpuku_classNames').value,
-        reverseTransform : t.tags.getByName('hanpuku_reverseTransform').value
+        reverseTransform : t.tags.getByName('hanpuku_reverseTransform').value,
+        zIndex : extractZPosition(t)
     };
-    
-    try {
-        output.zIndex = p.zOrderPosition;
-    } catch(e) {
-        // TODO: there's a bug in Illustrator that causes an Internal error
-        // if you attempt to get the zOrderPosition of an object inside a group
-        output.zIndex = 100;
-    }
     
     if (output.contents.length === 0 || t.paragraphs[0].justification === Justification.LEFT) {
         output.justification = 'LEFT';
@@ -215,6 +244,9 @@ function extractGroup(g, iType) {
     }
     for (p = 0; p < g.pathItems.length; p += 1) {
         output.paths.push(extractPath(g.pathItems[p]));
+    }
+    for (p = 0; p < g.compoundPathItems.length; p += 1) {
+        output.paths.push(extractCompoundPath(g.compoundPathItems[p]));
     }
     for (t = 0; t < g.textFrames.length; t += 1) {
         try {

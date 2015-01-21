@@ -31,7 +31,9 @@ function applyColor(iC,dC) {
     green = Number(dC[1]);
     blue = Number(dC[2]);
     black = 1;
-    
+    if (iC === undefined) {
+        console.log(dC);
+    }
     if (activeDoc.documentColorSpace === DocumentColorSpace.RGB) {
         iC.red = red;
         iC.green = green;
@@ -68,12 +70,18 @@ function applyVisualAttributes(iItem, dItem) {
     if (dItem.fill === 'none') {
         iItem.filled = false;
     } else {
+        if (iItem.fillColor === undefined) {
+            iItem.fillColor = new RGBColor();
+        }
         applyColor(iItem.fillColor, dItem.fill);
     }
     
     if (dItem.stroke === 'none') {
         iItem.stroked = false;
     } else {
+        if (iItem.strokeColor === undefined) {
+            iItem.strokeColor = new RGBColor();
+        }
         applyColor(iItem.strokeColor, dItem.stroke);
     }
     iItem.strokeWidth = dItem.strokeWidth;
@@ -104,6 +112,7 @@ function setPathPoints(iPath, segment) {
     for (i = 0; i < segment.points.length; i += 1) {
         anchorList.push(segment.points[i].anchor);
     }
+    
     iPath.setEntirePath(anchorList);
     for (i = 0; i < segment.points.length; i += 1) {
         iPath.pathPoints[i].leftDirection = segment.points[i].leftDirection;

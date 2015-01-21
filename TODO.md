@@ -44,7 +44,6 @@
 - Regex search/replace in text editors (esp. data)
 - Better text support (lots of bugs! I think a Chrome bug prevents using the x coordinate on text elements that have tspan in them...)
 - More examples
-- Add hanpuku.js support for <line> elements
 
 #### Medium priority
 - Replace textareas with ace editors
