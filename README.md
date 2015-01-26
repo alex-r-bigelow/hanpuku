@@ -18,4 +18,4 @@ Download the latest bundled extension [here](http://www.cs.utah.edu/~abigelow/#h
 
 Demo videos:
 
-<iframe width="420" height="315" src="//www.youtube.com/embed/xuBMgR6ElR4" frameborder="0" allowfullscreen></iframe>
+[![Force-Directed Graph](http://img.youtube.com/vi/xuBMgR6ElR4/0.jpg)](http://www.youtube.com/watch?v=xuBMgR6ElR4)
