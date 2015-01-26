@@ -208,6 +208,8 @@ function applyText(iText, dText) {
     iText.rotate(dText.theta*180/Math.PI, true, true, true, true, Transformation.DOCUMENTORIGIN);
     iText.translate(dText.x, dText.y);
     
+    // Store the current matrix, so we can extract any differences
+    
     // Generic attributes
     applyVisualAttributes(iText, dText);
     applyHanpukuTags(iText, dText);

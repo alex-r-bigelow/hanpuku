@@ -15,3 +15,7 @@ even filter the current Illustrator selection based on data, or perform complex 
 the code!
 
 Download the latest bundled extension [here](http://www.cs.utah.edu/~abigelow/#hanpuku).
+
+Demo videos:
+
+<iframe width="420" height="315" src="//www.youtube.com/embed/xuBMgR6ElR4" frameborder="0" allowfullscreen></iframe>
