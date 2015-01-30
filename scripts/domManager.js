@@ -374,7 +374,7 @@ DomManager.prototype.extractPath = function (g, z) {
     output.data = JsonCircular.stringify(output.data);
     
     // standardize() puts spaces around commands, and delimits parameters by single commas...
-    d = d.split(' ');
+    d = d !== null ? d.split(' ') : [];
     
     var currentSegment = null,
         lastParams,
@@ -406,7 +406,7 @@ DomManager.prototype.extractPath = function (g, z) {
                 closed : false
             };
             i += 2;
-        } else {
+        } else if (d[i] === 'C') {
             // Normal segment
             nextParams = d[i+1].split(',');
             nextParams[0] = Number(nextParams[0]);
@@ -423,6 +423,9 @@ DomManager.prototype.extractPath = function (g, z) {
                 rightDirection : [nextParams[4], nextParams[5]]   // If this doesn't get overridden, later just use the anchor
             });
             i += 2;
+        } else {
+            console.warn(i,d,d[i]);
+            throw "Bad d string";
         }
         lastParams = nextParams;
     }
@@ -444,8 +447,10 @@ DomManager.prototype.extractText = function (t, z) {
             scaleX : t.getAttribute('hanpuku_scale_x'),
             scaleY : t.getAttribute('hanpuku_scale_y'),
             theta : -t.getAttribute('hanpuku_theta'),
-            x : t.getAttribute('x'),
-            y : -t.getAttribute('y'),
+            x : t.getAttribute('hanpuku_x'),
+            y : -t.getAttribute('hanpuku_y'),
+            internalX : t.getAttribute('hanpuku_oldInternalX'),
+            internalY : t.getAttribute('hanpuku_oldInternalY'),
             contents : t.textContent,
             kerning : t.getAttribute('dx') === null ? "" : t.getAttribute('dx'),
             baselineShift : t.getAttribute('dy') === null ? "" : t.getAttribute('dy'),
@@ -649,8 +654,7 @@ DomManager.prototype.docToDom = function () {
             // set the new, double-reversed transforms as the regular transform property.
             // This way, everything in d3-land looks like nothing happened to the
             // transform tags, even though the native Illustrator positions were previously
-            // baked in. This also collects all the ids in the original document so that
-            // we can construct the exit array when we go back
+            // baked in.
             
             self.standardize();
             
@@ -659,8 +663,16 @@ DomManager.prototype.docToDom = function () {
                     this.setAttribute('transform',this.getAttribute('hanpuku_reverseTransform'));
                     this.removeAttribute('hanpuku_reverseTransform');
                 }
+                // We also need to restore internal text x,y coordinates
+                if (this.hasAttribute('hanpuku_internalX')) {
+                    this.setAttribute('x', this.getAttribute('hanpuku_internalX'));
+                    this.removeAttribute('hanpuku_internalX');
+                }
+                if (this.hasAttribute('hanpuku_internalY')) {
+                    this.setAttribute('y', this.getAttribute('hanpuku_internalY'));
+                    this.removeAttribute('hanpuku_internalY');
+                }
             });
-            
             
             // Finally, add the selection layer, and update the javascript context
             // (the original D3 selection will have been empty)
@@ -700,10 +712,7 @@ DomManager.prototype.extractPathString = function (segments) {
             d += " Z ";
         }
     }
-    if (d.search('NaN') !== -1) {
-        console.log(segments, d);
-        throw "hi";
-    }
+    
     return d;
 };
 DomManager.prototype.addPath = function (parent, path) {
@@ -724,10 +733,10 @@ DomManager.prototype.addPath = function (parent, path) {
     d3.select('#' + path.name).datum(JsonCircular.parse(JSON.parse(path.data)));
 };
 DomManager.prototype.addText = function (parent, text) {
-    var self = this,
-        t = parent.append('text')
+    var t = parent.append('text')
         .attr('id', text.name)
-        .text(text.contents),   // I deliberately don't support line breaks (the SVG will display improperly - see the documentation)
+        .text(text.contents),   // I deliberately don't support SVG line breaks (the SVG will display improperly - see the documentation)
+        transformString = "",
         container;
     
     // Justification
@@ -745,8 +754,19 @@ DomManager.prototype.addText = function (parent, text) {
         t.attr('class', text.classNames);
     }
     if (text.reverseTransform !== 'null') {
-        t.attr('transform', text.reverseTransform);
+        transformString = text.reverseTransform;
     }
+    // TODO: we need to apply any transformation differences
+    // to the transformation tag
+    //transformString += ' scale(' + text.scale_x + ',' + text.scale_y +')';
+    //transformString += ' rotate(' + text.theta +')';
+    //transformString += ' translate(' + text.x + ',' + (-text.y) +')';
+    t.attr('transform', transformString);
+    /*t.attr('hanpuku_scale_x', text.scale_x);
+    t.attr('hanpuku_scale_y', text.scale_y);
+    t.attr('hanpuku_theta', text.theta);
+    t.attr('hanpuku_x', text.x);
+    t.attr('hanpuku_y', -text.y);*/
     
     // Kerning
     if (text.kerning !== "") {
@@ -763,7 +783,9 @@ DomManager.prototype.addText = function (parent, text) {
         t.attr('rotate', text.rotate);
     }
     
-    // TODO: transform!
+    // Restore the internal x and y coordinates
+    t.attr('hanpuku_internalX', text.internalX);
+    t.attr('hanpuku_internalY', text.internalY);
     
     container = d3.select('#' + text.name);
     container.datum(JsonCircular.parse(JSON.parse(text.data)));

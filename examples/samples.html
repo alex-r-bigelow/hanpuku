@@ -20,6 +20,10 @@
                     window.parent.DATA.loadSampleDataFile('examples/data/stock.tsv');
                     window.parent.CODE.loadSampleJSFile('examples/scripts/lineChart.js');
                     window.parent.CODE.loadSampleCSSFile('examples/style/lineChart.css');
+                } else if (name === 'multiSeriesLineChart') {
+                    window.parent.DATA.loadSampleDataFile('examples/data/cityTemperatures.tsv');
+                    window.parent.CODE.loadSampleJSFile('examples/scripts/multiSeriesLineChart.js');
+                    window.parent.CODE.loadSampleCSSFile('examples/style/multiSeriesLineChart.css');
                 } else if (name === 'streamgraph') {
                     window.parent.DATA.loadSampleDataFile('examples/data/randomStream.js');
                     window.parent.CODE.loadSampleJSFile('examples/scripts/streamgraph.js');
@@ -53,9 +57,11 @@
                     'splom' : 'Scatterplot Matrix',
                     'force' : 'Force-directed graph',
                     'streamgraph' : 'Streamgraph',
-                    'areaChoropleth' : 'Area Choropleth'
-                    //'hierarchicalEdgeBundling' : 'Hierarchical Edge Bundling',
-                    //'stackedRadialArea' : 'Stacked Radial Area'
+                    'lineChart' : 'Line Chart',
+                    'multiSeriesLineChart' : 'Multi-Series Line Chart',
+                    'areaChoropleth' : 'Area Choropleth',
+                    'hierarchicalEdgeBundling' : 'Hierarchical Edge Bundling',
+                    'stackedRadialArea' : 'Stacked Radial Area'
                 },
                 resultText = "",
                 name;
