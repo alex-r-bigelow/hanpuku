@@ -464,6 +464,7 @@ DomManager.prototype.extractText = function (t, z) {
             opacity : parseFloat(computedStyle.opacity)
         },
         i;
+    
     if (output.data === undefined) {
         output.data = null;
     }
@@ -754,13 +755,13 @@ DomManager.prototype.addText = function (parent, text) {
         t.attr('class', text.classNames);
     }
     if (text.reverseTransform !== 'null') {
-        transformString = text.reverseTransform;
+        //transformString = text.reverseTransform;
     }
     // TODO: we need to apply any transformation differences
     // to the transformation tag
-    //transformString += ' scale(' + text.scale_x + ',' + text.scale_y +')';
-    //transformString += ' rotate(' + text.theta +')';
-    //transformString += ' translate(' + text.x + ',' + (-text.y) +')';
+    transformString += ' scale(' + text.scale_x + ',' + text.scale_y +')';
+    transformString += ' rotate(' + (text.theta*180/Math.PI) +')';
+    transformString += ' translate(' + (-text.x/1000) + ',' + text.y/1000 +')';
     t.attr('transform', transformString);
     /*t.attr('hanpuku_scale_x', text.scale_x);
     t.attr('hanpuku_scale_y', text.scale_y);

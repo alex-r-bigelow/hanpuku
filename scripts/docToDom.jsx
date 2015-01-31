@@ -15,6 +15,14 @@
             "hanpuku_internalY"
         ];
     
+    function getTag(item, name) {
+        try {
+            return item.tags.getByName(name).value;
+        } catch (e) {
+            return null;
+        }
+    }
+    
     function standardize(activeDoc) {
         var nameLookup = {};
         

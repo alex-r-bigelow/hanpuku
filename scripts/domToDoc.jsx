@@ -18,6 +18,12 @@
         };
     }
     
+    function storeTag(item, name, value) {
+        i = item.tags.add();
+        i.name = name;
+        i.value = String(value);
+    }
+    
     function applyColor(iC,dC) {
         var red, green, blue, black;
         
@@ -77,6 +83,12 @@
             applyColor(iItem.fillColor, dItem.fill);
         }
         
+        if (dItem.itemType === 'text') {
+            iItem.strokeWeight = dItem.strokeWidth;
+        } else {
+            iItem.strokeWidth = dItem.strokeWidth;
+        }
+        
         if (dItem.stroke === 'none') {
             iItem.stroked = false;
         } else {
@@ -86,11 +98,6 @@
             applyColor(iItem.strokeColor, dItem.stroke);
         }
         
-        if (dItem.itemType === 'text') {
-            iItem.strokeWeight = dItem.strokeWidth;
-        } else {
-            iItem.strokeWidth = dItem.strokeWidth;
-        }
         iItem.opacity = dItem.opacity*100;
     }
     
