@@ -4,16 +4,7 @@
             "" : true       // string so that elements with no name will be given one
         },
         alphabetic = new RegExp('[A-Za-z]', 'g'),
-        invalid = new RegExp('[^A-Za-z0-9-_]','g'),
-        tagList = [
-            "hanpuku_data",
-            "hanpuku_classNames",
-            "hanpuku_reverseTransform"
-        ],
-        textTagList = [
-            "hanpuku_internalX",
-            "hanpuku_internalY"
-        ];
+        invalid = new RegExp('[^A-Za-z0-9-_]','g');
     
     function getTag(item, name) {
         try {
@@ -26,14 +17,12 @@
     function standardize(activeDoc) {
         var nameLookup = {};
         
-        function standardizeItems(items, tagType) {
+        function standardizeItems(items) {
             var i,
                 oldName,
                 name,
                 newName,
-                freeId = 1,
-                tag,
-                t;
+                freeId = 1;
             
             for (i = 0; i < items.length; i += 1) {
                 // Make sure item names begin with [A-Za-z] and contain only [A-Za-z0-9\-\_]
@@ -53,39 +42,14 @@
                 }
                 items[i].name = newName;
                 nameLookup[newName] = items[i];
-                
-                // Create the needed tags if they don't exist
-                if (tagType === 'native' || tagType === 'text') {
-                    for (t = 0; t < tagList.length; t += 1) {
-                        try {
-                            items[i].tags.getByName(tagList[t]);
-                        } catch (e) {
-                            tag = items[i].tags.add();
-                            tag.name = tagList[t];
-                            tag.value = 'null';
-                        }
-                    }
-                }
-                
-                if (tagType === 'text') {
-                    for (t = 0; t < textTagList.length; t += 1) {
-                        try {
-                            items[i].tags.getByName(textTagList[t]);
-                        } catch (e) {
-                            tag = items[i].tags.add();
-                            tag.name = textTagList[t];
-                            tag.value = 'null';
-                        }
-                    }
-                }
             }
         }
         
-        standardizeItems(activeDoc.artboards, 'artboards');
-        standardizeItems(activeDoc.layers, 'layers');
-        standardizeItems(activeDoc.pathItems, 'native');
-        standardizeItems(activeDoc.groupItems, 'native');
-        standardizeItems(activeDoc.textFrames, 'text');
+        standardizeItems(activeDoc.artboards);
+        standardizeItems(activeDoc.layers);
+        standardizeItems(activeDoc.pathItems);
+        standardizeItems(activeDoc.groupItems);
+        standardizeItems(activeDoc.textFrames);
         
         return nameLookup;
     }
@@ -100,7 +64,7 @@
         } else if (attr === 'strokeColor' && e.stroked === false) {
             return 'none';
         } else if (e.hasOwnProperty(attr) === false) {
-            throw new Error(e.name + ' does not have color type: ' + attr);
+            throw new Error(e.name + ' does not have color attribute: ' + attr);
         }
         
         if (e[attr].typename === 'RGBColor') {
@@ -178,9 +142,9 @@
             strokeWidth : p.strokeWidth,
             opacity : p.opacity / 100,
             segments : [extractPathSegment(p)],
-            data : p.tags.getByName('hanpuku_data').value,
-            classNames : p.tags.getByName('hanpuku_classNames').value,
-            reverseTransform : p.tags.getByName('hanpuku_reverseTransform').value,
+            data : getTag(p, 'hanpuku_data'),
+            classNames : getTag(p, 'hanpuku_classNames'),
+            reverseTransform : getTag(p, 'hanpuku_reverseTransform'),
             zIndex : extractZPosition(p)
         };
         
@@ -197,9 +161,9 @@
             strokeWidth : p.pathItems[0].strokeWidth,
             opacity : p.pathItems[0].opacity / 100,
             segments : [],
-            data : p.tags.getByName('hanpuku_data').value,
-            classNames : p.tags.getByName('hanpuku_classNames').value,
-            reverseTransform : p.tags.getByName('hanpuku_reverseTransform').value,
+            data : getTag(p, 'hanpuku_data'),
+            classNames : getTag(p, 'hanpuku_classNames'),
+            reverseTransform : getTag(p, 'hanpuku_reverseTransform'),
             zIndex : extractZPosition(p)
         };
         
@@ -216,6 +180,11 @@
             k,
             b,
             r,
+            scale_x,
+            scale_y,
+            theta,
+            x,
+            y,
             output = {
                 itemType : 'text',
                 name : t.name,
@@ -224,12 +193,17 @@
                 strokeWidth : t.textRange.strokeWeight,
                 opacity : t.opacity / 100,
                 contents : t.contents,
-                data : t.tags.getByName('hanpuku_data').value,
-                classNames : t.tags.getByName('hanpuku_classNames').value,
-                reverseTransform : t.tags.getByName('hanpuku_reverseTransform').value,
-                internalX : t.tags.getByName('hanpuku_internalX').value,
-                internalY : t.tags.getByName('hanpuku_internalY').value,
-                zIndex : extractZPosition(t)
+                data : getTag(t, 'hanpuku_data'),
+                classNames : getTag(t, 'hanpuku_classNames'),
+                reverseTransform : getTag(t, 'hanpuku_reverseTransform'),
+                internalX : getTag(t, 'hanpuku_internalX'),
+                internalY : getTag(t, 'hanpuku_internalY'),
+                zIndex : extractZPosition(t),
+                scale_x_0 : getTag(t, 'hanpuku_scale_x_0'),
+                scale_y_0 : getTag(t, 'hanpuku_scale_y_0'),
+                theta_0 : getTag(t, 'hanpuku_theta_0'),
+                x_0 : getTag(t, 'hanpuku_x_0'),
+                y_0 : getTag(t, 'hanpuku_y_0')
             };
         
         // Extract justification
@@ -286,24 +260,29 @@
         output.rotate = output.rotate.join(',');
         
         
-        // Extract scale, rotation, and translation from Illustrator's
-        // matrix property (translation seems to change all the time,
-        // so I make a temporary TextFrame to get the frame of reference):
+        // Extract change in scale, rotation, and translation from Illustrator's
+        // matrix property
         temp = t.parent.textFrames.add();
         
-        output.scale_x = Math.sqrt(t.matrix.mValueA*t.matrix.mValueA +
-                                   t.matrix.mValueC*t.matrix.mValueC);
-        output.scale_y = Math.sqrt(t.matrix.mValueB*t.matrix.mValueB +
-                                   t.matrix.mValueD*t.matrix.mValueD);
-        output.theta = Math.atan2(t.matrix.mValueB, t.matrix.mValueD);
+        scale_x = Math.sqrt(t.matrix.mValueA*t.matrix.mValueA +
+                            t.matrix.mValueC*t.matrix.mValueC);
+        scale_y = Math.sqrt(t.matrix.mValueB*t.matrix.mValueB +
+                            t.matrix.mValueD*t.matrix.mValueD);
+        theta = Math.atan2(t.matrix.mValueB, t.matrix.mValueD);
         
-        temp.resize(output.scale_x*100, output.scale_y*100, true, true, true, true, true, Transformation.DOCUMENTORIGIN);
-        temp.rotate(output.theta*180/Math.PI, true, true, true, true, Transformation.DOCUMENTORIGIN);
+        temp.resize(scale_x*100, scale_y*100, true, true, true, true, true, Transformation.DOCUMENTORIGIN);
+        temp.rotate(theta*180/Math.PI, true, true, true, true, Transformation.DOCUMENTORIGIN);
         
-        output.x = t.matrix.mValueTX - temp.matrix.mValueTX;
-        output.y = t.matrix.mValueTY - temp.matrix.mValueTY;
+        x = t.matrix.mValueTX - temp.matrix.mValueTX;
+        y = t.matrix.mValueTY - temp.matrix.mValueTY;
         
         temp.remove();
+
+        output.scale_x_1 = scale_x;
+        output.scale_y_1 = scale_y;
+        output.theta_1 = theta;
+        output.x_1 = x;
+        output.y_1 = y;
         
         // TODO: convert more text properties!
         return output;
@@ -330,9 +309,9 @@
         }
         
         if (iType === 'group') {
-            output.data = g.tags.getByName('hanpuku_data').value;
-            output.classNames = g.tags.getByName('hanpuku_classNames').value;
-            output.reverseTransform = g.tags.getByName('hanpuku_reverseTransform').value;
+            output.data = getTag(g, 'hanpuku_data');
+            output.classNames = getTag(g, 'hanpuku_classNames');
+            output.reverseTransform = getTag(g, 'hanpuku_reverseTransform');
         }
         
         for (s = 0; s < g.groupItems.length; s += 1) {
@@ -351,6 +330,8 @@
                 s = true;
             } catch (e) {
                 // Just ignore text that wasn't generated by hanpuku
+                // TODO: Filter only by point-based text objects
+                // (convert ones that aren't?)
             }
             if (s === true) {
                 output.text.push(extractText(g.textFrames[t]));

@@ -449,8 +449,8 @@ DomManager.prototype.extractText = function (t, z) {
             theta : -t.getAttribute('hanpuku_theta'),
             x : t.getAttribute('hanpuku_x'),
             y : -t.getAttribute('hanpuku_y'),
-            internalX : t.getAttribute('hanpuku_oldInternalX'),
-            internalY : t.getAttribute('hanpuku_oldInternalY'),
+            internalX : t.hasAttribute('x') ? t.getAttribute('x') : 0,
+            internalY : t.hasAttribute('y') ? t.getAttribute('y') : 0,
             contents : t.textContent,
             kerning : t.getAttribute('dx') === null ? "" : t.getAttribute('dx'),
             baselineShift : t.getAttribute('dy') === null ? "" : t.getAttribute('dy'),
@@ -659,20 +659,50 @@ DomManager.prototype.docToDom = function () {
             
             self.standardize();
             
+            var temp;
             jQuery('svg g, svg path, svg text').each(function () {
                 if (this.hasAttribute('hanpuku_reverseTransform')) {
                     this.setAttribute('transform',this.getAttribute('hanpuku_reverseTransform'));
-                    this.removeAttribute('hanpuku_reverseTransform');
                 }
-                // We also need to restore internal text x,y coordinates
+                
+                // In addition to switching transform tags, we want to get as
+                // close to the original, non-standard SVG as we can:
+                
+                // Restore internal text x,y coordinates
                 if (this.hasAttribute('hanpuku_internalX')) {
-                    this.setAttribute('x', this.getAttribute('hanpuku_internalX'));
-                    this.removeAttribute('hanpuku_internalX');
+                    temp = Number(this.getAttribute('hanpuku_internalX'));
+                    if (!isNaN(temp)) {
+                        this.setAttribute('x', temp);
+                    }
                 }
                 if (this.hasAttribute('hanpuku_internalY')) {
-                    this.setAttribute('y', this.getAttribute('hanpuku_internalY'));
-                    this.removeAttribute('hanpuku_internalY');
+                    temp = Number(this.getAttribute('hanpuku_internalY'));
+                    if (!isNaN(temp)) {
+                        this.setAttribute('y', temp);
+                    }
                 }
+                // Apply additional Illustrator transformations to text (other Illustrator
+                // transformations are preserved in geometry coordinates)
+                if (this.hasAttribute('hanpuku_postTransform')) {
+                    temp = "";
+                    if (this.hasAttribute('transform')) {
+                        temp = ' ' + this.getAttribute('transform');
+                    }
+                    this.setAttribute('transform', this.getAttribute('hanpuku_postTransform') + temp);
+                }
+                // Purge any tags leftover from standardize (by switching transform
+                // tags, we just converted it back to as close to the original,
+                // non-standard SVG as we could
+                this.removeAttribute('hanpuku_reverseTransform');
+                this.removeAttribute('hanpuku_nonNativeTransform');
+                this.removeAttribute('hanpuku_scale_x');
+                this.removeAttribute('hanpuku_scale_y');
+                this.removeAttribute('hanpuku_theta');
+                this.removeAttribute('hanpuku_x');
+                this.removeAttribute('hanpuku_y');
+                this.removeAttribute('hanpuku_internalX');
+                this.removeAttribute('hanpuku_internalY');
+                this.removeAttribute('hanpuku_postTransform');
             });
             
             // Finally, add the selection layer, and update the javascript context
@@ -737,8 +767,8 @@ DomManager.prototype.addText = function (parent, text) {
     var t = parent.append('text')
         .attr('id', text.name)
         .text(text.contents),   // I deliberately don't support SVG line breaks (the SVG will display improperly - see the documentation)
-        transformString = "",
-        container;
+        temp,
+        diffMatrix;
     
     // Justification
     if (text.justification === 'LEFT') {
@@ -755,19 +785,36 @@ DomManager.prototype.addText = function (parent, text) {
         t.attr('class', text.classNames);
     }
     if (text.reverseTransform !== 'null') {
-        //transformString = text.reverseTransform;
+        t.attr('transform', text.reverseTransform);
     }
-    // TODO: we need to apply any transformation differences
-    // to the transformation tag
-    transformString += ' scale(' + text.scale_x + ',' + text.scale_y +')';
-    transformString += ' rotate(' + (text.theta*180/Math.PI) +')';
-    transformString += ' translate(' + (-text.x/1000) + ',' + text.y/1000 +')';
-    t.attr('transform', transformString);
-    /*t.attr('hanpuku_scale_x', text.scale_x);
-    t.attr('hanpuku_scale_y', text.scale_y);
-    t.attr('hanpuku_theta', text.theta);
-    t.attr('hanpuku_x', text.x);
-    t.attr('hanpuku_y', -text.y);*/
+    
+    // Extract any transformation changes that were made in Illustrator,
+    // and add them to the transform attribute AFTER the reverseTransform
+    // has been reversed in the docToDom hack
+    
+    // to the transformation tag - because the
+    // internal x and y were incorporated,
+    // we need to factor them out before applying
+    // any changes (as we're re-applying the x
+    // and y in their original locations)
+    sinTheta = Math.sin(text.theta_1 - text.theta_0);
+    cosTheta = Math.cos(text.theta_1 - text.theta_0);
+    diffMatrix = [text.scale_x_1*cosTheta/text.scale_x_0,
+                  -text.scale_y_1*sinTheta/text.scale_y_0,
+                  text.scale_x_1*sinTheta/text.scale_x_0,
+                  text.scale_y_1*cosTheta/text.scale_y_0,
+                  text.x_1 - text.x_0,
+                  text.y_0 - text.y_1];
+    
+    temp = hanpuku.matMultiply([1,0,0,1,Number(text.internalX),Number(text.internalY)], diffMatrix);
+    //temp = hanpuku.matMultiply(temp, [1,0,0,1,text.x_0 - text.x_1, text.y_1 - text.y_0]);
+    temp = hanpuku.matMultiply(temp, [1,0,0,1,-Number(text.internalX),-Number(text.internalY)]);
+    
+    t.attr('hanpuku_postTransform', 'matrix(' + temp.join(',') + ')');
+    
+    //transformString += ' matrix(' + temp.join(',') + ')';
+    
+    //t.attr('transform', transformString);
     
     // Kerning
     if (text.kerning !== "") {

@@ -73,7 +73,7 @@
         }
     }
     
-    function applyVisualAttributes(iItem, dItem) {
+    function applyFillAndStroke(iItem, dItem) {
         if (dItem.fill === 'none') {
             iItem.filled = false;
         } else {
@@ -83,15 +83,23 @@
             applyColor(iItem.fillColor, dItem.fill);
         }
         
-        if (dItem.itemType === 'text') {
-            iItem.strokeWeight = dItem.strokeWidth;
-        } else {
-            iItem.strokeWidth = dItem.strokeWidth;
-        }
+        
         
         if (dItem.stroke === 'none') {
+            if (dItem.itemType === 'text') {
+                iItem.strokeWeight = 0;
+            } else {
+                iItem.strokeWidth = 0;
+            }
+            
             iItem.stroked = false;
         } else {
+            if (dItem.itemType === 'text') {
+                iItem.strokeWeight = dItem.strokeWidth;
+            } else {
+                iItem.strokeWidth = dItem.strokeWidth;
+            }
+            
             if (iItem.strokeColor === undefined) {
                 iItem.strokeColor = new RGBColor();
             }
@@ -101,18 +109,10 @@
         iItem.opacity = dItem.opacity*100;
     }
     
-    function applyHanpukuTags(iItem, dItem) {
-        var i = iItem.tags.add();
-        i.name = 'hanpuku_data';
-        i.value = JSON.stringify(dItem.data);
-        
-        i = iItem.tags.add();
-        i.name = 'hanpuku_classNames';
-        i.value = dItem.classNames;
-        
-        i = iItem.tags.add();
-        i.name = 'hanpuku_reverseTransform';
-        i.value = dItem.reverseTransform;
+    function applyBasics(iItem, dItem) {
+        storeTag(iItem, 'hanpuku_data', JSON.stringify(dItem.data));
+        storeTag(iItem, 'hanpuku_classNames', dItem.classNames);
+        storeTag(iItem, 'hanpuku_reverseTransform', dItem.reverseTransform);
         
         if (doc.selection.indexOf(dItem.name) !== -1) {
             iItem.selected = true;
@@ -139,8 +139,8 @@
         
         setPathPoints(iPath, dPath.segments[0]);
         
-        applyVisualAttributes(iPath, dPath);
-        applyHanpukuTags(iPath, dPath);
+        applyFillAndStroke(iPath, dPath);
+        applyBasics(iPath, dPath);
     }
     
     function applyCompoundPath(iCompPath, dCompPath) {
@@ -162,14 +162,19 @@
         // The compound path doesn't possess any visual styles of its own;
         // instead, Illustrator propagates style changes to one pathItem to all
         // of them
-        applyVisualAttributes(iCompPath.pathItems[0], dCompPath);
-        applyHanpukuTags(iCompPath, dCompPath);
+        applyFillAndStroke(iCompPath.pathItems[0], dCompPath);
+        applyBasics(iCompPath, dCompPath);
     }
     
     function applyText(iText, dText) {
         var i,
             j,
-            currentShift;
+            currentShift,
+            scale_x,
+            scale_y,
+            theta,
+            x,
+            y;
         
         iText.name = dText.name;
         iText.contents = dText.contents;
@@ -220,22 +225,44 @@
         // In addition to data, we have to freeze internal x and y coordinates
         // so that the SVG DOM doesn't lose them (we don't use them in Illustrator,
         // but we have to pass them along)
-        i = iText.tags.add();
-        i.name = 'hanpuku_internalX';
-        i.value = String(dText.internalX);
-        
-        i = iText.tags.add();
-        i.name = 'hanpuku_internalY';
-        i.value = String(dText.internalY);
+        storeTag(iText, 'hanpuku_internalX', dText.internalX);
+        storeTag(iText, 'hanpuku_internalY', dText.internalY);
         
         // Transformations (this took FOREVER to figure out!! be exceedingly cautious if touching!)
         iText.resize(dText.scaleX*100, dText.scaleY*100, true, true, true, true, true, Transformation.DOCUMENTORIGIN);
         iText.rotate(dText.theta*180/Math.PI, true, true, true, true, Transformation.DOCUMENTORIGIN);
         iText.translate(dText.x, dText.y);
         
+        // Extract scale, rotation, and translation from Illustrator's
+        // matrix property (in theory I should be able to use the ones
+        // in dText, but Illustrator does strange stuff to its matrices
+        // that I haven't figured out yet). We need to know this to record
+        // any transformations that are made in Illustrator:
+        temp = iText.parent.textFrames.add();
+        
+        scale_x = Math.sqrt(iText.matrix.mValueA*iText.matrix.mValueA +
+                            iText.matrix.mValueC*iText.matrix.mValueC);
+        scale_y = Math.sqrt(iText.matrix.mValueB*iText.matrix.mValueB +
+                            iText.matrix.mValueD*iText.matrix.mValueD);
+        theta = Math.atan2(iText.matrix.mValueB, iText.matrix.mValueD);
+        
+        temp.resize(scale_x*100, scale_y*100, true, true, true, true, true, Transformation.DOCUMENTORIGIN);
+        temp.rotate(theta*180/Math.PI, true, true, true, true, Transformation.DOCUMENTORIGIN);
+        
+        x = iText.matrix.mValueTX - temp.matrix.mValueTX;
+        y = iText.matrix.mValueTY - temp.matrix.mValueTY;
+        
+        temp.remove();
+
+        storeTag(iText, 'hanpuku_scale_x_0', scale_x);
+        storeTag(iText, 'hanpuku_scale_y_0', scale_y);
+        storeTag(iText, 'hanpuku_theta_0', theta);
+        storeTag(iText, 'hanpuku_x_0', x);
+        storeTag(iText, 'hanpuku_y_0', y);
+        
         // Generic attributes
-        applyVisualAttributes(iText.textRange, dText);
-        applyHanpukuTags(iText, dText);
+        applyFillAndStroke(iText.textRange, dText);
+        applyBasics(iText, dText);
     }
     
     function applyGroup(iGroup, dGroup)
@@ -297,7 +324,7 @@
         
         // Generic attributes (Layers don't support tags :-( TODO: hack them into activeDoc.XMPString?))
         if (dGroup.itemType === 'group') {
-            applyHanpukuTags(iGroup, dGroup);
+            applyBasics(iGroup, dGroup);
         }
     }
     
