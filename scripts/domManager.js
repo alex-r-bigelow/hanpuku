@@ -455,9 +455,12 @@ DomManager.prototype.extractText = function (t, z) {
             kerning : t.getAttribute('dx') === null ? "" : t.getAttribute('dx'),
             baselineShift : t.getAttribute('dy') === null ? "" : t.getAttribute('dy'),
             rotate : t.getAttribute('rotate') === null ? "" : t.getAttribute('rotate'),
-            fontFamily : computedStyle.fontFamily,
+            fontFamilies : computedStyle.fontFamily.split(','),
+            fontStyle : computedStyle.fontStyle,
             fontWeight : computedStyle.fontWeight,
-            fontSize : computedStyle.fontSize,
+            fontSize : convertUnits(t, computedStyle.fontSize, "px"),   // weirdly, px in browser land actually means pt
+            fontVariant : computedStyle.fontVariant,
+            // fontStretch : computedStyle.fontStretch, // TODO: still unsupported in Chrome
             fill : self.color(computedStyle.fill),
             stroke : self.color(computedStyle.stroke),
             strokeWidth : parseFloat(computedStyle.strokeWidth),
@@ -781,40 +784,54 @@ DomManager.prototype.addText = function (parent, text) {
         t.attr('text-anchor', 'start');
     }
     
+    // Font properties
+    t.style('font-size', text.fontSize)
+     .style('font-family', text.fontFamily);
+    
     if (text.classNames !== 'null') {
         t.attr('class', text.classNames);
     }
+    
+    // Transformations
+    
     if (text.reverseTransform !== 'null') {
         t.attr('transform', text.reverseTransform);
     }
     
-    // Extract any transformation changes that were made in Illustrator,
-    // and add them to the transform attribute AFTER the reverseTransform
-    // has been reversed in the docToDom hack
-    
-    // to the transformation tag - because the
-    // internal x and y were incorporated,
-    // we need to factor them out before applying
-    // any changes (as we're re-applying the x
-    // and y in their original locations)
-    sinTheta = Math.sin(text.theta_1 - text.theta_0);
-    cosTheta = Math.cos(text.theta_1 - text.theta_0);
-    diffMatrix = [text.scale_x_1*cosTheta/text.scale_x_0,
-                  -text.scale_y_1*sinTheta/text.scale_y_0,
-                  text.scale_x_1*sinTheta/text.scale_x_0,
-                  text.scale_y_1*cosTheta/text.scale_y_0,
-                  text.x_1 - text.x_0,
-                  text.y_0 - text.y_1];
-    
-    temp = hanpuku.matMultiply([1,0,0,1,Number(text.internalX),Number(text.internalY)], diffMatrix);
-    //temp = hanpuku.matMultiply(temp, [1,0,0,1,text.x_0 - text.x_1, text.y_1 - text.y_0]);
-    temp = hanpuku.matMultiply(temp, [1,0,0,1,-Number(text.internalX),-Number(text.internalY)]);
-    
-    t.attr('hanpuku_postTransform', 'matrix(' + temp.join(',') + ')');
-    
-    //transformString += ' matrix(' + temp.join(',') + ')';
-    
-    //t.attr('transform', transformString);
+    if (text.x_0 === null) {
+        // This is a new item! Just use the absolute coordinates
+        sinTheta = Math.sin(text.theta_1);
+        cosTheta = Math.cos(text.theta_1);
+        diffMatrix = [text.scale_x_1*cosTheta,
+                      -text.scale_y_1*sinTheta,
+                      text.scale_x_1*sinTheta,
+                      text.scale_y_1*cosTheta,
+                      text.x_1,
+                      -text.y_1];
+        t.attr('hanpuku_postTransform', 'matrix(' + diffMatrix.join(',') + ')');
+    } else {
+        // Extract any transformation changes that were made in Illustrator,
+        // and add them to the transform attribute AFTER the reverseTransform
+        // has been reversed in the docToDom hack
+        
+        sinTheta = Math.sin(text.theta_1 - text.theta_0);
+        cosTheta = Math.cos(text.theta_1 - text.theta_0);
+        diffMatrix = [text.scale_x_1*cosTheta/text.scale_x_0,
+                      -text.scale_y_1*sinTheta/text.scale_y_0,
+                      text.scale_x_1*sinTheta/text.scale_x_0,
+                      text.scale_y_1*cosTheta/text.scale_y_0,
+                      text.x_1 - text.x_0,
+                      text.y_0 - text.y_1];
+        
+        // Because the
+        // internal x and y were incorporated,
+        // we need to factor them out before applying
+        // any changes (as we're re-applying the x
+        // and y in their original locations)
+        temp = hanpuku.matMultiply([1,0,0,1,Number(text.internalX),Number(text.internalY)], diffMatrix);
+        temp = hanpuku.matMultiply(temp, [1,0,0,1,-Number(text.internalX),-Number(text.internalY)]);
+        t.attr('hanpuku_postTransform', 'matrix(' + temp.join(',') + ')');
+    }
     
     // Kerning
     if (text.kerning !== "") {

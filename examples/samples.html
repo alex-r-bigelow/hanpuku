@@ -27,6 +27,9 @@
                 } else if (name === 'streamgraph') {
                     window.parent.DATA.loadSampleDataFile('examples/data/randomStream.js');
                     window.parent.CODE.loadSampleJSFile('examples/scripts/streamgraph.js');
+                }  else if (name === 'streamgraph2') {
+                    window.parent.DATA.loadSampleDataFile('examples/data/energyNgrams.csv');
+                    window.parent.CODE.loadSampleJSFile('examples/scripts/streamgraph2.js');
                 } else if (name === 'basicTree') {
                     window.parent.DATA.loadSampleDataFile('examples/data/basicTree.csv');
                     window.parent.CODE.loadSampleJSFile('examples/scripts/basicTree.js');
@@ -56,12 +59,12 @@
                     'basicTree' : 'Basic Tree',
                     'splom' : 'Scatterplot Matrix',
                     'force' : 'Force-directed graph',
-                    'streamgraph' : 'Streamgraph',
+                    'streamgraph2' : 'Streamgraph',
                     'lineChart' : 'Line Chart',
-                    'multiSeriesLineChart' : 'Multi-Series Line Chart',
-                    'areaChoropleth' : 'Area Choropleth',
-                    'hierarchicalEdgeBundling' : 'Hierarchical Edge Bundling',
-                    'stackedRadialArea' : 'Stacked Radial Area'
+                    'multiSeriesLineChart' : 'Multi-Series Line Chart'
+                    //'areaChoropleth' : 'Area Choropleth'
+                    //'hierarchicalEdgeBundling' : 'Hierarchical Edge Bundling',
+                    //'stackedRadialArea' : 'Stacked Radial Area'
                 },
                 resultText = "",
                 name;

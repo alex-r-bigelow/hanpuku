@@ -36,13 +36,13 @@
 ### TODO:
 
 #### High priority
-- Circular data in the Data preview...? This probably needs a redesign, especially if we
-  want to deal with embedding data files inside documents later...
+- Circular data in the Data preview (visualize cycles)
 - Fix Selection overlay bug
 - Inconsistent z-index sorting bug
-- Support arc, disjoint, and shortcut paths (also fix Q / T inaccuracies)
+- New Illustrator text position (there's no M_0...)
+- Double-apply text position bug (probably not just text!)
+- Support arcs
 - Regex search/replace in text editors (esp. data)
-- Better text support (lots of bugs! I think a Chrome bug prevents using the x coordinate on text elements that have tspan in them...)
 - More examples
 
 #### Medium priority
@@ -52,10 +52,9 @@
 - Embed data, js, css files inside the .ai file (preserve layer-level properties while I'm at it)
 - Load multiple js, css files, distinguish between js libraries and scripts (run the former immediately)
 - Support SVG Polygon, Polyline
-- Support Gradients, CMYK color, stroke properties (dashes, cap, etc.), Masks
+- Support Gradients, CMYK color, stroke properties (dashes, cap, etc.), Masks, Symbols
 
 #### Low priority (probably next paper)
-- Fix bug associated with single paths too long for Illustrator
 - Bindings tab
 - Selection query tools
 - Dom preview selection functionality

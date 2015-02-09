@@ -7,7 +7,35 @@
             'text' : 'textFrames',
             'layer' : 'layers',
             'artboard' : 'artboards'
-        };
+        },
+        FONT_WEIGHTS = {
+            normal : [''],
+            bold : ['Bold'],
+            bolder : ['Black','ExtraBold','Heavy','ExtraBlack','Fat','Poster','UltraBlack'],
+            lighter : ['Light','Thin','Book','Demi','ExtraLight','UltraLight'],
+            '100' : ['ExtraLight', 'UltraLight'],
+            '200' : ['Light', 'Thin'],
+            '300' : ['Book', 'Demi'],
+            '400' : [''],
+            '500' : ['Medium'],
+            '600' : ['Semibold','Demibold'],
+            '700' : ['Bold'],
+            '800' : ['Black','ExtraBold','Heavy'],
+            '900' : ['ExtraBlack','Fat','Poster','UltraBlack']
+        },
+        FONT_STYLES = {
+            'normal' : [''],
+            'italic' : ['Italic','Oblique'],
+            'oblique' : ['Oblique','Italic']
+        },
+        warnedFonts = {},
+        i;
+    // As app.textFonts.getByName() needs both the font family and
+    // the style name, and as that call takes a long time anyway, let's precompute
+    // a font lookup table
+    //for (i = 0; i < app.textFonts.length; i += 1) {
+        //FONT_LOOKUP[]
+    //}
     
     function phrogz(name)
     {
@@ -22,6 +50,108 @@
         i = item.tags.add();
         i.name = name;
         i.value = String(value);
+    }
+    
+    function applyFont(iTextRange, fontFamilies, fontStyle, fontWeight) {
+        var i,
+            f,
+            base,
+            stretch,
+            foundFont = false,
+            fontFamily;
+        // TODO: This is non-trivial! Somehow need to find the closest named font...
+        // app.textFonts.getByName('HelveticaNeue-UltraLightItalic'), or iterate
+        // the array and check other properties (e.g.:
+        // app.textFonts[301].family === 'Helvetica Neue'
+        // app.textFonts[301].name === 'HelveticaNeue-UltraLightItalic'
+        // app.textFonts[301].style === 'UltraLight Italic')
+        
+        // from the DOM, we get
+        // fontStyle (normal, italic, oblique)
+        // fontWeight (normal, bold, bolder, lighter, 100-900)
+        // fontStretch (ultra-condensed, extra-condensed, condensed, semi-condensed,
+        //   normal, semi-expanded, expanded, extra-expanded, ultra-expanded)
+        // ...though Adobe's font names as fontFamily work, though if you set something like
+        // fontWeight on TOP of a weighted Adobe fontFamily, it will still override it
+        // ... and dText.fontStretch actually doesn't.
+        
+        for (f = 0; f < fontFamilies.length; f += 1) {
+            fontFamily = fontFamilies[f];
+            
+            if (fontStyle !== 'normal' || fontWeight !== 'normal') {
+                // Okay, we need to find the base font family, and override ONLY
+                // the appropriate style/weight parts of the string
+                base = fontFamily.split('-')[0];
+                
+                // Figure out font-stretch (Chrome doesn't support the font-stretch css property,
+                // so we only use the font family string itself)
+                i = fontFamily.search('Condensed');
+                if (i !== -1) {
+                    stretch = fontFamily.substring(fontFamily.indexOf('-')+1,i+9);
+                } else {
+                    i = fontFamily.search('Expanded');
+                    if (i !== -1) {
+                        stretch = fontFamily.substring(fontFamily.indexOf('-')+1,i+8);
+                    } else {
+                        stretch = "";
+                    }
+                }
+                
+                // Figure out fontStyle
+                if (fontStyle === 'normal') {
+                    if (fontFamily.search('Italic') !== -1) {
+                        fontStyle = 'Italic';
+                    } else if (fontFamily.search('Oblique') !== -1) {
+                        fontStyle = 'Oblique';
+                    } else {
+                        fontStyle = '';
+                    }
+                } else {
+                    // convert from CSS styles; TODO: test all possibilities, don't just take the first!
+                    if (FONT_STYLES.hasOwnProperty(fontStyle)) {
+                        fontStyle = FONT_STYLES[fontStyle][0];
+                    }
+                }
+                
+                // Figure out fontWeight
+                if (fontWeight === 'normal') {
+                    // Whatever is left of the string...
+                    fontWeight = fontFamily.replace(base+'-','').replace(stretch, '').replace(fontStyle, '');
+                } else {
+                    // convert from CSS weights; TODO: test all possibilities, don't just take the first!
+                    if (FONT_WEIGHTS.hasOwnProperty(fontWeight)) {
+                        fontWeight = FONT_WEIGHTS[fontWeight][0];
+                    }
+                }
+                
+                fontFamily = base + '-' + stretch + fontWeight + fontStyle;
+                // If the overridden font name doesn't exist, just ignore them
+                // TODO: try to 
+                try {
+                    app.textFonts.getByName(fontFamily);
+                } catch(e) {
+                    if (warnedFonts.hasOwnProperty(fontFamily) === false) {
+                        warnedFonts[fontFamily] = true;
+                        console.log("Couldn't find font: " + fontFamily);
+                    }
+                    fontFamily = fontFamilies[f];
+                }
+            }
+            
+            console.log(fontFamily, base, stretch, fontStyle, fontWeight);
+            
+            try {
+                iTextRange.textFont = app.textFonts.getByName(fontFamily);
+                foundFont = true;
+                break;
+            } catch (e) {}
+        }
+        
+        fontFamily = fontFamilies.join(',');
+        if (foundFont === false && warnedFonts.hasOwnProperty(fontFamily) === false) {
+            warnedFonts[fontFamily] = true;
+            console.log("Couldn't apply font stack: " + fontFamily);
+        }
     }
     
     function applyColor(iC,dC) {
@@ -77,13 +207,12 @@
         if (dItem.fill === 'none') {
             iItem.filled = false;
         } else {
+            iItem.filled = true;
             if (iItem.fillColor === undefined) {
                 iItem.fillColor = new RGBColor();
             }
             applyColor(iItem.fillColor, dItem.fill);
         }
-        
-        
         
         if (dItem.stroke === 'none') {
             if (dItem.itemType === 'text') {
@@ -91,9 +220,9 @@
             } else {
                 iItem.strokeWidth = 0;
             }
-            
             iItem.stroked = false;
         } else {
+            iItem.stroked = true;
             if (dItem.itemType === 'text') {
                 iItem.strokeWeight = dItem.strokeWidth;
             } else {
@@ -181,17 +310,14 @@
         
         // Fonts
         
-        // TODO: This is non-trivial! Somehow need to find the closest named font...
-        // app.textFonts.getByName('HelveticaNeue-UltraLightItalic'), or iterate
-        // the array and check other properties (e.g.:
-        // app.textFonts[301].family === 'Helvetica Neue'
-        // app.textFonts[301].name === 'HelveticaNeue-UltraLightItalic'
-        // app.textFonts[301].style === 'UltraLight Italic')
+        iText.textRange.size = parseFloat(dText.fontSize);
+        applyFont(iText.textRange,
+                  dText.fontFamilies,
+                  dText.fontStyle,
+                  dText.fontWeight);
+                  // dText.fontStretch);   // still unsupported in Chrome
         
-        // from the DOM, we get dText.fontFamily, dText.fontSize,
-        // dText.fontStyle (normal, italic, oblique)
-        // dText.fontVariant (normal, small-caps)
-        // dText.fontWeight (normal, bold, bolder, lighter, 100-900)
+        // TODO: dText.fontVariant (normal, small-caps)
         
         // Justification
         if (dText.justification === 'CENTER') {

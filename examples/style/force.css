@@ -3,6 +3,10 @@
   stroke-width: 1.5px;
 }
 
+.node text{
+  stroke: none;
+}
+
 .link {
   stroke: #999;
   stroke-opacity: .6;
