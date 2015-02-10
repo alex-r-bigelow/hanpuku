@@ -56,10 +56,13 @@
     }
     
     function extractColor(e, attr) {
+        var color;
         // TODO: If the activeDocument is in CMYK mode, add
         // device-cmyk(c,m,y,k) to the SVG element's style
         // with an rgb backup. For now, I stupidly convert
         // everything to RGB
+        // TODO: Figure out the semantics of SpotColor and
+        // why it's different
         if (attr === 'fillColor' && e.filled === false) {
             return 'none';
         } else if (attr === 'strokeColor' && e.stroked === false) {
@@ -68,30 +71,38 @@
             throw new Error(e.name + ' does not have color attribute: ' + attr);
         }
         
-        if (e[attr].typename === 'RGBColor') {
-            return 'rgb(' + e[attr].red + ',' +
-                            e[attr].green + ',' +
-                            e[attr].blue + ')';
-        } else if (e[attr].typename === 'GrayColor') {
-            return 'rgb(' + e[attr].gray + ',' +
-                            e[attr].gray + ',' +
-                            e[attr].gray + ')';
-        } else if (e[attr].typename === 'CMYKColor') {
-            return 'rgb(' + Math.floor(0.0255 * (100 - e[attr].cyan) * (100 - e[attr].black)) +
-                      ',' + Math.floor(0.0255 * (100 - e[attr].magenta) * (100 - e[attr].black)) +
-                      ',' + Math.floor(0.0255 * (100 - e[attr].yellow) * (100 - e[attr].black)) + ')';
+        if (e[attr].typename === 'SpotColor') {
+            color = e[attr].spot.color;
+        } else {
+            color = e[attr];
+        }
+        
+        if (color.typename === 'RGBColor') {
+            return 'rgb(' + color.red + ',' +
+                            color.green + ',' +
+                            color.blue + ')';
+        } else if (color.typename === 'GrayColor') {
+            return 'rgb(' + color.gray + ',' +
+                            color.gray + ',' +
+                            color.gray + ')';
+        } else if (color.typename === 'CMYKColor') {
+            return 'rgb(' + Math.floor(0.0255 * (100 - color.cyan) * (100 - color.black)) +
+                      ',' + Math.floor(0.0255 * (100 - color.magenta) * (100 - color.black)) +
+                      ',' + Math.floor(0.0255 * (100 - color.yellow) * (100 - color.black)) + ')';
             
             // TODO: switch to this once Chrome supports it
-            //return 'device-cmyk(' + e[attr].cyan + ',' +
-            //                        e[attr].magenta + ',' +
-            //                        e[attr].yellow + ',' +
-            //                        e[attr].black + ')';
-        } else if (e[attr].typename === 'NoColor') {
+            //return 'device-cmyk(' + color.cyan + ',' +
+            //                        color.magenta + ',' +
+            //                        color.yellow + ',' +
+            //                        color.black + ')';
+        } else if (color.typename === 'NoColor') {
             return 'none';
+        } else if (color.typename === 'SpotColor') {
+            
         } else {
             if (alertedUnsupported === false) {
                 console.logError({
-                    'message' : 'hanpuku does not yet support ' + e[attr].typename,
+                    'message' : 'hanpuku does not yet support ' + color.typename,
                     'line' : 70});
                 alertedUnsupported = true;
             }
