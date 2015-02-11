@@ -1,4 +1,6 @@
+/*global input, app, console, DocumentColorSpace, RGBColor, Justification, Transformation, ZOrderMethod*/
 (function () {
+    "use strict";
     var doc = input,
         activeDoc,
         ITEM_CONTAINERS = {
@@ -11,22 +13,22 @@
         FONT_WEIGHTS = {
             normal : [''],
             bold : ['Bold'],
-            bolder : ['Black','ExtraBold','Heavy','ExtraBlack','Fat','Poster','UltraBlack'],
-            lighter : ['Light','Thin','Book','Demi','ExtraLight','UltraLight'],
+            bolder : ['Black', 'ExtraBold', 'Heavy', 'ExtraBlack', 'Fat', 'Poster', 'UltraBlack'],
+            lighter : ['Light', 'Thin', 'Book', 'Demi', 'ExtraLight', 'UltraLight'],
             '100' : ['ExtraLight', 'UltraLight'],
             '200' : ['Light', 'Thin'],
             '300' : ['Book', 'Demi'],
             '400' : [''],
             '500' : ['Medium'],
-            '600' : ['Semibold','Demibold'],
+            '600' : ['Semibold', 'Demibold'],
             '700' : ['Bold'],
-            '800' : ['Black','ExtraBold','Heavy'],
-            '900' : ['ExtraBlack','Fat','Poster','UltraBlack']
+            '800' : ['Black', 'ExtraBold', 'Heavy'],
+            '900' : ['ExtraBlack', 'Fat', 'Poster', 'UltraBlack']
         },
         FONT_STYLES = {
             'normal' : [''],
-            'italic' : ['Italic','Oblique'],
-            'oblique' : ['Oblique','Italic']
+            'italic' : ['Italic', 'Oblique'],
+            'oblique' : ['Oblique', 'Italic']
         },
         warnedFonts = {},
         i;
@@ -37,11 +39,9 @@
         //FONT_LOOKUP[]
     //}
     
-    function phrogz(name)
-    {
+    function phrogz(name) {
         var v, params = Array.prototype.slice.call(arguments, 1);
-        return function (o)
-        {
+        return function (o) {
             return (typeof (v = o[name]) === 'function' ? v.apply(o, params) : v);
         };
     }
@@ -87,11 +87,11 @@
                 // so we only use the font family string itself)
                 i = fontFamily.search('Condensed');
                 if (i !== -1) {
-                    stretch = fontFamily.substring(fontFamily.indexOf('-')+1,i+9);
+                    stretch = fontFamily.substring(fontFamily.indexOf('-') + 1, i + 9);
                 } else {
                     i = fontFamily.search('Expanded');
                     if (i !== -1) {
-                        stretch = fontFamily.substring(fontFamily.indexOf('-')+1,i+8);
+                        stretch = fontFamily.substring(fontFamily.indexOf('-') + 1, i + 8);
                     } else {
                         stretch = "";
                     }
@@ -116,7 +116,7 @@
                 // Figure out fontWeight
                 if (fontWeight === 'normal') {
                     // Whatever is left of the string...
-                    fontWeight = fontFamily.replace(base+'-','').replace(stretch, '').replace(fontStyle, '');
+                    fontWeight = fontFamily.replace(base + '-', '').replace(stretch, '').replace(fontStyle, '');
                 } else {
                     // convert from CSS weights; TODO: test all possibilities, don't just take the first!
                     if (FONT_WEIGHTS.hasOwnProperty(fontWeight)) {
@@ -129,7 +129,7 @@
                 // TODO: try to 
                 try {
                     app.textFonts.getByName(fontFamily);
-                } catch(e) {
+                } catch (e) {
                     if (warnedFonts.hasOwnProperty(fontFamily) === false) {
                         warnedFonts[fontFamily] = true;
                         console.log("Couldn't find font: " + fontFamily);
@@ -144,17 +144,17 @@
                 iTextRange.textFont = app.textFonts.getByName(fontFamily);
                 foundFont = true;
                 break;
-            } catch (e) {}
+            } catch (err) {}
         }
         
-        fontFamily = fontFamilies.join(',');
+        fontFamily = fontFamilies.join(', ');
         if (foundFont === false && warnedFonts.hasOwnProperty(fontFamily) === false) {
             warnedFonts[fontFamily] = true;
             console.log("Couldn't apply font stack: " + fontFamily);
         }
     }
     
-    function applyColor(iC,dC) {
+    function applyColor(iC, dC) {
         var red, green, blue, black;
         
         if (dC.split('(').length < 2) {
@@ -162,7 +162,7 @@
         }
         dC = dC.split('(')[1];
         dC = dC.split(')')[0];
-        dC = dC.split(',');
+        dC = dC.split(', ');
         
         red = Number(dC[0]);
         green = Number(dC[1]);
@@ -235,7 +235,7 @@
             applyColor(iItem.strokeColor, dItem.stroke);
         }
         
-        iItem.opacity = dItem.opacity*100;
+        iItem.opacity = dItem.opacity * 100;
     }
     
     function applyBasics(iItem, dItem) {
@@ -303,7 +303,8 @@
             scale_y,
             theta,
             x,
-            y;
+            y,
+            temp;
         
         iText.name = dText.name;
         iText.contents = dText.contents;
@@ -337,7 +338,7 @@
         
         for (i = 0; i < iText.characters.length; i += 1) {
             if (dText.kerning.length > i) {
-                iText.characters[i].kerning = 1000*parseFloat(dText.kerning[i]);    // We need thousandths of an em
+                iText.characters[i].kerning = 1000 * parseFloat(dText.kerning[i]);    // We need thousandths of an em
             }
             if (dText.baselineShift.length > i) {
                 currentShift -= parseFloat(dText.baselineShift[i]); // Already in pt
@@ -355,8 +356,8 @@
         storeTag(iText, 'hanpuku_internalY', dText.internalY);
         
         // Transformations (this took FOREVER to figure out!! be exceedingly cautious if touching!)
-        iText.resize(dText.scaleX*100, dText.scaleY*100, true, true, true, true, true, Transformation.DOCUMENTORIGIN);
-        iText.rotate(dText.theta*180/Math.PI, true, true, true, true, Transformation.DOCUMENTORIGIN);
+        iText.resize(dText.scaleX * 100, dText.scaleY * 100, true, true, true, true, true, Transformation.DOCUMENTORIGIN);
+        iText.rotate(dText.theta * 180 / Math.PI, true, true, true, true, Transformation.DOCUMENTORIGIN);
         iText.translate(dText.x, dText.y);
         
         // Extract scale, rotation, and translation from Illustrator's
@@ -366,14 +367,14 @@
         // any transformations that are made in Illustrator:
         temp = iText.parent.textFrames.add();
         
-        scale_x = Math.sqrt(iText.matrix.mValueA*iText.matrix.mValueA +
-                            iText.matrix.mValueC*iText.matrix.mValueC);
-        scale_y = Math.sqrt(iText.matrix.mValueB*iText.matrix.mValueB +
-                            iText.matrix.mValueD*iText.matrix.mValueD);
+        scale_x = Math.sqrt(iText.matrix.mValueA * iText.matrix.mValueA +
+                            iText.matrix.mValueC * iText.matrix.mValueC);
+        scale_y = Math.sqrt(iText.matrix.mValueB * iText.matrix.mValueB +
+                            iText.matrix.mValueD * iText.matrix.mValueD);
         theta = Math.atan2(iText.matrix.mValueB, iText.matrix.mValueD);
         
-        temp.resize(scale_x*100, scale_y*100, true, true, true, true, true, Transformation.DOCUMENTORIGIN);
-        temp.rotate(theta*180/Math.PI, true, true, true, true, Transformation.DOCUMENTORIGIN);
+        temp.resize(scale_x * 100, scale_y * 100, true, true, true, true, true, Transformation.DOCUMENTORIGIN);
+        temp.rotate(theta * 180 / Math.PI, true, true, true, true, Transformation.DOCUMENTORIGIN);
         
         x = iText.matrix.mValueTX - temp.matrix.mValueTX;
         y = iText.matrix.mValueTY - temp.matrix.mValueTY;
@@ -391,8 +392,7 @@
         applyBasics(iText, dText);
     }
     
-    function applyGroup(iGroup, dGroup)
-    {
+    function applyGroup(iGroup, dGroup) {
         //var itemOrder = dGroup.groups.concat(dGroup.paths, dGroup.text).sort(phrogz('zIndex')),
         var itemOrder = dGroup.groups.concat(dGroup.paths).concat(dGroup.text).sort(phrogz('zIndex')),
             i,
@@ -405,7 +405,7 @@
             if (itemOrder[i].itemType === 'group') {
                 try {
                     newItem = iGroup.groupItems.getByName(itemOrder[i].name);
-                } catch (e) {
+                } catch (e1) {
                     newItem = iGroup.groupItems.add();
                 }
                 applyGroup(newItem, itemOrder[i]);
@@ -414,12 +414,12 @@
                     // This is a compound path
                     try {
                         newItem = iGroup.compoundPathItems.getByName(itemOrder[i].name);
-                    } catch (e) {
+                    } catch (e2) {
                         try {
                             // If this used to be a regular path, delete the old one
                             newItem = iGroup.pathItems.getByName(itemOrder[i].name);
                             newItem.remove();
-                        } catch (e) {}
+                        } catch (e3) {}
                         newItem = iGroup.compoundPathItems.add();
                     }
                     applyCompoundPath(newItem, itemOrder[i]);
@@ -427,12 +427,12 @@
                     // This is a regular path
                     try {
                         newItem = iGroup.pathItems.getByName(itemOrder[i].name);
-                    } catch (e) {
+                    } catch (e4) {
                         try {
                             // If this used to be a compound path, delete the old one
                             newItem = iGroup.compoundPathItems.getByName(itemOrder[i].name);
                             newItem.remove();
-                        } catch (e) {}
+                        } catch (e5) {}
                         newItem = iGroup.pathItems.add();
                     }
                     applyPath(newItem, itemOrder[i]);
@@ -440,7 +440,7 @@
             } else if (itemOrder[i].itemType === 'text') {
                 try {
                     newItem = iGroup.textFrames.getByName(itemOrder[i].name);
-                } catch (e) {
+                } catch (e6) {
                     newItem = iGroup.textFrames.add();
                 }
                 applyText(newItem, itemOrder[i]);
@@ -454,21 +454,18 @@
         }
     }
     
-    function applyDocument()
-    {
-        if (app.documents.length === 0)
-        {
+    function applyDocument() {
+        if (app.documents.length === 0) {
             app.documents.add();
         }
         activeDoc = app.activeDocument;
         var a, artboard, l, layer;
         
         // Modify / add needed artboards
-        for (a = 0; a < doc.artboards.length; a += 1)
-        {
+        for (a = 0; a < doc.artboards.length; a += 1) {
             try {
                 artboard = activeDoc.artboards.getByName(doc.artboards[a].name);
-            } catch (e) {
+            } catch (e1) {
                 artboard = activeDoc.artboards.add(doc.artboards[a].rect);
             }
             artboard.artboardRect = doc.artboards[a].rect;
@@ -477,11 +474,10 @@
         
         // Modify / add needed layers in order
         doc.layers = doc.layers.sort(phrogz('zIndex'));
-        for (l = 0; l < doc.layers.length; l += 1)
-        {
+        for (l = 0; l < doc.layers.length; l += 1) {
             try {
                 layer = activeDoc.layers.getByName(doc.layers[l].name);
-            } catch (e) {
+            } catch (e2) {
                 layer = activeDoc.layers.add();
             }
             layer.zOrder(ZOrderMethod.BRINGTOFRONT);
@@ -492,15 +488,15 @@
         for (a = 0; a < doc.exit.length; a += 1) {
             try {
                 activeDoc[ITEM_CONTAINERS[doc.exit[a].itemType]].getByName(doc.exit[a].name).remove();
-            } catch (e) {}
+            } catch (e3) {}
         }
     }
     
     try {
         applyDocument();
         app.redraw();
-    } catch(e) {
+    } catch (e) {
         console.logError(e);
     }
     return console.jsonPacket();
-})();
+}());

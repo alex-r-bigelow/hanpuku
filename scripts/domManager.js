@@ -1,4 +1,5 @@
 /*jslint evil:true forin:true*/
+/*globals ejQuery, jQuery, ed3, d3, DATA, EXTENSION, ILLUSTRATOR, JsonCircular, console, convertUnits, phrogz, hanpuku*/
 
 /*
  * The purpose of this class is to act as an intermediary between
@@ -6,9 +7,11 @@
  * d3.js code and CSS operate on.
  */
 
-function DomManager () {
+function DomManager() {
+    "use strict";
     var self = this,
-        element;
+        element,
+        targetDiv;
     
     // Set up our iframe
     targetDiv = document.getElementById('domPreviewContent');
@@ -49,6 +52,7 @@ DomManager.DOM_LIBS = [
 ];
 
 DomManager.getElementType = function (e) {
+    "use strict";
     if (e.tagName === 'g') {
         if (e.parentNode.tagName === 'svg') {
             return 'layer';
@@ -60,45 +64,49 @@ DomManager.getElementType = function (e) {
     }
 };
 DomManager.prototype.init = function () {
-    
+    "use strict";
 };
 DomManager.prototype.disableUI = function () {
+    "use strict";
     var self = this;
     ejQuery('#zoomButtons button').attr('disabled', true);
     self.iframe.contentDocument.body.innerHTML = "";
 };
 DomManager.prototype.onRefresh = function () {
+    "use strict";
     ejQuery('#zoomButtons button').attr('disabled', false);
 };
 DomManager.prototype.zoomIn = function () {
-    var self = this;
-    var current = jQuery('#' + self.docName).css('zoom'),
+    "use strict";
+    var self = this,
+        current = jQuery('#' + self.docName).css('zoom'),
         newZoom = current * 2;
     if (newZoom > 64) {
         newZoom = 64;
     }
     jQuery('#' + self.docName).css('zoom', newZoom);
-    ejQuery('#zoomButtons span').text((newZoom*100) + "%");
+    ejQuery('#zoomButtons span').text((newZoom * 100) + "%");
 };
 DomManager.prototype.zoomOut = function () {
-    var self = this;
-    var current = jQuery('#' + self.docName).css('zoom'),
+    "use strict";
+    var self = this,
+        current = jQuery('#' + self.docName).css('zoom'),
         newZoom = current / 2;
     if (newZoom < 0.03125) {
         newZoom = 0.03125;
     }
     jQuery('#' + self.docName).css('zoom', newZoom);
-    ejQuery('#zoomButtons span').text((newZoom*100) + "%");
+    ejQuery('#zoomButtons span').text((newZoom * 100) + "%");
 };
 DomManager.prototype.initScope = function () {
+    "use strict";
     var self = this,
         s,
         scriptCallback = function (script) {
             self.runScript(script, true);
         },
-        loadFunc = function () {
-            var url = arguments[0],
-                callback = arguments.length === 3 ? arguments[2] : arguments[1],
+        loadFunc = function (url, a, b) {
+            var callback = arguments.length === 3 ? b : a,
                 file = DATA.getFile(url);
             if (file === undefined) {
                 EXTENSION.displayMessage("<p style='color:#f00;'>" + url + " has not been loaded in the Data tab.</p>");
@@ -138,6 +146,7 @@ DomManager.prototype.initScope = function () {
      * we've already loaded and parsed any relevant files in the Data tab
      * (or if we haven't they need to put it there!)
      */
+    /*jslint nomen: true*/
     d3._text = d3.text;
     d3.text = loadFunc;
     d3._json = d3.json;
@@ -152,9 +161,10 @@ DomManager.prototype.initScope = function () {
     d3.tsv = loadFunc;
     //d3._js = d3.js;
     d3.js = loadFunc;
+    /*jslint nomen: false*/
 };
-DomManager.prototype.runScript = function (script, ignoreSelection)
-{
+DomManager.prototype.runScript = function (script, ignoreSelection) {
+    "use strict";
     var self = this,
         error;
     
@@ -165,7 +175,7 @@ DomManager.prototype.runScript = function (script, ignoreSelection)
     
     // execute script in private context - not for security, but
     // for a cleaner scope that feels more like coding in a normal browser
-    error = (new Function( "try{ with(this) { " + script +
+    error = (new Function("try{ with(this) { " + script +
                 "} } catch(e) { console.warn(e.stack); var temp = e.stack.split('\\n'); " +
                 "return [temp[0], temp[1].split(':')[2]]; } return null;")).call(self.iframeScope);
     if (error !== null) {
@@ -189,12 +199,15 @@ DomManager.prototype.runScript = function (script, ignoreSelection)
     return true;
 };
 DomManager.prototype.updateSelectionLayer = function () {
-    var self = this;
+    "use strict";
+    var self = this,
+        layer,
+        selectionRect;
     
     jQuery('#hanpuku_selectionLayer').remove();
-    var layer = d3.select('#' + self.docName).append('g')
-                    .attr('id', 'hanpuku_selectionLayer'),
-        selectionRect = layer.selectAll('path').data(ILLUSTRATOR.selectedIDs);
+    layer = d3.select('#' + self.docName).append('g')
+              .attr('id', 'hanpuku_selectionLayer');
+    selectionRect = layer.selectAll('path').data(ILLUSTRATOR.selectedIDs);
     selectionRect.enter().append('path')
         .attr('fill', 'none')
         .attr('stroke-width', '5px')
@@ -212,6 +225,7 @@ DomManager.prototype.updateSelectionLayer = function () {
         });
 };
 DomManager.prototype.unifySvgTags = function (svgNode) {
+    "use strict";
     var self = this,
         newId = svgNode.getAttribute('id'),
         svg,
@@ -234,7 +248,7 @@ DomManager.prototype.unifySvgTags = function (svgNode) {
     bounds = svgNode.getBoundingClientRect();
     
     // Create the artboard and group elements
-    artboard = jQuery(document.createElementNS('http://www.w3.org/2000/svg','path'));
+    artboard = jQuery(document.createElementNS('http://www.w3.org/2000/svg', 'path'));
     artboard.attr({
         'class' : 'artboard',
         'fill' : '#fff',
@@ -245,7 +259,7 @@ DomManager.prototype.unifySvgTags = function (svgNode) {
               'L' + bounds.right + ',' + bounds.bottom +
               'L' + bounds.left + ',' + bounds.bottom + 'Z'
     });
-    groupNode = document.createElementNS('http://www.w3.org/2000/svg','g');
+    groupNode = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     group = jQuery(groupNode);
     group.attr({
         'transform' : 'translate(' + bounds.left + ',' + bounds.top + ')'
@@ -299,10 +313,11 @@ DomManager.prototype.unifySvgTags = function (svgNode) {
 DomManager.SHORTHAND_REGEX = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
 DomManager.HEX_PARSING_REGEX = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i;
 DomManager.prototype.color = function (s) {
+    "use strict";
     if (s[0] === '#') {
         // Stolen from http://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
         // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
-        s = s.replace(DomManager.SHORTHAND_REGEX, function(m, r, g, b) {
+        s = s.replace(DomManager.SHORTHAND_REGEX, function (m, r, g, b) {
             s = r + r + g + g + b + b;
         });
         
@@ -311,12 +326,13 @@ DomManager.prototype.color = function (s) {
                      parseInt(result[2], 16) + ', ' +
                      parseInt(result[3], 16) + ')';
     }
-    if (s !== 'none' && s.substring(0,4) !== 'rgb(') {
+    if (s !== 'none' && s.substring(0, 4) !== 'rgb(') {
         throw "Unsupported color: " + s;
     }
     return s;
 };
 DomManager.prototype.enforceUniqueIds = function (e) {
+    "use strict";
     var self = this,
         id,
         newId,
@@ -348,9 +364,14 @@ DomManager.prototype.enforceUniqueIds = function (e) {
 };
 DomManager.PATH_SPLITTER = new RegExp('[MmZzLlHhVvCcSsQqTtAa]', 'g');
 DomManager.prototype.extractPath = function (g, z) {
+    "use strict";
     var self = this,
-        d = g.getAttribute('d');
+        d = g.getAttribute('d'),
         computedStyle = window.getComputedStyle(g),
+        currentSegment,
+        lastParams,
+        nextParams,
+        i,
         output = {
             itemType : 'path',
             name : g.getAttribute('id'),
@@ -376,10 +397,8 @@ DomManager.prototype.extractPath = function (g, z) {
     // standardize() puts spaces around commands, and delimits parameters by single commas...
     d = d !== null ? d.split(' ') : [];
     
-    var currentSegment = null,
-        lastParams,
-        nextParams,
-        i = 0;
+    currentSegment = null;
+    i = 0;
     while (i < d.length) {
         if (d[i] === 'Z') {
             // End of a segment; nuke the last cubic anchor (standardize() guarantees it will be the same anchor as
@@ -393,7 +412,7 @@ DomManager.prototype.extractPath = function (g, z) {
             if (currentSegment !== null) {
                 output.segments.push(currentSegment);
             }
-            nextParams = d[i+1].split(',');
+            nextParams = d[i + 1].split(',');
             nextParams[0] = Number(nextParams[0]);
             nextParams[1] = -Number(nextParams[1]);
             
@@ -408,7 +427,7 @@ DomManager.prototype.extractPath = function (g, z) {
             i += 2;
         } else if (d[i] === 'C') {
             // Normal segment
-            nextParams = d[i+1].split(',');
+            nextParams = d[i + 1].split(',');
             nextParams[0] = Number(nextParams[0]);
             nextParams[1] = -Number(nextParams[1]);
             nextParams[2] = Number(nextParams[2]);
@@ -416,7 +435,7 @@ DomManager.prototype.extractPath = function (g, z) {
             nextParams[4] = Number(nextParams[4]);
             nextParams[5] = -Number(nextParams[5]);
             currentSegment.points[currentSegment.points.length - 1].
-                rightDirection = [nextParams[0],nextParams[1]];
+                rightDirection = [nextParams[0], nextParams[1]];
             currentSegment.points.push({
                 anchor : [nextParams[4], nextParams[5]],
                 leftDirection : [nextParams[2], nextParams[3]],
@@ -424,7 +443,7 @@ DomManager.prototype.extractPath = function (g, z) {
             });
             i += 2;
         } else {
-            console.warn(i,d,d[i]);
+            console.warn(i, d, d[i]);
             throw "Bad d string";
         }
         lastParams = nextParams;
@@ -435,6 +454,7 @@ DomManager.prototype.extractPath = function (g, z) {
     return output;
 };
 DomManager.prototype.extractText = function (t, z) {
+    "use strict";
     var self = this,
         computedStyle = window.getComputedStyle(t),
         output = {
@@ -485,6 +505,7 @@ DomManager.prototype.extractText = function (t, z) {
     return output;
 };
 DomManager.prototype.extractGroup = function (g, z, iType) {
+    "use strict";
     var self = this,
         output = {
             itemType : iType,
@@ -521,8 +542,9 @@ DomManager.prototype.extractGroup = function (g, z, iType) {
     return output;
 };
 DomManager.prototype.standardize = function () {
+    "use strict";
     var self = this,
-        currentZoom = jQuery('#' + self.docName).css('zoom');    
+        currentZoom = jQuery('#' + self.docName).css('zoom');
     
     self.lastNameLookup = self.nameLookup;
     self.nameLookup = {};
@@ -537,6 +559,7 @@ DomManager.prototype.standardize = function () {
     jQuery('#' + self.docName).css('zoom', currentZoom);
 };
 DomManager.prototype.extractDocument = function () {
+    "use strict";
     var self = this,
         output = {
             itemType : 'document',
@@ -547,7 +570,8 @@ DomManager.prototype.extractDocument = function () {
         },
         s,
         z = 1,
-        temp;
+        temp,
+        a;
     
     self.standardize();
     
@@ -582,6 +606,7 @@ DomManager.prototype.extractDocument = function () {
     return output;
 };
 DomManager.prototype.domToDoc = function () {
+    "use strict";
     // Throw away all the selection rectangles
     var self = this;
     jQuery('#hanpuku_selectionLayer').remove();
@@ -594,9 +619,15 @@ DomManager.prototype.domToDoc = function () {
  *
  **/
 DomManager.prototype.docToDom = function () {
+    "use strict";
     var self = this;
     
     ILLUSTRATOR.runJSX(null, 'scripts/docToDom.jsx', function (result) {
+        var svg,
+            artboards,
+            l,
+            temp;
+        
         if (result === "Isolation Mode Error") {
             EXTENSION.displayMessage('<p style="color:#f00;">Can\'t operate in Isolation Mode (an Illustrator bug)</p>');
             result = null;
@@ -621,10 +652,10 @@ DomManager.prototype.docToDom = function () {
             self.viewBounds.height = self.viewBounds.bottom - self.viewBounds.top;
             
             d3.select('body')
-                .style('margin','0')
+                .style('margin', '0')
                 .style('background-color', EXTENSION.bodyColor);
             
-            var svg = d3.select('body').append('svg')
+            svg = d3.select('body').append('svg')
                 .attr('id', result.name)
                 .attr('width', self.viewBounds.width)
                 .attr('height', self.viewBounds.height)
@@ -633,20 +664,19 @@ DomManager.prototype.docToDom = function () {
                 .attr('zoom', '100%');
             
             // Add the artboards
-            var artboards = svg.selectAll('.artboard').data(result.artboards);
+            artboards = svg.selectAll('.artboard').data(result.artboards);
             artboards.enter().append('rect')
-                .attr('class','artboard');
-            artboards.attr('id',phrogz('name'))
-                .attr('x',function (d) { return d.rect[0]; })
-                .attr('y',function (d) { return d.rect[1]; })
-                .attr('width',function (d) { return d.rect[2] - d.rect[0]; })
-                .attr('height',function (d) { return d.rect[3] - d.rect[1]; })
-                .attr('fill','#fff')
+                .attr('class', 'artboard');
+            artboards.attr('id', phrogz('name'))
+                .attr('x', function (d) { return d.rect[0]; })
+                .attr('y', function (d) { return d.rect[1]; })
+                .attr('width', function (d) { return d.rect[2] - d.rect[0]; })
+                .attr('height', function (d) { return d.rect[3] - d.rect[1]; })
+                .attr('fill', '#fff')
                 .attr('stroke-width', 1)
-                .attr('stroke','#000');
+                .attr('stroke', '#000');
             
             // Add the layers (just groups)
-            var l;
             result.layers = result.layers.sort(phrogz('zIndex'));
             for (l = 0; l < result.layers.length; l += 1) {
                 self.addGroup(svg, result.layers[l]);
@@ -662,10 +692,9 @@ DomManager.prototype.docToDom = function () {
             
             self.standardize();
             
-            var temp;
             jQuery('svg g, svg path, svg text').each(function () {
                 if (this.hasAttribute('hanpuku_reverseTransform')) {
-                    this.setAttribute('transform',this.getAttribute('hanpuku_reverseTransform'));
+                    this.setAttribute('transform', this.getAttribute('hanpuku_reverseTransform'));
                 }
                 
                 // In addition to switching transform tags, we want to get as
@@ -720,9 +749,11 @@ DomManager.prototype.docToDom = function () {
     });
 };
 DomManager.prototype.extractPathString = function (segments) {
+    "use strict";
     var p,
         point,
-        d = "";
+        d = "",
+        s;
     
     for (s = 0; s < segments.length; s += 1) {
         point = segments[s].points[0];
@@ -731,14 +762,14 @@ DomManager.prototype.extractPathString = function (segments) {
         for (p = 1; p < segments[s].points.length; p += 1) {
             point = segments[s].points[p];
             
-            d += " C " + segments[s].points[p-1].rightDirection[0] + "," +
-                       segments[s].points[p-1].rightDirection[1] + "," +
+            d += " C " + segments[s].points[p - 1].rightDirection[0] + "," +
+                       segments[s].points[p - 1].rightDirection[1] + "," +
                        point.leftDirection[0] + "," + point.leftDirection[1] + "," +
                        point.anchor[0] + "," + point.anchor[1];
         }
         if (segments[s].closed === true) {
-            d += " C " + segments[s].points[segments[s].points.length-1].rightDirection[0] + "," +
-                       segments[s].points[segments[s].points.length-1].rightDirection[1] + "," +
+            d += " C " + segments[s].points[segments[s].points.length - 1].rightDirection[0] + "," +
+                       segments[s].points[segments[s].points.length - 1].rightDirection[1] + "," +
                        segments[s].points[0].leftDirection[0] + "," +
                        segments[s].points[0].leftDirection[1] + "," +
                        segments[s].points[0].anchor[0] + "," +
@@ -750,14 +781,15 @@ DomManager.prototype.extractPathString = function (segments) {
     return d;
 };
 DomManager.prototype.addPath = function (parent, path) {
+    "use strict";
     var self = this,
         p = parent.append('path')
-        .attr('id', path.name)
-        .attr('d', self.extractPathString(path.segments))
-        .style('fill', path.fill)
-        .style('stroke', path.stroke)
-        .style('stroke-width', path.strokeWidth)
-        .style('opacity', path.opacity);
+            .attr('id', path.name)
+            .attr('d', self.extractPathString(path.segments))
+            .style('fill', path.fill)
+            .style('stroke', path.stroke)
+            .style('stroke-width', path.strokeWidth)
+            .style('opacity', path.opacity);
     if (path.classNames !== "null") {
         p.attr('class', path.classNames);
     }
@@ -767,11 +799,15 @@ DomManager.prototype.addPath = function (parent, path) {
     d3.select('#' + path.name).datum(JsonCircular.parse(JSON.parse(path.data)));
 };
 DomManager.prototype.addText = function (parent, text) {
+    "use strict";
     var t = parent.append('text')
         .attr('id', text.name)
         .text(text.contents),   // I deliberately don't support SVG line breaks (the SVG will display improperly - see the documentation)
         temp,
-        diffMatrix;
+        diffMatrix,
+        sinTheta,
+        cosTheta,
+        container;
     
     // Justification
     if (text.justification === 'LEFT') {
@@ -786,7 +822,7 @@ DomManager.prototype.addText = function (parent, text) {
     
     // Font properties
     t.style('font-size', text.fontSize)
-     .style('font-family', text.fontFamily);
+        .style('font-family', text.fontFamily);
     
     if (text.classNames !== 'null') {
         t.attr('class', text.classNames);
@@ -802,10 +838,10 @@ DomManager.prototype.addText = function (parent, text) {
         // This is a new item! Just use the absolute coordinates
         sinTheta = Math.sin(text.theta_1);
         cosTheta = Math.cos(text.theta_1);
-        diffMatrix = [text.scale_x_1*cosTheta,
-                      -text.scale_y_1*sinTheta,
-                      text.scale_x_1*sinTheta,
-                      text.scale_y_1*cosTheta,
+        diffMatrix = [text.scale_x_1 * cosTheta,
+                      -text.scale_y_1 * sinTheta,
+                      text.scale_x_1 * sinTheta,
+                      text.scale_y_1 * cosTheta,
                       text.x_1,
                       -text.y_1];
         t.attr('hanpuku_postTransform', 'matrix(' + diffMatrix.join(',') + ')');
@@ -816,10 +852,10 @@ DomManager.prototype.addText = function (parent, text) {
         
         sinTheta = Math.sin(text.theta_1 - text.theta_0);
         cosTheta = Math.cos(text.theta_1 - text.theta_0);
-        diffMatrix = [text.scale_x_1*cosTheta/text.scale_x_0,
-                      -text.scale_y_1*sinTheta/text.scale_y_0,
-                      text.scale_x_1*sinTheta/text.scale_x_0,
-                      text.scale_y_1*cosTheta/text.scale_y_0,
+        diffMatrix = [text.scale_x_1 * cosTheta / text.scale_x_0,
+                      -text.scale_y_1 * sinTheta / text.scale_y_0,
+                      text.scale_x_1 * sinTheta / text.scale_x_0,
+                      text.scale_y_1 * cosTheta / text.scale_y_0,
                       text.x_1 - text.x_0,
                       text.y_0 - text.y_1];
         
@@ -828,8 +864,8 @@ DomManager.prototype.addText = function (parent, text) {
         // we need to factor them out before applying
         // any changes (as we're re-applying the x
         // and y in their original locations)
-        temp = hanpuku.matMultiply([1,0,0,1,Number(text.internalX),Number(text.internalY)], diffMatrix);
-        temp = hanpuku.matMultiply(temp, [1,0,0,1,-Number(text.internalX),-Number(text.internalY)]);
+        temp = hanpuku.matMultiply([1, 0, 0, 1, Number(text.internalX), Number(text.internalY)], diffMatrix);
+        temp = hanpuku.matMultiply(temp, [1, 0, 0, 1, -Number(text.internalX), -Number(text.internalY)]);
         t.attr('hanpuku_postTransform', 'matrix(' + temp.join(',') + ')');
     }
     
@@ -856,9 +892,10 @@ DomManager.prototype.addText = function (parent, text) {
     container.datum(JsonCircular.parse(JSON.parse(text.data)));
 };
 DomManager.prototype.addGroup = function (parent, group) {
+    "use strict";
     var self = this,
         g = parent.append('g')
-        .attr('id', group.name),
+            .attr('id', group.name),
         c,
         p,
         t;

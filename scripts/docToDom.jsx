@@ -1,10 +1,12 @@
+/*globals console, Justification, Transformation, TextType, app*/
 (function () {
+    "use strict";
     var alertedUnsupported = false,
         reservedNames = {   // All IDs in the panel are reserved, we include the empty
             "" : true       // string so that elements with no name will be given one
         },
         alphabetic = new RegExp('[A-Za-z]', 'g'),
-        invalid = new RegExp('[^A-Za-z0-9-_]','g');
+        invalid = new RegExp('[^A-Za-z0-9-_]', 'g');
     
     function getTag(item, name) {
         try {
@@ -97,13 +99,12 @@
             //                        color.black + ')';
         } else if (color.typename === 'NoColor') {
             return 'none';
-        } else if (color.typename === 'SpotColor') {
-            
         } else {
             if (alertedUnsupported === false) {
                 console.logError({
                     'message' : 'hanpuku does not yet support ' + color.typename,
-                    'line' : 70});
+                    'line' : 70
+                });
                 alertedUnsupported = true;
             }
             return 'rgb(0,0,0)';
@@ -113,7 +114,7 @@
     function extractZPosition(e) {
         try {
             return e.zOrderPosition;
-        } catch (e) {
+        } catch (e1) {
             // TODO: there's a bug in Illustrator that causes an Internal error
             // if you attempt to get the zOrderPosition of an object inside a group
             return 100;
@@ -145,7 +146,7 @@
         return result;
     }
     
-    function extractPath (p) {
+    function extractPath(p) {
         var output = {
             itemType : 'path',
             name : p.name,
@@ -163,21 +164,21 @@
         return output;
     }
     
-    function extractCompoundPath (p) {
+    function extractCompoundPath(p) {
         var s,
             output = {
-            itemType : 'path',
-            name : p.name,
-            fill : extractColor(p.pathItems[0], 'fillColor'),
-            stroke : extractColor(p.pathItems[0], 'strokeColor'),
-            strokeWidth : p.pathItems[0].strokeWidth,
-            opacity : p.pathItems[0].opacity / 100,
-            segments : [],
-            data : getTag(p, 'hanpuku_data'),
-            classNames : getTag(p, 'hanpuku_classNames'),
-            reverseTransform : getTag(p, 'hanpuku_reverseTransform'),
-            zIndex : extractZPosition(p)
-        };
+                itemType : 'path',
+                name : p.name,
+                fill : extractColor(p.pathItems[0], 'fillColor'),
+                stroke : extractColor(p.pathItems[0], 'strokeColor'),
+                strokeWidth : p.pathItems[0].strokeWidth,
+                opacity : p.pathItems[0].opacity / 100,
+                segments : [],
+                data : getTag(p, 'hanpuku_data'),
+                classNames : getTag(p, 'hanpuku_classNames'),
+                reverseTransform : getTag(p, 'hanpuku_reverseTransform'),
+                zIndex : extractZPosition(p)
+            };
         
         for (s = 0; s < p.pathItems.length; s += 1) {
             output.segments.push(extractPathSegment(p.pathItems[s]));
@@ -188,6 +189,7 @@
     
     function extractText(t) {
         var temp,
+            currentShift,
             i,
             k,
             b,
@@ -244,7 +246,7 @@
             } catch (e) {
                 temp = 0;   // TODO: support auto, optical
             }
-            output.kerning.push(temp*1000 + 'em');
+            output.kerning.push(temp * 1000 + 'em');
             
             output.baselineShift.push((-t.characters[i].baselineShift - currentShift) + 'pt');
             currentShift = -t.characters[i].baselineShift;
@@ -266,11 +268,11 @@
             i -= 1;
         }
         
-        output.kerning.splice(k+1);
+        output.kerning.splice(k + 1);
         output.kerning = output.kerning.join(',');
-        output.baselineShift.splice(b+1);
+        output.baselineShift.splice(b + 1);
         output.baselineShift = output.baselineShift.join(',');
-        output.rotate.splice(r+1);
+        output.rotate.splice(r + 1);
         output.rotate = output.rotate.join(',');
         
         
@@ -279,10 +281,10 @@
         temp = t.parent.textFrames.add();
         
         if (output.x_0 === null) {
-            output.scale_x_0 = Math.sqrt(temp.matrix.mValueA*temp.matrix.mValueA +
-                            temp.matrix.mValueC*temp.matrix.mValueC);
-            output.scale_y_0 = Math.sqrt(temp.matrix.mValueB*temp.matrix.mValueB +
-                                temp.matrix.mValueD*temp.matrix.mValueD);
+            output.scale_x_0 = Math.sqrt(temp.matrix.mValueA * temp.matrix.mValueA +
+                                         temp.matrix.mValueC * temp.matrix.mValueC);
+            output.scale_y_0 = Math.sqrt(temp.matrix.mValueB * temp.matrix.mValueB +
+                                         temp.matrix.mValueD * temp.matrix.mValueD);
             output.theta_0 = Math.atan2(temp.matrix.mValueB, temp.matrix.mValueD);
             output.x_0 = temp.left;
             output.y_0 = temp.top;
@@ -295,14 +297,14 @@
             output.theta_0 = 0;
         }*/
         
-        scale_x = Math.sqrt(t.matrix.mValueA*t.matrix.mValueA +
-                            t.matrix.mValueC*t.matrix.mValueC);
-        scale_y = Math.sqrt(t.matrix.mValueB*t.matrix.mValueB +
-                            t.matrix.mValueD*t.matrix.mValueD);
+        scale_x = Math.sqrt(t.matrix.mValueA * t.matrix.mValueA +
+                            t.matrix.mValueC * t.matrix.mValueC);
+        scale_y = Math.sqrt(t.matrix.mValueB * t.matrix.mValueB +
+                            t.matrix.mValueD * t.matrix.mValueD);
         theta = Math.atan2(t.matrix.mValueB, t.matrix.mValueD);
         
-        temp.resize(scale_x*100, scale_y*100, true, true, true, true, true, Transformation.DOCUMENTORIGIN);
-        temp.rotate(theta*180/Math.PI, true, true, true, true, Transformation.DOCUMENTORIGIN);
+        temp.resize(scale_x * 100, scale_y * 100, true, true, true, true, true, Transformation.DOCUMENTORIGIN);
+        temp.rotate(theta * 180 / Math.PI, true, true, true, true, Transformation.DOCUMENTORIGIN);
         
         x = t.matrix.mValueTX - temp.matrix.mValueTX;
         y = t.matrix.mValueTY - temp.matrix.mValueTY;
@@ -333,7 +335,7 @@
         
         try {
             output.zIndex = g.zOrderPosition;
-        } catch(e) {
+        } catch (e) {
             // TODO: there's a bug in Illustrator that causes an Internal error
             // if you attempt to get the zOrderPosition of an object inside a group
             output.zIndex = 100;
@@ -364,13 +366,19 @@
     }
     
     function extractDocument() {
-        var output = null;
+        var output = null,
+            activeDoc,
+            newBoard,
+            left,
+            right,
+            top,
+            bottom,
+            a,
+            l,
+            s;
     
         if (app.documents.length > 0) {
-            var activeDoc = app.activeDocument,
-                newBoard,
-                left, right, top, bottom,
-                a, l, s;
+            activeDoc = app.activeDocument;
             
             if (activeDoc.activeLayer.name === 'Isolation Mode') {
                 return "Isolation Mode Error";
@@ -428,8 +436,8 @@
     
     try {
         console.setOutput(extractDocument());
-    } catch(e) {
+    } catch (e) {
         console.logError(e);
     }
     return console.jsonPacket();
-})();
+}());
