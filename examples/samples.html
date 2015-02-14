@@ -50,6 +50,10 @@
                     window.parent.DATA.loadSampleDataFile('examples/data/us.json');
                     window.parent.CODE.loadSampleJSFile('examples/scripts/areaChoropleth.js');
                     window.parent.CODE.loadSampleCSSFile('examples/style/areaChoropleth.css');
+                } else if (name === 'zoomableSunburst') {
+                    window.parent.DATA.loadSampleDataFile('examples/data/flare.json');
+                    window.parent.CODE.loadSampleJSFile('examples/scripts/zoomableSunburst.js');
+                    window.parent.CODE.loadSampleCSSFile('examples/style/zoomableSunburst.css');
                 }
             }
             
@@ -57,6 +61,7 @@
                     'scatterplot' : 'Scatterplot',
                     'groupedBars' : 'Grouped Bar Chart',
                     'basicTree' : 'Basic Tree',
+                    'zoomableSunburst' : 'Zoomable Sunburst',
                     'splom' : 'Scatterplot Matrix',
                     'force' : 'Force-directed graph',
                     'streamgraph2' : 'Streamgraph',
