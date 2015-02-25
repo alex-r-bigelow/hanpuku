@@ -1,9 +1,12 @@
 /*jslint evil:true*/
+/*globals jQuery, d3, ejQuery, ed3, ILLUSTRATOR, DATA, DOM, CODE, MAP, ExamplesManager, IllustratorConnection, DataManager, MappingManager, DomManager, CodeManager*/
+
 (function () {
     var extensionScope = this;
     
     function ExtensionManager() {
-        var self = this;
+        var self = this,
+            s;
         
         /**
         * First load up any libraries / scripts the extension needs.
@@ -11,7 +14,6 @@
         * the JS namespace isn't polluted with all my scripts
         * and libraries
         */
-        var s;
         window.module = undefined; // hack to get jQuery to load properly
         for (s = 0; s < ExtensionManager.EXTENSION_SCRIPTS.length; s += 1) {
             self.loadScript(ExtensionManager.EXTENSION_SCRIPTS[s]);
@@ -126,7 +128,7 @@
         xmlhttp.onreadystatechange = function () {
             if (xmlhttp.readyState === 4) {
                 if (xmlhttp.status === 200 || xmlhttp.status === 0) {
-                eval.apply(extensionScope, [xmlhttp.responseText]);
+                    eval.apply(extensionScope, [xmlhttp.responseText]);
                 } else {
                     throw new Error('Error ' + xmlhttp.status + ' loading library: ' + scriptName);
                 }
@@ -140,7 +142,11 @@
         var self = this,
             i = ILLUSTRATOR.connection.getHostEnvironment().appSkinInfo,
             background = i.panelBackgroundColor.color,
-            useWhite = (background.red + background.green + background.blue)/(3*255.0) <= 0.5;
+            useWhite = (background.red + background.green + background.blue) / (3 * 255.0) <= 0.5,
+            p,
+            panel,
+            v,
+            view;
         
         self.textColor = useWhite ? '#fff' : '#000';
         self.oppositeTextColor = useWhite ? '#000' : '#fff';
@@ -151,24 +157,24 @@
         self.backgroundColor = 'rgba(' + Math.floor(background.red) + ',' +
                                 Math.floor(background.green) + ',' +
                                 Math.floor(background.blue) + ',' +
-                                0.5*(background.alpha/255.0) + ')';
+                                0.5 * (background.alpha / 255.0) + ')';
         
         self.textBackgroundColor = 'rgba(' + Math.floor(background.red) + ',' +
                                             Math.floor(background.green) + ',' +
                                             Math.floor(background.blue) + ',' +
-                                            (background.alpha/255.0) + ')';
+                                            (background.alpha / 255.0) + ')';
         self.bodyColor = 'rgba(' + Math.floor(background.red) + ',' +
                                    Math.floor(background.green) + ',' +
                                    Math.floor(background.blue) + ',' +
-                                   0.75*(background.alpha/255.0) + ')';
+                                   0.75 * (background.alpha / 255.0) + ')';
         self.haloColor = 'rgba(' + (255 - Math.floor(background.red)) + ',' +
                                 (255 - Math.floor(background.green)) + ',' +
                                 (255 - Math.floor(background.blue)) + ',' +
-                                (background.alpha/255.0) + ')';
+                                (background.alpha / 255.0) + ')';
         self.buttonColor = 'rgba(' + Math.floor(background.red) + ',' +
                                     Math.floor(background.green) + ',' +
                                     Math.floor(background.blue) + ',' +
-                                    0.25*(background.alpha/255.0) + ')';
+                                    0.25 * (background.alpha / 255.0) + ')';
         
         // Apply the font and colors
         ejQuery('body').css('font-family', self.fontFamily)
@@ -185,7 +191,6 @@
         
         
         // Init the tab buttons
-        var p, panel, v, view;
         for (p in ExtensionManager.PANELS) {
             if (ExtensionManager.PANELS.hasOwnProperty(p)) {
                 panel = ExtensionManager.PANELS[p];
@@ -211,7 +216,8 @@
                 'html' : message,
                 'timer' : undefined
             },
-            mContents = "";
+            mContents = "",
+            i;
         
         self.messages.push(mobj);
         // Update the message area contents
@@ -265,7 +271,7 @@
             button.attr('class', null);
             button.css('color', self.oppositeTextColor);
             
-            oldTab = oldTab.substring(0,oldTab.length-12);
+            oldTab = oldTab.substring(0, oldTab.length - 12);
             for (v in ExtensionManager.PANELS[oldTab].views) {
                 if (ExtensionManager.PANELS[oldTab].views.hasOwnProperty(v)) {
                     ejQuery('#' + v).hide();
@@ -283,7 +289,7 @@
                 viewElement = ejQuery('#' + v);
                 
                 viewElement.show();
-                viewElement.css('position','absolute');
+                viewElement.css('position', 'absolute');
                 viewElement.css('left', view.bounds[0]);
                 viewElement.css('top', view.bounds[1]);
                 viewElement.css('right', view.bounds[2]);
@@ -377,4 +383,4 @@
         extensionScope.EXTENSION.debug();
         
     };
-})();
+}());

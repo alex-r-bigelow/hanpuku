@@ -39,6 +39,10 @@ function DomManager() {
     self.nameLookup = undefined;
     self.lastNameLookup = undefined;
     self.copyNumber = 0;
+    
+    self.animationFrame = null;
+    self.interval = null;
+    self.timeout = null;
 }
 DomManager.PADDING = 64;
 DomManager.DOM_LIBS = [
@@ -50,6 +54,13 @@ DomManager.DOM_LIBS = [
     'lib/hanpuku.js',
     'lib/phrogz.js'
 ];
+DomManager.NOOP = function () {
+    "use strict";
+};
+DomManager.COMPARE_Z = function (a, b) {
+    "use strict";
+    return a.zIndex - b.zIndex;
+};
 
 DomManager.getElementType = function (e) {
     "use strict";
@@ -166,12 +177,21 @@ DomManager.prototype.initScope = function () {
 DomManager.prototype.runScript = function (script, ignoreSelection) {
     "use strict";
     var self = this,
-        error;
+        error,
+        animationFrame,
+        timeout,
+        interval,
+        i;
     
     if (ignoreSelection !== true) {
         // remove our selection layer
         jQuery('#hanpuku_selectionLayer').remove();
     }
+    
+    // any "processes" created from this point need to be stopped before we standardize
+    self.animationFrame = window.requestAnimationFrame(DomManager.NOOP);
+    self.timeout = window.setTimeout(DomManager.NOOP);
+    self.interval = window.setInterval(DomManager.NOOP);
     
     // execute script in private context - not for security, but
     // for a cleaner scope that feels more like coding in a normal browser
@@ -527,6 +547,7 @@ DomManager.prototype.extractGroup = function (g, z, iType) {
         output.classNames = g.getAttribute('class') === null ? "" : g.getAttribute('class');
         output.reverseTransform = g.getAttribute('hanpuku_reverseTransform') === null ? "" : g.getAttribute('hanpuku_reverseTransform');
     }
+    
     for (s = 0; s < g.childNodes.length; s += 1) {
         if (g.childNodes[s].tagName === 'g') {
             output.groups.push(self.extractGroup(g.childNodes[s], z2, 'group'));
@@ -607,9 +628,32 @@ DomManager.prototype.extractDocument = function () {
 };
 DomManager.prototype.domToDoc = function () {
     "use strict";
+    var self = this,
+        i;
+    
+    // Need to clear out any "processes" that are running
+    if (self.animationFrame !== null) {
+        for (i = window.requestAnimationFrame(DomManager.NOOP); i > self.animationFrame; i -= 1) {
+            window.cancelAnimationFrame(i);
+        }
+    }
+    self.animationFrame = null;
+    if (self.interval !== null) {
+        for (i = window.setInterval(DomManager.NOOP); i > self.interval; i -= 1) {
+            window.clearInterval(i);
+        }
+    }
+    self.interval = null;
+    if (self.timeout !== null) {
+        for (i = window.setTimeout(DomManager.NOOP); i > self.timeout; i -= 1) {
+            window.clearTimeout(i);
+        }
+    }
+    self.timeout = null;
+    
     // Throw away all the selection rectangles
-    var self = this;
     jQuery('#hanpuku_selectionLayer').remove();
+    
     ILLUSTRATOR.runJSX(self.extractDocument(), 'scripts/domToDoc.jsx', function (result) {});
 };
 
@@ -629,7 +673,7 @@ DomManager.prototype.docToDom = function () {
             temp;
         
         if (result === "Isolation Mode Error") {
-            EXTENSION.displayMessage('<p style="color:#f00;">Can\'t operate in Isolation Mode (an Illustrator bug)</p>');
+            EXTENSION.displayMessage('<p style="color:#f00;">Hanpuku can\'t operate in Isolation Mode (an Illustrator bug)</p>');
             result = null;
         }
         if (result !== null) {
@@ -677,7 +721,7 @@ DomManager.prototype.docToDom = function () {
                 .attr('stroke', '#000');
             
             // Add the layers (just groups)
-            result.layers = result.layers.sort(phrogz('zIndex'));
+            result.layers = result.layers.sort(DomManager.COMPARE_Z);
             for (l = 0; l < result.layers.length; l += 1) {
                 self.addGroup(svg, result.layers[l]);
             }
@@ -896,6 +940,7 @@ DomManager.prototype.addGroup = function (parent, group) {
     var self = this,
         g = parent.append('g')
             .attr('id', group.name),
+        children = group.groups.concat(group.paths).concat(group.text).sort(DomManager.COMPARE_Z),
         c,
         p,
         t;
@@ -909,16 +954,19 @@ DomManager.prototype.addGroup = function (parent, group) {
         d3.select('#' + group.name).datum(JsonCircular.parse(JSON.parse(group.data)));
     }
     
-    group.groups = group.groups.sort(phrogz('zIndex'));
-    for (c = 0; c < group.groups.length; c += 1) {
-        self.addGroup(g, group.groups[c]);
-    }
-    group.paths = group.paths.sort(phrogz('zIndex'));
-    for (p = 0; p < group.paths.length; p += 1) {
-        self.addPath(g, group.paths[p]);
-    }
-    group.text = group.text.sort(phrogz('zIndex'));
-    for (t = 0; t < group.text.length; t += 1) {
-        self.addText(g, group.text[t]);
+    for (c = 0; c < children.length; c += 1) {
+        if (children[c].itemType === 'group') {
+            self.addGroup(g, children[c]);
+        } else if (children[c].itemType === 'path') {
+            self.addPath(g, children[c]);
+            if (children[c].name === 'Background' || children[c].name === 'L' || children[c].name === 'C') {
+                console.log(c, children[c]);
+            }
+        } else if (children[c].itemType === 'text') {
+            self.addText(g, children[c]);
+        } else {
+            console.warn(children[c]);
+            throw "Unknown itemType: " + children[c];
+        }
     }
 };

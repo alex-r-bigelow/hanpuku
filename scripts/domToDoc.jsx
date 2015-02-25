@@ -39,11 +39,8 @@
         //FONT_LOOKUP[]
     //}
     
-    function phrogz(name) {
-        var v, params = Array.prototype.slice.call(arguments, 1);
-        return function (o) {
-            return (typeof (v = o[name]) === 'function' ? v.apply(o, params) : v);
-        };
+    function COMPARE_Z(a, b) {
+        return a.zIndex - b.zIndex;
     }
     
     function storeTag(item, name, value) {
@@ -204,14 +201,24 @@
     }
     
     function applyFillAndStroke(iItem, dItem) {
+        var color;
         if (dItem.fill === 'none') {
             iItem.filled = false;
         } else {
             iItem.filled = true;
             if (iItem.fillColor === undefined) {
                 iItem.fillColor = new RGBColor();
+                color = iItem.fillColor;
+            } else if (iItem.fillColor.typename === 'SpotColor') {
+                // TODO: I really should connect to the existing
+                // spot color if it hasn't changed:
+                //color = iItem.fillColor.spot.color;
+                iItem.fillColor = new RGBColor();
+                color = iItem.fillColor;
+            } else {
+                color = iItem.fillColor;
             }
-            applyColor(iItem.fillColor, dItem.fill);
+            applyColor(color, dItem.fill);
         }
         
         if (dItem.stroke === 'none') {
@@ -231,8 +238,17 @@
             
             if (iItem.strokeColor === undefined) {
                 iItem.strokeColor = new RGBColor();
+                color = iItem.strokeColor;
+            } else if (iItem.strokeColor.typename === 'SpotColor') {
+                // TODO: I really should connect to the existing
+                // spot color if it hasn't changed:
+                //color = iItem.strokeColor.spot.color;
+                iItem.strokeColor = new RGBColor();
+                color = iItem.strokeColor;
+            } else {
+                color = iItem.strokeColor;
             }
-            applyColor(iItem.strokeColor, dItem.stroke);
+            applyColor(color, dItem.stroke);
         }
         
         iItem.opacity = dItem.opacity * 100;
@@ -277,15 +293,21 @@
             segment;
         
         iCompPath.name = dCompPath.name;
-        if (iCompPath.pathItems !== undefined) {
-            // Because compound paths use the same settings across all
-            // child elements, I can simply start fresh - nothing should
-            // get nuked by doing this
-            iCompPath.pathItems.removeAll();
-        }
+        // I can be cavalier about not matching the appropriate
+        // segments, because attributes are shared across all segments
         for (i = 0; i < dCompPath.segments.length; i += 1) {
-            segment = iCompPath.pathItems.add();
+            if (iCompPath.pathItems.length > i) {
+                // Just reuse the pathItem if it exists
+                segment = iCompPath.pathItems[i];
+            } else {
+                // Otherwise create a new one
+                segment = iCompPath.pathItems.add();
+            }
             setPathPoints(segment, dCompPath.segments[i]);
+        }
+        for (i = iCompPath.pathItems.length - 1; i >= dCompPath.segments.length; i -= 1) {
+            // Clean up any leftover pathItems
+            iCompPath.pathItems[i].remove();
         }
         
         // The compound path doesn't possess any visual styles of its own;
@@ -393,8 +415,8 @@
     }
     
     function applyGroup(iGroup, dGroup) {
-        //var itemOrder = dGroup.groups.concat(dGroup.paths, dGroup.text).sort(phrogz('zIndex')),
-        var itemOrder = dGroup.groups.concat(dGroup.paths).concat(dGroup.text).sort(phrogz('zIndex')),
+        //var itemOrder = dGroup.groups.concat(dGroup.paths, dGroup.text).sort(COMPARE_Z),
+        var itemOrder = dGroup.groups.concat(dGroup.paths).concat(dGroup.text).sort(COMPARE_Z),
             i,
             newItem;
         
@@ -473,15 +495,15 @@
         }
         
         // Modify / add needed layers in order
-        doc.layers = doc.layers.sort(phrogz('zIndex'));
+        doc.layers = doc.layers.sort(COMPARE_Z);
         for (l = 0; l < doc.layers.length; l += 1) {
             try {
                 layer = activeDoc.layers.getByName(doc.layers[l].name);
             } catch (e2) {
                 layer = activeDoc.layers.add();
             }
-            layer.zOrder(ZOrderMethod.BRINGTOFRONT);
             applyGroup(layer, doc.layers[l]);
+            layer.zOrder(ZOrderMethod.BRINGTOFRONT);
         }
         
         // Remove any elements that were explicitly deleted in the DOM

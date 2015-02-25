@@ -39,6 +39,7 @@
 - Circular data in the Data preview (visualize cycles)
 - Fix Selection overlay bug
 - Inconsistent z-index sorting bug
+- Don't change spot colors
 - New Illustrator text position (there's no M_0...)
 - Double-apply text position bug (probably not just text!)
 - Support arcs

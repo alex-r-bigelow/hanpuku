@@ -35,7 +35,8 @@ d3.json("miserables.json", function(error, graph) {
   var node = nodeLayer.selectAll(".node")
       .data(graph.nodes, function (d) { return d.name; });
   var nodeEnter = node.enter().append("g")
-      .attr("class", "node");
+      .attr("class", "node")
+      .attr("id", function(d) { return d.name; });
   nodeEnter.append('circle').attr("r", 5)
       .style("fill", function(d) { return color(d.group); });
   node.call(force.drag);

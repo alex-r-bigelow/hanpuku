@@ -63,8 +63,6 @@
         // device-cmyk(c,m,y,k) to the SVG element's style
         // with an rgb backup. For now, I stupidly convert
         // everything to RGB
-        // TODO: Figure out the semantics of SpotColor and
-        // why it's different
         if (attr === 'fillColor' && e.filled === false) {
             return 'none';
         } else if (attr === 'strokeColor' && e.stroked === false) {
@@ -113,11 +111,13 @@
     
     function extractZPosition(e) {
         try {
-            return e.zOrderPosition;
+            return e.absoluteZOrderPosition;
         } catch (e1) {
-            // TODO: there's a bug in Illustrator that causes an Internal error
-            // if you attempt to get the zOrderPosition of an object inside a group
-            return 100;
+            try {
+                return e.zOrderPosition;
+            } catch (e2) {
+                return 1;
+            }
         }
     }
     
@@ -280,23 +280,6 @@
         // matrix property
         temp = t.parent.textFrames.add();
         
-        if (output.x_0 === null) {
-            output.scale_x_0 = Math.sqrt(temp.matrix.mValueA * temp.matrix.mValueA +
-                                         temp.matrix.mValueC * temp.matrix.mValueC);
-            output.scale_y_0 = Math.sqrt(temp.matrix.mValueB * temp.matrix.mValueB +
-                                         temp.matrix.mValueD * temp.matrix.mValueD);
-            output.theta_0 = Math.atan2(temp.matrix.mValueB, temp.matrix.mValueD);
-            output.x_0 = temp.left;
-            output.y_0 = temp.top;
-        }
-        /*if (output.x_0 === null) {
-            output.x_0 = 0;
-            output.y_0 = 0;
-            output.scale_x_0 = 1;
-            output.scale_y_0 = 1;
-            output.theta_0 = 0;
-        }*/
-        
         scale_x = Math.sqrt(t.matrix.mValueA * t.matrix.mValueA +
                             t.matrix.mValueC * t.matrix.mValueC);
         scale_y = Math.sqrt(t.matrix.mValueB * t.matrix.mValueB +
@@ -327,19 +310,12 @@
             name : g.name,
             groups : [],
             paths : [],
-            text : []
+            text : [],
+            zIndex : extractZPosition(g)
         },
             s,
             p,
             t;
-        
-        try {
-            output.zIndex = g.zOrderPosition;
-        } catch (e) {
-            // TODO: there's a bug in Illustrator that causes an Internal error
-            // if you attempt to get the zOrderPosition of an object inside a group
-            output.zIndex = 100;
-        }
         
         if (iType === 'group') {
             output.data = getTag(g, 'hanpuku_data');
