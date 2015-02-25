@@ -5,8 +5,9 @@
         reservedNames = {   // All IDs in the panel are reserved, we include the empty
             "" : true       // string so that elements with no name will be given one
         },
-        alphabetic = new RegExp('[A-Za-z]', 'g'),
+        alphabetic = new RegExp('[A-Za-z]'),
         invalid = new RegExp('[^A-Za-z0-9-_]', 'g');
+    // Technically, HTML ids are pretty permissive, however, jQuery chokes on periods and colons
     
     function getTag(item, name) {
         try {
@@ -30,16 +31,19 @@
                 // Make sure item names begin with [A-Za-z] and contain only [A-Za-z0-9\-\_]
                 // (jQuery / old DOM restrictions), and are unique (case-insensitive)
                 oldName = items[i].name;
+                
+                // Enforce strict rules about valid characters (for jQuery's sake)
                 name = oldName.replace(invalid, '_');
                 if (name.length === 0) {
                     name = items[i].constructor.name;
-                } else if (alphabetic.test(name[0]) !== true) {
+                } else if (alphabetic.test(name.charAt(0)) !== true) {
+                    // HTML ids must start with an alphabetic
                     name = items[i].constructor.name + '_' + name;
                 }
                 
                 newName = name;
                 while (reservedNames.hasOwnProperty(newName) || nameLookup.hasOwnProperty(newName)) {
-                    newName = name + freeId;
+                    newName = name + '_' + freeId;
                     freeId += 1;
                 }
                 items[i].name = newName;
@@ -308,6 +312,7 @@
         var output = {
             itemType : iType,
             name : g.name,
+            opacity : g.opacity / 100,
             groups : [],
             paths : [],
             text : [],

@@ -61,6 +61,9 @@ DomManager.COMPARE_Z = function (a, b) {
     "use strict";
     return a.zIndex - b.zIndex;
 };
+DomManager.ALPHABETIC = new RegExp('[A-Za-z]');
+DomManager.INVALID = new RegExp('[^A-Za-z0-9-_]', 'g');
+// Technically, HTML ids are pretty permissive, however, jQuery chokes on periods and colons
 
 DomManager.getElementType = function (e) {
     "use strict";
@@ -197,7 +200,7 @@ DomManager.prototype.runScript = function (script, ignoreSelection) {
     // for a cleaner scope that feels more like coding in a normal browser
     error = (new Function("try{ with(this) { " + script +
                 "} } catch(e) { console.warn(e.stack); var temp = e.stack.split('\\n'); " +
-                "return [temp[0], temp[1].split(':')[2]]; } return null;")).call(self.iframeScope);
+                "return [temp[0], temp[1].split(':')[4]]; } return null;")).call(self.iframeScope);
     if (error !== null) {
         EXTENSION.displayMessage('<p style="color:#f00;">' + error[0] + ' on line ' + error[1] + '</p>');
         return false;
@@ -363,10 +366,17 @@ DomManager.prototype.enforceUniqueIds = function (e) {
     if (id === null) {
         id = e.tagName;
     }
+    if (DomManager.ALPHABETIC.test(id.charAt(0)) !== true) {
+        // HTML ids must start with an alphabetic
+        id = e.tagName + '_' + id;
+    }
+    // Enforce strict rules about valid characters (for jQuery's sake)
+    id = id.replace(DomManager.INVALID, '_');
+    
     newId = id;
     
     while (self.nameLookup.hasOwnProperty(newId)) {
-        newId = id + self.copyNumber;
+        newId = id + '_' + self.copyNumber;
         self.copyNumber += 1;
     }
     e.setAttribute('id', newId);
@@ -527,16 +537,19 @@ DomManager.prototype.extractText = function (t, z) {
 DomManager.prototype.extractGroup = function (g, z, iType) {
     "use strict";
     var self = this,
+        computedStyle = window.getComputedStyle(g),
         output = {
             itemType : iType,
             name : g.getAttribute('id'),
             zIndex : z,
             groups : [],
             paths : [],
-            text : []
+            text : [],
+            opacity : parseFloat(computedStyle.opacity)
         },
         s,
         z2 = 1;
+    output.opacity = isNaN(output.opacity) ? 1 : output.opacity;
     
     if (iType === 'group') {
         output.data = d3.select('#' + g.getAttribute('id')).data()[0];
@@ -939,7 +952,8 @@ DomManager.prototype.addGroup = function (parent, group) {
     "use strict";
     var self = this,
         g = parent.append('g')
-            .attr('id', group.name),
+            .attr('id', group.name)
+            .style('opacity', group.opacity),
         children = group.groups.concat(group.paths).concat(group.text).sort(DomManager.COMPARE_Z),
         c,
         p,
@@ -959,9 +973,6 @@ DomManager.prototype.addGroup = function (parent, group) {
             self.addGroup(g, children[c]);
         } else if (children[c].itemType === 'path') {
             self.addPath(g, children[c]);
-            if (children[c].name === 'Background' || children[c].name === 'L' || children[c].name === 'C') {
-                console.log(c, children[c]);
-            }
         } else if (children[c].itemType === 'text') {
             self.addText(g, children[c]);
         } else {

@@ -222,7 +222,7 @@
         }
         
         if (dItem.stroke === 'none') {
-            if (dItem.itemType === 'text') {
+            if (iItem.typename === 'TextFrame') {
                 iItem.strokeWeight = 0;
             } else {
                 iItem.strokeWidth = 0;
@@ -230,7 +230,7 @@
             iItem.stroked = false;
         } else {
             iItem.stroked = true;
-            if (dItem.itemType === 'text') {
+            if (iItem.typename === 'TextFrame') {
                 iItem.strokeWeight = dItem.strokeWidth;
             } else {
                 iItem.strokeWidth = dItem.strokeWidth;
@@ -421,6 +421,7 @@
             newItem;
         
         iGroup.name = dGroup.name;
+        iGroup.opacity = dGroup.opacity * 100;
         
         // Modify / add needed groups, paths, and text items in order
         for (i = 0; i < itemOrder.length; i += 1) {
