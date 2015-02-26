@@ -135,8 +135,6 @@
                 }
             }
             
-            console.log(fontFamily, base, stretch, fontStyle, fontWeight);
-            
             try {
                 iTextRange.textFont = app.textFonts.getByName(fontFamily);
                 foundFont = true;
