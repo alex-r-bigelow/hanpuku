@@ -10,6 +10,11 @@
             'layer' : 'layers',
             'artboard' : 'artboards'
         },
+        FONT_STRETCH = {
+            Condensed : ['Condensed', 'Cond', 'Cn'],
+            Regular : ['', 'Regular'],
+            Extended : ['Extended']
+        },
         FONT_WEIGHTS = {
             normal : [''],
             bold : ['Bold'],
@@ -27,10 +32,10 @@
         },
         FONT_STYLES = {
             'normal' : [''],
-            'italic' : ['Italic', 'Oblique'],
-            'oblique' : ['Oblique', 'Italic']
+            'italic' : ['Italic', 'Oblique', 'It'],
+            'oblique' : ['Oblique', 'Italic', 'It']
         },
-        warnedFonts = {},
+        fontLookup = {},
         i;
     // As app.textFonts.getByName() needs both the font family and
     // the style name, and as that call takes a long time anyway, let's precompute
@@ -54,8 +59,15 @@
             f,
             base,
             stretch,
-            foundFont = false,
-            fontFamily;
+            foundFont = null,
+            fontFamily,
+            lookupString = fontFamilies.join(', ');
+        if (fontStyle !== 'normal') {
+            lookupString += ' +override ' + fontStyle;
+        }
+        if (fontWeight !== 'normal') {
+            lookupString += ' +override ' + fontWeight;
+        }
         // TODO: This is non-trivial! Somehow need to find the closest named font...
         // app.textFonts.getByName('HelveticaNeue-UltraLightItalic'), or iterate
         // the array and check other properties (e.g.:
@@ -72,28 +84,45 @@
         // fontWeight on TOP of a weighted Adobe fontFamily, it will still override it
         // ... and dText.fontStretch actually doesn't.
         
+        if (fontLookup.hasOwnProperty(lookupString)) {
+            if (fontLookup[lookupString] !== null) {
+                iTextRange.textFont = fontLookup[lookupString];
+            }
+            return;
+        }
+        
         for (f = 0; f < fontFamilies.length; f += 1) {
-            fontFamily = fontFamilies[f];
+            fontFamily = fontFamilies[f].trim();
             
-            if (fontStyle !== 'normal' || fontWeight !== 'normal') {
-                // Okay, we need to find the base font family, and override ONLY
-                // the appropriate style/weight parts of the string
-                base = fontFamily.split('-')[0];
-                
-                // Figure out font-stretch (Chrome doesn't support the font-stretch css property,
-                // so we only use the font family string itself)
-                i = fontFamily.search('Condensed');
+            // Use adobe's defaults for generic browser font families
+            base = fontFamily.toLowerCase();
+            if (base === 'sans-serif') {
+                foundFont = app.textFonts.getByName('MyriadPro-Regular');
+                break;
+            } else if (base === 'serif') {
+                foundFont = app.textFonts.getByName('MinionPro-Regular');
+                break;
+            }
+            
+            // Figure out the actual base font name
+            base = fontFamily.split('-')[0].replace(/\s/, '');
+            
+            // Figure out font-stretch (Chrome doesn't support the font-stretch css property,
+            // so we only use the font family string itself)
+            i = fontFamily.search('Condensed');
+            if (i !== -1) {
+                stretch = fontFamily.substring(fontFamily.indexOf('-') + 1, i + 9);
+            } else {
+                i = fontFamily.search('Expanded');
                 if (i !== -1) {
-                    stretch = fontFamily.substring(fontFamily.indexOf('-') + 1, i + 9);
+                    stretch = fontFamily.substring(fontFamily.indexOf('-') + 1, i + 8);
                 } else {
-                    i = fontFamily.search('Expanded');
-                    if (i !== -1) {
-                        stretch = fontFamily.substring(fontFamily.indexOf('-') + 1, i + 8);
-                    } else {
-                        stretch = "";
-                    }
+                    stretch = "";
                 }
-                
+            }
+            
+            // Apply any overrides
+            if (fontStyle !== 'normal' || fontWeight !== 'normal') {
                 // Figure out fontStyle
                 if (fontStyle === 'normal') {
                     if (fontFamily.search('Italic') !== -1) {
@@ -120,33 +149,33 @@
                         fontWeight = FONT_WEIGHTS[fontWeight][0];
                     }
                 }
-                
-                fontFamily = base + '-' + stretch + fontWeight + fontStyle;
-                // If the overridden font name doesn't exist, just ignore them
-                // TODO: try to 
-                try {
-                    app.textFonts.getByName(fontFamily);
-                } catch (e) {
-                    if (warnedFonts.hasOwnProperty(fontFamily) === false) {
-                        warnedFonts[fontFamily] = true;
-                        console.log("Couldn't find font: " + fontFamily);
-                    }
-                    fontFamily = fontFamilies[f];
-                }
             }
             
+            // First try the most specific name we can
+            fontFamily = base + '-' + stretch + fontWeight + fontStyle;
+            // TODO: try out different variants of style names (use dicts at the beginning of the file)
+            // and different orders (sometimes stretch is last...?)
             try {
-                iTextRange.textFont = app.textFonts.getByName(fontFamily);
-                foundFont = true;
+                foundFont = app.textFonts.getByName(fontFamily);
                 break;
-            } catch (err) {}
+            } catch (e) {
+                // Okay, just try the base font name, and ignore the styles
+                try {
+                    foundFont = app.textFonts.getByName(base);
+                    break;
+                } catch (err) {
+                    // No luck... try the next item in the font stack
+                }
+            }
         }
         
-        fontFamily = fontFamilies.join(', ');
-        if (foundFont === false && warnedFonts.hasOwnProperty(fontFamily) === false) {
-            warnedFonts[fontFamily] = true;
-            console.log("Couldn't apply font stack: " + fontFamily);
+        if (foundFont === null) {
+            console.log("Couldn't resolve font stack: " + lookupString);
+        } else {
+            iTextRange.textFont = foundFont;
         }
+        
+        fontLookup[lookupString] = foundFont;
     }
     
     function applyColor(iC, dC) {
@@ -416,6 +445,7 @@
         //var itemOrder = dGroup.groups.concat(dGroup.paths, dGroup.text).sort(COMPARE_Z),
         var itemOrder = dGroup.groups.concat(dGroup.paths).concat(dGroup.text).sort(COMPARE_Z),
             i,
+            j,
             newItem;
         
         iGroup.name = dGroup.name;
@@ -430,6 +460,9 @@
                     newItem = iGroup.groupItems.add();
                 }
                 applyGroup(newItem, itemOrder[i]);
+                try {
+                    console.log('h', newItem.pathItems.getByName('V').strokeWidth);
+                } catch (tempeh) {}
             } else if (itemOrder[i].itemType === 'path') {
                 if (itemOrder[i].segments.length > 1) {
                     // This is a compound path
@@ -452,9 +485,20 @@
                         try {
                             // If this used to be a compound path, delete the old one
                             newItem = iGroup.compoundPathItems.getByName(itemOrder[i].name);
-                            newItem.remove();
-                        } catch (e5) {}
-                        newItem = iGroup.pathItems.add();
+                            // TODO: for some reason app.redraw() at the end of the script nukes
+                            // some of the changes to new pathItems (specifically, stroke weight)...
+                            // ideally, I should replace
+                            // the compoundPathItem with a regular pathItem instead of just using
+                            // the first one inside the compoundPathItem:
+                            //newItem.remove();
+                            
+                            for (j = 1; j < newItem.pathItems.length; j += 1) {
+                                newItem.pathItems[j].remove();
+                            }
+                            newItem = newItem.pathItems[0];
+                        } catch (e5) {
+                            newItem = iGroup.pathItems.add();
+                        }
                     }
                     applyPath(newItem, itemOrder[i]);
                 }
@@ -504,7 +548,6 @@
             applyGroup(layer, doc.layers[l]);
             layer.zOrder(ZOrderMethod.BRINGTOFRONT);
         }
-        
         // Remove any elements that were explicitly deleted in the DOM
         for (a = 0; a < doc.exit.length; a += 1) {
             try {

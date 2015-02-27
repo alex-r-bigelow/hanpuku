@@ -2,10 +2,11 @@
 
 #### Known bugs
 - Selection overlay bug
-- Links to Swatch colors lost
+- Links to Swatch colors are lost
 - New Illustrator text position (there's no M_0...)
 - Double-apply text position bug (probably not just text!)
 - Arc approximation irregularities
+- Duplicate path endpoints
 
 #### High priority
 - Font support

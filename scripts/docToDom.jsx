@@ -156,7 +156,6 @@
             name : p.name,
             fill : extractColor(p, 'fillColor'),
             stroke : extractColor(p, 'strokeColor'),
-            strokeWidth : p.strokeWidth,
             opacity : p.opacity / 100,
             segments : [extractPathSegment(p)],
             data : getTag(p, 'hanpuku_data'),
@@ -164,6 +163,8 @@
             reverseTransform : getTag(p, 'hanpuku_reverseTransform'),
             zIndex : extractZPosition(p)
         };
+        
+        output.strokeWidth = output.stroke === 'none' ? 0 : p.strokeWidth;
         
         return output;
     }
@@ -175,7 +176,6 @@
                 name : p.name,
                 fill : extractColor(p.pathItems[0], 'fillColor'),
                 stroke : extractColor(p.pathItems[0], 'strokeColor'),
-                strokeWidth : p.pathItems[0].strokeWidth,
                 opacity : p.pathItems[0].opacity / 100,
                 segments : [],
                 data : getTag(p, 'hanpuku_data'),
@@ -183,6 +183,8 @@
                 reverseTransform : getTag(p, 'hanpuku_reverseTransform'),
                 zIndex : extractZPosition(p)
             };
+        
+        output.strokeWidth = output.stroke === 'none' ? 0 : p.pathItems[0].strokeWidth;
         
         for (s = 0; s < p.pathItems.length; s += 1) {
             output.segments.push(extractPathSegment(p.pathItems[s]));
@@ -208,7 +210,6 @@
                 name : t.name,
                 fill : extractColor(t.textRange, 'fillColor'),
                 stroke : extractColor(t.textRange, 'strokeColor'),
-                strokeWidth : t.textRange.strokeWeight,
                 opacity : t.opacity / 100,
                 contents : t.contents,
                 data : getTag(t, 'hanpuku_data'),
@@ -225,6 +226,8 @@
                 fontSize : t.textRange.size,
                 fontFamily : t.textRange.textFont.name
             };
+        
+        output.strokeWidth = output.stroke === 'none' ? 0 : t.textRange.strokeWeight;
         
         // Extract justification
         if (output.contents.length === 0 || t.paragraphs[0].justification === Justification.LEFT) {

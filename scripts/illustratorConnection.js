@@ -1,4 +1,6 @@
-function IllustratorConnection () {
+/*globals CSInterface, console, ejQuery, DOM, d3, EXTENSION*/
+function IllustratorConnection() {
+    "use strict";
     var self = this;
     
     self.connection = new CSInterface();
@@ -14,6 +16,7 @@ IllustratorConnection.JSX_LIBS = [
 ];
 /* Tools to interact with extendScript */
 IllustratorConnection.prototype.loadJSXlibs = function () {
+    "use strict";
     var self = this,
         i = 0,
         successFunction = function (script) {
@@ -43,6 +46,7 @@ IllustratorConnection.prototype.loadJSXlibs = function () {
     });
 };
 IllustratorConnection.prototype.runJSX = function (input, path, callback) {
+    "use strict";
     var self = this,
         i;
     if (self.loadedJSXlibs === false) {
@@ -80,10 +84,12 @@ IllustratorConnection.prototype.runJSX = function (input, path, callback) {
     }
 };
 IllustratorConnection.prototype.openBrowser = function (url) {
+    "use strict";
     var self = this;
     self.connection.openURLInDefaultBrowser(url);
 };
 IllustratorConnection.prototype.init = function () {
+    "use strict";
     var self = this,
         updateFunc = function () { DOM.docToDom(); };
     //window.onfocus = updateFunc;
@@ -92,6 +98,7 @@ IllustratorConnection.prototype.init = function () {
     self.connection.addEventListener('documentAfterDeactivate', updateFunc);
 };
 IllustratorConnection.prototype.getD3selection = function () {
+    "use strict";
     var self = this;
     if (self.selectedIDs.length === 0) {
         return d3.select('givemeanemptyselection'); // definitely not a tag name...
@@ -100,6 +107,7 @@ IllustratorConnection.prototype.getD3selection = function () {
     }
 };
 IllustratorConnection.prototype.updateSelection = function (d3selection) {
+    "use strict";
     var self = this;
     self.selectedIDs = [];
     if (d3selection instanceof d3.selection) {
@@ -111,10 +119,12 @@ IllustratorConnection.prototype.updateSelection = function (d3selection) {
     }
 };
 IllustratorConnection.prototype.refresh = function () {
+    "use strict";
     DOM.docToDom();
     EXTENSION.notifyRefresh();
 };
 IllustratorConnection.prototype.apply = function () {
+    "use strict";
     DOM.domToDoc();
     DOM.docToDom();
 };

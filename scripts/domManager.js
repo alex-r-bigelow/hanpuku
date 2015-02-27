@@ -25,7 +25,7 @@ function DomManager() {
     element.setAttribute('type', 'text/css');
     element.setAttribute('id', 'illustratorFeel');
     self.iframe.contentDocument.head.appendChild(element);
-    element.innerText = "text { font-family: 'Myriad Pro'; font-size: 12px; }";
+    element.innerText = "text { font-family: 'Myriad Pro',sans-serif; font-size: 12px; }";
     
     // Give it a CSS header element for user-injected CSS:
     element = self.iframe.contentDocument.createElement('style');
