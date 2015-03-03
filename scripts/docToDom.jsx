@@ -2,6 +2,10 @@
 (function () {
     "use strict";
     var alertedUnsupported = false,
+        supportedTypeNames = {
+            'GroupItem' : true,
+            'PathItem' : true
+        },
         reservedNames = {   // All IDs in the panel are reserved, we include the empty
             "" : true       // string so that elements with no name will be given one
         },
@@ -84,15 +88,15 @@
         if (color.typename === 'RGBColor') {
             return 'rgb(' + color.red + ',' +
                             color.green + ',' +
-                            color.blue + ')';
+                            color.blue + ') /*hanpuku_untouched*/';
         } else if (color.typename === 'GrayColor') {
             return 'rgb(' + color.gray + ',' +
                             color.gray + ',' +
-                            color.gray + ')';
+                            color.gray + ') /*hanpuku_untouched*/';
         } else if (color.typename === 'CMYKColor') {
             return 'rgb(' + Math.floor(0.0255 * (100 - color.cyan) * (100 - color.black)) +
                       ',' + Math.floor(0.0255 * (100 - color.magenta) * (100 - color.black)) +
-                      ',' + Math.floor(0.0255 * (100 - color.yellow) * (100 - color.black)) + ')';
+                      ',' + Math.floor(0.0255 * (100 - color.yellow) * (100 - color.black)) + ') /*hanpuku_untouched*/';
             
             // TODO: switch to this once Chrome supports it
             //return 'device-cmyk(' + color.cyan + ',' +
@@ -105,12 +109,12 @@
             if (alertedUnsupported === false) {
                 // send a warning, but don't fail
                 console.logError({
-                    'message' : 'Hanpuku does not yet support ' + color.typename + '; unless overridden, it will be ignored.',
+                    'message' : 'Hanpuku does not yet support ' + color.typename + ' unless overridden, it will be ignored.',
                     'line' : 107
                 });
                 alertedUnsupported = true;
             }
-            return 'rgb(0,0,0); /* hanpuku_unsupported: ' + color.typename + '*/';
+            return 'rgb(0,0,0) /*hanpuku_unsupported:' + color.typename + '*/';
         }
     }
     
@@ -412,7 +416,10 @@
                 output.layers.push(extractGroup(activeDoc.layers[l], 'layer'));
             }
             for (s = 0; s < activeDoc.selection.length; s += 1) {
-                output.selection.push(activeDoc.selection[s].name);
+                // Only include compatible objects
+                if (supportedTypeNames.hasOwnProperty(activeDoc.selection[s].typename)) {
+                    output.selection.push(activeDoc.selection[s].name);
+                }
             }
         }
         

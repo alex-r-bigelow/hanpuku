@@ -1,12 +1,12 @@
 ### TODO:
 
 #### Known bugs
-- Selection overlay bug
-- Links to Swatch colors are lost
+- Links to Swatch colors are lost (need to do a true diff model on everything)
 - New Illustrator text position (there's no M_0...)
 - Double-apply text position bug (probably not just text!)
 - Arc approximation irregularities
 - Duplicate path endpoints
+- Need to turn off perspective grid temporarily (if it's on) in domToDoc
 
 #### High priority
 - Font support

@@ -170,9 +170,10 @@
         }
         
         if (foundFont === null) {
+            // Fail quietly
             console.logError({
                 message : "Hanpuku could not resolve CSS font stack: " + lookupString,
-                line : 172
+                line : 174
             });
         } else {
             iTextRange.textFont = foundFont;
@@ -183,11 +184,6 @@
     
     function applyColor(iC, dC) {
         var red, green, blue, black;
-        
-        if (dC.search('hanpuku_unsupported') !== -1) {
-            // don't touch colors we can't support
-            return;
-        }
         
         if (dC.split('(').length < 2) {
             console.warn("Bad color:" + String(dC));
@@ -200,9 +196,7 @@
         green = Number(dC[1]);
         blue = Number(dC[2]);
         black = 1;
-        if (iC === undefined) {
-            console.log(dC);
-        }
+        
         if (activeDoc.documentColorSpace === DocumentColorSpace.RGB) {
             iC.red = red;
             iC.green = green;

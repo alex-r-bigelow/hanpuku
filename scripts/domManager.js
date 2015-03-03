@@ -233,17 +233,25 @@ DomManager.prototype.updateSelectionLayer = function () {
     selectionRect = layer.selectAll('path').data(ILLUSTRATOR.selectedIDs);
     selectionRect.enter().append('path')
         .attr('fill', 'none')
-        .attr('stroke-width', '5px')
+        .attr('stroke-width', '1px')
         .attr('stroke', 'rgb(98,131,255)')
         .attr('d', function (d) {
             var bounds = self.iframe.contentDocument.getElementById(d).getBoundingClientRect();
             // I don't use getBBox() because we might be overlaying something inside a group
             // and the overlay paths need to be at the root level so we can add/remove them
-            // easily. That said, we need to account for the svg element's viewBounds
-            return "M" + (bounds.left + self.viewBounds.left) + "," + (bounds.top + self.viewBounds.top) +
-                   "L" + (bounds.right + self.viewBounds.left) + "," + (bounds.top + self.viewBounds.top) +
-                   "L" + (bounds.right + self.viewBounds.left) + "," + (bounds.bottom + self.viewBounds.top) +
-                   "L" + (bounds.left + self.viewBounds.left) + "," + (bounds.bottom + self.viewBounds.top) +
+            // easily. That said, we need to account for the svg element's viewBounds, as well as
+            // the iframe's scroll position
+            bounds = {
+                left : bounds.left + self.viewBounds.left + self.iframe.contentWindow.pageXOffset,
+                top : bounds.top + self.viewBounds.top + self.iframe.contentWindow.pageYOffset,
+                right : bounds.right + self.viewBounds.left + self.iframe.contentWindow.pageXOffset,
+                bottom : bounds.bottom + self.viewBounds.top + self.iframe.contentWindow.pageYOffset
+            };
+            
+            return "M" + (bounds.left) + "," + (bounds.top) +
+                   "L" + (bounds.right) + "," + (bounds.top) +
+                   "L" + (bounds.right) + "," + (bounds.bottom) +
+                   "L" + (bounds.left) + "," + (bounds.bottom) +
                    "Z";
         });
 };
@@ -675,7 +683,7 @@ DomManager.prototype.domToDoc = function () {
             } else {
                 throw error;
             }
-    });
+        });
 };
 
 /**

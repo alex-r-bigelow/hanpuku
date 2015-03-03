@@ -170,53 +170,6 @@
                     can still be added in the traditional way, but these may help make your code more update-friendly
                     after "Apply" has been clicked.</p>
                 </li>
-                <li><h3>Additional d3 Functions: Absolute Coordinates</h3><br/>
-                    <p>Illustrator only supports global coordinates (i.e. SVG-style nested transformations on
-                    various groups can not be used). This is very problematic for perhaps the majority of
-                    existing d3 code; nested transformations are used extensively. Hanpuku masks this process
-                    from its DOM; when refreshing the DOM from the existing document, old tranformation tags
-                    and local coordinates are reapplied where they previously existed.</p>
-                    <p>That said, some nuances can still exist, especially if you plan on manipulating
-                    drawn objects that did not previously have these attributes. To make hanpuku code more
-                    flexible to this, and to allow Illustrator-style edits with code,
-                    we have monkey-patched these functions onto d3 selections:</p>
-                    <ul>
-                        <li>
-                            <h4><code>d3.selection.setGlobalPosition(x, y, anchor);</code></h4>
-                            <p>Aligns every element in the current selection to the specified global x,y coordinates,
-                            where anchor is one of:
-                            <ul>
-                                <li>d3.ANCHORS.TOP_LEFT</li>
-                                <li>d3.ANCHORS.TOP_CENTER</li>
-                                <li>d3.ANCHORS.TOP_RIGHT</li>
-                                <li>d3.ANCHORS.MIDDLE_LEFT</li>
-                                <li>d3.ANCHORS.MIDDLE_CENTER</li>
-                                <li>d3.ANCHORS.MIDDLE_RIGHT</li>
-                                <li>d3.ANCHORS.BOTTOM_LEFT</li>
-                                <li>d3.ANCHORS.BOTTOM_CENTER</li>
-                                <li>d3.ANCHORS.BOTTOM_RIGHT</li>
-                            </ul></p>
-                        </li>
-                        <li>
-                            <h4><code>d3.selection.setGlobalBBox(x, y, width, height);</code></h4>
-                            <p>Scales and translates every element in the current selection to fit exactly
-                            in the specified rectangle (in global coordinates).</p>
-                        </li>
-                        <li>
-                            <h4><code>d3.selection.setGlobalTransform(m);</code></h4>
-                            <p>Applies a transformation matrix to every element in the selection AFTER first centering
-                            the element on the document's 0,0 coordinate. Its parameter, m, is a 6-element matrix in
-                            SVG order, e.g. a matrix that translates 5px in x and 10px in y would be [1,0,0,1,5,10].</p>
-                        </li>
-                        <li>
-                            <h4><code>d3.selection.standardize();</code></h4>
-                            <p>Makes the current selection immediately compatible with Illustrator; i.e. transform tags
-                            are applied AND all primitives are immediately converted to cubic-interpolated paths.</p>
-                        </li>
-                    </ul>
-                    <p>As with any d3 function, each parameter may be a function instead of a value that
-                    will be called with two parameters: the data element, and its index.</p>
-                </li>
                 <li><h3>Text</h3>
                     <p>Adobe is famous for its abilities to handle text well, and SVG is notorious for <i>not</i> handling
                     it well. Translating between the two is very complex, and has lots of side effects that hanpuku can't
@@ -272,9 +225,10 @@
                 </li>
                 <li><h3>Debugging</h3>
                     <p>I plan to embed Chrome's developer tools inside the widget when I can figure out how to do it
-                    (iframe?). In the mean time, you can run Google Chrome outside Illustrator, and go to
-                    http://localhost:8088. Unfortunately, this exposes the entire extension's DOM; for your purposes,
-                    you will probably want to navigate here in the Elements tab:</p>
+                    (iframe?). In the mean time, you can go to <a href="#" onclick="window.parent.ILLUSTRATOR.openBrowser('http://localhost:8088')">http://localhost:8088</a>
+                    to debug your scripts. Unfortunately, this exposes
+                    the entire extension's DOM; for your purposes, you will probably want to navigate here in the Elements
+                    tab:</p>
                     <ul>
                         <li>&lt;html&gt;</li>
                         <li>&lt;body onload="...</li>
