@@ -123,10 +123,10 @@ DomManager.prototype.initScope = function () {
             var callback = arguments.length === 3 ? b : a,
                 file = DATA.getFile(url);
             if (file === undefined) {
-                EXTENSION.displayMessage("<p style='color:#f00;'>" + url + " has not been loaded in the Data tab.</p>");
+                EXTENSION.displayError(url + " has not been loaded in the Data tab.");
                 //callback(url + " has not been loaded in the Data tab.", undefined);
             } else if (file.parsed.error_type !== undefined) {
-                EXTENSION.displayMessage("<p style='color:#f00;'>Error parsing " + url + "; see the Data tab for details.</p>");
+                EXTENSION.displayError("Error parsing " + url + "; see the Data tab for details.");
                 //callback("Error parsing " + url + "; see the Data tab for details.", undefined);
             } else {
                 callback(undefined, file.parsed);
@@ -202,7 +202,7 @@ DomManager.prototype.runScript = function (script, ignoreSelection) {
                 "} } catch(e) { console.warn(e.stack); var temp = e.stack.split('\\n'); " +
                 "return [temp[0], temp[1].split(':')[4]]; } return null;")).call(self.iframeScope);
     if (error !== null) {
-        EXTENSION.displayMessage('<p style="color:#f00;">' + error[0] + ' on line ' + error[1] + '</p>');
+        EXTENSION.displayError('Your script had an error: ' + error[0] + ' on line ' + error[1]);
         return false;
     }
     
@@ -667,7 +667,15 @@ DomManager.prototype.domToDoc = function () {
     // Throw away all the selection rectangles
     jQuery('#hanpuku_selectionLayer').remove();
     
-    ILLUSTRATOR.runJSX(self.extractDocument(), 'scripts/domToDoc.jsx', function (result) {});
+    ILLUSTRATOR.runJSX(self.extractDocument(), 'scripts/domToDoc.jsx', function (result) {},
+        function (error) {
+            // Something went wrong...
+            if (error.message.search('Hanpuku ') === 0) {
+                EXTENSION.displayWarning(error.message);
+            } else {
+                throw error;
+            }
+    });
 };
 
 /**
@@ -686,7 +694,7 @@ DomManager.prototype.docToDom = function () {
             temp;
         
         if (result === "Isolation Mode Error") {
-            EXTENSION.displayMessage('<p style="color:#f00;">Hanpuku can\'t operate in Isolation Mode (an Illustrator bug)</p>');
+            EXTENSION.displayError('Hanpuku can\'t operate in Isolation Mode (an Illustrator bug)');
             result = null;
         }
         if (result !== null) {
@@ -803,6 +811,13 @@ DomManager.prototype.docToDom = function () {
             self.viewBounds = undefined;
         }
         EXTENSION.notifyRefresh();
+    }, function (error) {
+        // Something went wrong...
+        if (error.message.search('Hanpuku ') === 0) {
+            EXTENSION.displayWarning(error.message);
+        } else {
+            throw error;
+        }
     });
 };
 DomManager.prototype.extractPathString = function (segments) {

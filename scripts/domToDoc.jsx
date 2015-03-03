@@ -170,7 +170,10 @@
         }
         
         if (foundFont === null) {
-            console.log("Couldn't resolve font stack: " + lookupString);
+            console.logError({
+                message : "Hanpuku could not resolve CSS font stack: " + lookupString,
+                line : 172
+            });
         } else {
             iTextRange.textFont = foundFont;
         }
@@ -180,6 +183,11 @@
     
     function applyColor(iC, dC) {
         var red, green, blue, black;
+        
+        if (dC.search('hanpuku_unsupported') !== -1) {
+            // don't touch colors we can't support
+            return;
+        }
         
         if (dC.split('(').length < 2) {
             console.warn("Bad color:" + String(dC));

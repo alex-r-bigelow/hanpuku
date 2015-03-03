@@ -19,7 +19,7 @@ input[type="file"] {
 }
 .halo {
     padding:4px;
-    opacity: 0.75;
+    opacity: 0.9;
 }
 .controls {
     position: absolute;

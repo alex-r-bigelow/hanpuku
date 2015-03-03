@@ -230,7 +230,7 @@ DataManager.prototype.loadFiles = function () {
     for (i = 0; i < newFiles.length; i += 1) {
         if (DataManager.FORMAT_LOOKUP.hasOwnProperty(newFiles[i].type) === false) {
             if (warnedAboutFiles === false) {
-                warningText = "Sorry, hanpuku does not support " + newFiles[i].type + ". It only supports ";
+                warningText = "Hanpuku does not yet support " + newFiles[i].type + ". It only supports ";
                 for (j = 0; j < DataManager.SUPPORTED_FORMATS.length; j += 1) {
                     if (j !== 0) {
                         warningText += ', ';

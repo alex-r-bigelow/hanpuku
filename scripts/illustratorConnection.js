@@ -45,13 +45,13 @@ IllustratorConnection.prototype.loadJSXlibs = function () {
         cache: false
     });
 };
-IllustratorConnection.prototype.runJSX = function (input, path, callback) {
+IllustratorConnection.prototype.runJSX = function (input, path, callback, errorFunction) {
     "use strict";
     var self = this,
         i;
     if (self.loadedJSXlibs === false) {
         // Try again in a second...
-        window.setTimeout(function () { self.runJSX(input, path, callback); }, 1000);
+        window.setTimeout(function () { self.runJSX(input, path, callback, errorFunction); }, 1000);
     } else {
         ejQuery.ajax({
             url: path,
@@ -72,8 +72,11 @@ IllustratorConnection.prototype.runJSX = function (input, path, callback) {
                             console.log(result.logs[i]);
                         }
                         if (result.error !== null) {
-                            console.warn("JSX Error in " + path + " on line: " + result.error.line);
-                            throw "JSX Error: " + result.error.message;
+                            if (errorFunction) {
+                                errorFunction(result.error);
+                            } else {
+                                throw "JSX Error in " + path + " on line " + result.error.line + ": " + result.error.message;
+                            }
                         }
                     }
                     callback(result.output);

@@ -103,13 +103,14 @@
             return 'none';
         } else {
             if (alertedUnsupported === false) {
+                // send a warning, but don't fail
                 console.logError({
-                    'message' : 'hanpuku does not yet support ' + color.typename,
-                    'line' : 70
+                    'message' : 'Hanpuku does not yet support ' + color.typename + '; unless overridden, it will be ignored.',
+                    'line' : 107
                 });
                 alertedUnsupported = true;
             }
-            return 'rgb(0,0,0)';
+            return 'rgb(0,0,0); /* hanpuku_unsupported: ' + color.typename + '*/';
         }
     }
     

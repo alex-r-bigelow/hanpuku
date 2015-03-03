@@ -33,7 +33,7 @@
         self.messageTimer = undefined;
     }
     ExtensionManager.MESSAGE_DELAY = 5000;
-    ExtensionManager.ANIMATION_DELAY = 500;
+    ExtensionManager.ANIMATION_DELAY = 700;
     ExtensionManager.EXTENSION_SCRIPTS = [
         "lib/jquery-1.11.0.min.js",
         "lib/json-circular.js",
@@ -210,6 +210,16 @@
         // Init the message area
         ejQuery('#messageOverlay').hide();
     };
+    ExtensionManager.prototype.displayError = function (message) {
+        "use strict";
+        var self = this;
+        self.displayMessage('<p style="color:#e00000;">ERROR: ' + message + '</p>');
+    };
+    ExtensionManager.prototype.displayWarning = function (message) {
+        "use strict";
+        var self = this;
+        self.displayMessage('<p style="color:#ff5800;">WARNING: ' + message + '</p>');
+    };
     ExtensionManager.prototype.displayMessage = function (message) {
         var self = this,
             mobj = {
@@ -357,7 +367,8 @@
     };
     
     ExtensionManager.prototype.debug = function () {
-        CODE.loadSampleJSFile('examples/scripts/test.js', 'test.js');
+        // CODE.loadSampleJSFile('testing/arcTest.js', 'arcTest.js');
+        // CODE.loadSampleJSFile('testing/fontTest.js', 'fontTest.js');
     };
     
     window.setupExtension = function () {
