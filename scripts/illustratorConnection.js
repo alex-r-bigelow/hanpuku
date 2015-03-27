@@ -1,4 +1,4 @@
-/*globals CSInterface, console, ejQuery, DOM, d3, EXTENSION*/
+/*globals CSInterface, console, ejQuery, DOM, d3, EXTENSION, window*/
 function IllustratorConnection() {
     "use strict";
     var self = this;
@@ -60,6 +60,7 @@ IllustratorConnection.prototype.runJSX = function (input, path, callback, errorF
                 self.connection.evalScript(script, function (r) {
                     var result;
                     if (r.isOk === false) {
+                        console.warn("Unknown JSX Error");
                         throw r;
                     } else {
                         try {

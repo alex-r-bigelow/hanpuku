@@ -38,8 +38,8 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
               <Width>1600</Width>
             </Size>
             <MinSize>
-              <Height>800</Height>
-              <Width>800</Width>
+              <Height>500</Height>
+              <Width>500</Width>
             </MinSize>
           </Geometry>
           <Icons>

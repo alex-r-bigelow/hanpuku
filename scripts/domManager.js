@@ -1,5 +1,5 @@
-/*jslint evil:true forin:true*/
-/*globals ejQuery, jQuery, ed3, d3, DATA, EXTENSION, ILLUSTRATOR, JsonCircular, console, convertUnits, phrogz, hanpuku*/
+/*jslint evil:true*/
+/*globals ejQuery, jQuery, ed3, d3, DATA, EXTENSION, ILLUSTRATOR, JsonCircular, console, convertUnits, phrogz, hanpuku, document, window*/
 
 /*
  * The purpose of this class is to act as an intermediary between
@@ -118,19 +118,6 @@ DomManager.prototype.initScope = function () {
         s,
         scriptCallback = function (script) {
             self.runScript(script, true);
-        },
-        loadFunc = function (url, a, b) {
-            var callback = arguments.length === 3 ? b : a,
-                file = DATA.getFile(url);
-            if (file === undefined) {
-                EXTENSION.displayError(url + " has not been loaded in the Data tab.");
-                //callback(url + " has not been loaded in the Data tab.", undefined);
-            } else if (file.parsed.error_type !== undefined) {
-                EXTENSION.displayError("Error parsing " + url + "; see the Data tab for details.");
-                //callback("Error parsing " + url + "; see the Data tab for details.", undefined);
-            } else {
-                callback(undefined, file.parsed);
-            }
         };
     // Clear out old variables
     self.iframeScope = {};
@@ -151,6 +138,7 @@ DomManager.prototype.initScope = function () {
      * in the normal way... this is kind of nuanced for each library
      */
     self.runScript('jQuery = window.jQuery;', true);
+    
     self.iframeScope.window.d3 = self.iframe.contentWindow.parent.d3;
     self.iframeScope.window.topojson = self.iframe.contentWindow.parent.topojson;
     self.iframeScope.window.queue = self.iframe.contentWindow.parent.queue;
@@ -162,19 +150,19 @@ DomManager.prototype.initScope = function () {
      */
     /*jslint nomen: true*/
     d3._text = d3.text;
-    d3.text = loadFunc;
+    d3.text = DATA.createLoadingFunction(d3._text);
     d3._json = d3.json;
-    d3.json = loadFunc;
+    d3.json = DATA.createLoadingFunction(d3._json);
     d3._xml = d3.xml;
-    d3.xml = loadFunc;
+    d3.xml = DATA.createLoadingFunction(d3._xml);
     d3._html = d3.html;
-    d3.html = loadFunc;
+    d3.html = DATA.createLoadingFunction(d3._html);
     d3._csv = d3.csv;
-    d3.csv = loadFunc;
+    d3.csv = DATA.createLoadingFunction(d3._csv);
     d3._tsv = d3.tsv;
-    d3.tsv = loadFunc;
+    d3.tsv = DATA.createLoadingFunction(d3._tsv);
     //d3._js = d3.js;
-    d3.js = loadFunc;
+    d3.js = DATA.createLoadingFunction(null);
     /*jslint nomen: false*/
 };
 DomManager.prototype.runScript = function (script, ignoreSelection) {
@@ -788,13 +776,17 @@ DomManager.prototype.docToDom = function () {
                 }
                 // Apply additional Illustrator transformations to text (other Illustrator
                 // transformations are preserved in geometry coordinates)
-                if (this.hasAttribute('hanpuku_postTransform')) {
-                    temp = "";
-                    if (this.hasAttribute('transform')) {
-                        temp = ' ' + this.getAttribute('transform');
-                    }
-                    this.setAttribute('transform', this.getAttribute('hanpuku_postTransform') + temp);
+                temp = "";
+                if (this.hasAttribute('hanpuku_prependTransform')) {
+                    temp += this.getAttribute('hanpuku_prependTransform');
                 }
+                if (this.hasAttribute('transform')) {
+                    temp += this.getAttribute('transform');
+                }
+                if (this.hasAttribute('hanpuku_appendTransform')) {
+                    temp += this.getAttribute('hanpuku_appendTransform');
+                }
+                this.setAttribute('transform', temp);
                 // Purge any tags leftover from standardize (by switching transform
                 // tags, we just converted it back to as close to the original,
                 // non-standard SVG as we could
@@ -807,7 +799,8 @@ DomManager.prototype.docToDom = function () {
                 this.removeAttribute('hanpuku_y');
                 this.removeAttribute('hanpuku_internalX');
                 this.removeAttribute('hanpuku_internalY');
-                this.removeAttribute('hanpuku_postTransform');
+                this.removeAttribute('hanpuku_appendTransform');
+                this.removeAttribute('hanpuku_prependTransform');
             });
             
             // Finally, add the selection layer, and update the javascript context
@@ -915,7 +908,8 @@ DomManager.prototype.addText = function (parent, text) {
     }
     
     if (text.x_0 === null) {
-        // This is a new item! Just use the absolute coordinates
+        // This is a new item! Append the absolute transformation AFTER
+        // the reverseTransform has been reversed in the docToDom hack
         sinTheta = Math.sin(text.theta_1);
         cosTheta = Math.cos(text.theta_1);
         diffMatrix = [text.scale_x_1 * cosTheta,
@@ -924,12 +918,27 @@ DomManager.prototype.addText = function (parent, text) {
                       text.scale_y_1 * cosTheta,
                       text.x_1,
                       -text.y_1];
-        t.attr('hanpuku_postTransform', 'matrix(' + diffMatrix.join(',') + ')');
+        t.attr('hanpuku_prependTransform', 'matrix(' + diffMatrix.join(',') + ')');
     } else {
         // Extract any transformation changes that were made in Illustrator,
-        // and add them to the transform attribute AFTER the reverseTransform
+        // and prepend them to the transform attribute AFTER the reverseTransform
         // has been reversed in the docToDom hack
+        if (text.contents === 'Sepal Length (cm)') {
+            console.log(text);
+        }
         
+        text.internalX = Number(text.internalX);
+        text.internalY = Number(text.internalY);
+        
+        t.attr('hanpuku_appendTransform', 'scale(' + (text.scale_x_1 / text.scale_x_0) +
+                                        ',' + (text.scale_y_1 / text.scale_y_0) + ')' +
+                                        'rotate(' + (180 * (text.theta_0 - text.theta_1) / Math.PI) +
+                                        ',' + text.internalX +
+                                        ',' + text.internalY + ')' +
+                                        'translate(' + (text.x_1 - text.x_0) +
+                                        ',' + (text.y_0 - text.y_1) + ')');
+        
+        /*
         sinTheta = Math.sin(text.theta_1 - text.theta_0);
         cosTheta = Math.cos(text.theta_1 - text.theta_0);
         diffMatrix = [text.scale_x_1 * cosTheta / text.scale_x_0,
@@ -937,16 +946,16 @@ DomManager.prototype.addText = function (parent, text) {
                       text.scale_x_1 * sinTheta / text.scale_x_0,
                       text.scale_y_1 * cosTheta / text.scale_y_0,
                       text.x_1 - text.x_0,
-                      text.y_0 - text.y_1];
+                      text.y_0 - text.y_1];*/
         
         // Because the
         // internal x and y were incorporated,
         // we need to factor them out before applying
         // any changes (as we're re-applying the x
         // and y in their original locations)
-        temp = hanpuku.matMultiply([1, 0, 0, 1, Number(text.internalX), Number(text.internalY)], diffMatrix);
-        temp = hanpuku.matMultiply(temp, [1, 0, 0, 1, -Number(text.internalX), -Number(text.internalY)]);
-        t.attr('hanpuku_postTransform', 'matrix(' + temp.join(',') + ')');
+        //temp = hanpuku.matMultiply([1, 0, 0, 1, Number(text.internalX), Number(text.internalY)], diffMatrix);
+        //temp = hanpuku.matMultiply(temp, [1, 0, 0, 1, -Number(text.internalX), -Number(text.internalY)]);
+        //t.attr('hanpuku_postTransform', 'matrix(' + temp.join(',') + ')');
     }
     
     // Kerning

@@ -1,0 +1,40 @@
+Character,The Silmarillion,The Hobbit,The Fellowship of the Ring,The Two Towers,The Return of the King,Role
+Aragorn,0,0,1,1,1,Protagonist
+Arwen Undómiel,0,0,1,0,1,Protagonist
+Bard the Bowman,0,1,0,0,0,Protagonist
+Beorn,0,1,0,0,0,Protagonist
+Beren,1,0,0,0,0,Protagonist
+Bilbo Baggins,0,1,1,0,1,Protagonist
+Boromir,0,0,1,0,0,Protagonist
+Denethor,0,0,0,0,1,Protagonist
+Eärendil,1,0,0,0,0,Protagonist
+Elrond,1,1,1,1,1,Protagonist
+Éomer,0,0,0,1,1,Protagonist
+Éowyn,0,0,0,1,1,Protagonist
+Faramir,0,0,0,1,1,Protagonist
+Fëanor,1,0,0,0,0,Protagonist
+Frodo Baggins,0,0,1,1,1,Protagonist
+Galadriel,1,0,1,1,1,Protagonist
+Gandalf,0,1,1,1,1,Protagonist
+Gimli,0,0,1,1,1,Protagonist
+Glaurung,1,0,0,0,0,Antagonist
+Glorfindel,1,0,1,0,0,Protagonist
+Gollum,0,1,1,1,1,Antagonist
+Gríma Wormtongue,0,0,0,1,1,Antagonist
+Húrin,1,0,0,0,0,Protagonist
+Legolas Greenleaf,0,0,1,1,1,Protagonist
+Lúthien,1,0,0,0,0,Protagonist
+Melkor / Morgoth,1,0,0,0,0,Antagonist
+Meriadoc Brandybuck,0,0,1,1,1,Protagonist
+Peregrin Took,0,0,1,1,1,Protagonist
+Samwise Gamgee,0,0,1,1,1,Protagonist
+Saruman the White,0,0,1,1,1,Antagonist
+Sauron,1,0,1,1,1,Antagonist
+Smaug,0,1,0,0,0,Protagonist
+Théoden,0,0,0,1,1,Protagonist
+Thorin Oakenshield,0,1,0,0,0,Protagonist
+Thranduil,0,1,0,0,0,Protagonist
+Tom Bombadil,0,0,1,0,0,Protagonist
+Treebeard,0,0,0,1,0,Protagonist
+Túrin Turambar,1,0,0,0,0,Protagonist
+Witch-king of Angmar,1,0,1,0,1,Antagonist

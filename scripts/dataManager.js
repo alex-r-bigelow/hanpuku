@@ -1,5 +1,7 @@
+/*globals ed3, ejQuery, EXTENSION, TYPING_INTERVAL, FileReader, clearTimeout, setTimeout, window*/
 /*jslint evil:true*/
 function DataFile(name, type, raw) {
+    "use strict";
     var self = this;
     
     self.name = name;
@@ -12,6 +14,7 @@ function DataFile(name, type, raw) {
     self.evaluate();
 }
 DataFile.prototype.evaluate = function () {
+    "use strict";
     var self = this,
         temp;
     self.parsed = null;
@@ -38,13 +41,15 @@ DataFile.prototype.evaluate = function () {
             throw new Error("Attempted to parse unsupported data type: " + self.type);
         }
         self.valid = true;
-    } catch(e) {
-        self.parsed = {"error_type" : e.name};
+    } catch (e) {
+        self.parsed = {"error_type" : e.name,
+                       "error_object" : e};
         self.parsed["ERROR: Couldn't parse " + self.name + " as " + self.type] = e.stack.split('\n');
     }
 };
 
-function OrphanFile () {
+function OrphanFile() {
+    "use strict";
     DataFile.call(this, 'default', 'text/json', '{}');
     var self = this;
     
@@ -59,6 +64,7 @@ OrphanFile.prototype.constructor = OrphanFile;
 
 
 function DataManager() {
+    "use strict";
     var self = this;
     
     self.allFiles = [];
@@ -95,14 +101,17 @@ DataManager.FORMAT_LOOKUP = {
     'application/js' : 'text/js'
 };
 DataManager.prototype.init = function () {
+    "use strict";
     var self = this;
     self.addFile(new OrphanFile());
     self.currentFile = self.allFiles[0].name;
     self.updatePanel();
 };
 DataManager.prototype.updatePanel = function () {
+    "use strict";
     var self = this,
-        i, f,
+        i,
+        f,
         currentDataFile = ejQuery('#currentDataFile'),
         editor = ejQuery('#dataTextEditor'),
         //embedBox = ejQuery('#embedFileCheckBox'),
@@ -135,6 +144,7 @@ DataManager.prototype.updatePanel = function () {
     currentDataFile.append('<option value="loadNewFile">Load...</option>');
 };
 DataManager.prototype.edit = function () {
+    "use strict";
     var self = this,
         f = self.getFile(self.currentFile);
     clearTimeout(self.typingTimer);
@@ -144,6 +154,7 @@ DataManager.prototype.edit = function () {
     }, TYPING_INTERVAL);
 };
 DataManager.prototype.switchFile = function () {
+    "use strict";
     var self = this,
         newFile = ejQuery('#currentDataFile').val();
     
@@ -160,11 +171,13 @@ DataManager.prototype.switchFile = function () {
     }
 };
 DataManager.prototype.changeEmbed = function () {
+    "use strict";
     var self = this;
     self.getFile(self.currentFile).embed = ejQuery('#embedFileCheckBox').prop('checked');
     self.updatePanel();
 };
 DataManager.prototype.changeType = function () {
+    "use strict";
     var self = this,
         current = self.getFile(self.currentFile),
         newType = ejQuery('#dataTypeSelect').val();
@@ -172,7 +185,8 @@ DataManager.prototype.changeType = function () {
     self.updatePanel();
     EXTENSION.notifyNewData();
 };
-DataManager.prototype.addFile = function(newFile) {
+DataManager.prototype.addFile = function (newFile) {
+    "use strict";
     var self = this;
     
     if (self.fileLookup.hasOwnProperty(newFile.name)) {
@@ -182,15 +196,18 @@ DataManager.prototype.addFile = function(newFile) {
         self.allFiles.push(newFile);
     }
 };
-DataManager.prototype.hasFile = function(fileName) {
+DataManager.prototype.hasFile = function (fileName) {
+    "use strict";
     var self = this;
     return self.fileLookup.hasOwnProperty(fileName);
 };
-DataManager.prototype.getFile = function(fileName) {
+DataManager.prototype.getFile = function (fileName) {
+    "use strict";
     var self = this;
     return self.allFiles[self.fileLookup[fileName]];
 };
 DataManager.prototype.loadSampleDataFile = function (url) {
+    "use strict";
     var self = this;
     ejQuery.get(url, function (dataString) {
         var parts = url.split('/'),
@@ -210,6 +227,7 @@ DataManager.prototype.loadSampleDataFile = function (url) {
     });
 };
 DataManager.prototype.loadFile = function (f) {
+    "use strict";
     var self = this,
         fileReader = new FileReader();
     fileReader.onload = function (e) {
@@ -218,6 +236,7 @@ DataManager.prototype.loadFile = function (f) {
     fileReader.readAsText(f);
 };
 DataManager.prototype.loadFiles = function () {
+    "use strict";
     var self = this,
         newFiles = ejQuery('#dataFileInput')[0].files,
         i,
@@ -235,13 +254,13 @@ DataManager.prototype.loadFiles = function () {
                     if (j !== 0) {
                         warningText += ', ';
                     }
-                    if (j === DataManager.SUPPORTED_FORMATS.length-1) {
+                    if (j === DataManager.SUPPORTED_FORMATS.length - 1) {
                         warningText += 'and ';
                     }
                     warningText += DataManager.FRIENDLY_FORMAT_NAMES[DataManager.SUPPORTED_FORMATS[j]];
                 }
                 warningText += " data files.";
-                alert(warningText);
+                EXTENSION.displayWarning(warningText);
                 warnedAboutFiles = true;
             }
         } else {
@@ -258,7 +277,7 @@ DataManager.prototype.loadFiles = function () {
         var f;
         for (f = 0; f < self.allFiles.length; f += 1) {
             if (unloadedFiles.indexOf(self.allFiles[f].name) !== -1) {
-                unloadedFiles.splice(unloadedFiles.indexOf(self.allFiles[f].name),1);
+                unloadedFiles.splice(unloadedFiles.indexOf(self.allFiles[f].name), 1);
             }
         }
         // TODO: add a spinner?
@@ -270,4 +289,37 @@ DataManager.prototype.loadFiles = function () {
         }
     }
     updateWhenLoaded();
+};
+DataManager.prototype.createLoadingFunction = function (nativeFunc) {
+    "use strict";
+    var self = this;
+    // text : error, response
+    // json : error, response
+    // xml : error, response
+    // html : error, response
+    // csv : 
+    return function (url, a, b) {
+        var callback = arguments.length === 3 ? b : a,
+            file = self.getFile(url);
+        if (file === undefined) {
+            if (nativeFunc === null) {
+                EXTENSION.displayError("Sorry, " + url + " has not been loaded in the Data tab.");
+            } else {
+                // couldn't find the file... maybe it's a real url
+                nativeFunc(url, a, b);
+            }
+        } else if (file.parsed.error_type !== undefined) {
+            // the user messed up some kind of formatting in the data tab; the error will
+            // be displayed there in detail
+            EXTENSION.displayError("Error parsing " + url + "; see the Data tab for details.");
+            callback(file.parsed.error_object);
+        } else {
+            // successfully found the file...
+            if (callback.length === 1) {
+                callback(file.parsed);
+            } else {
+                callback(null, file.parsed);
+            }
+        }
+    };
 };

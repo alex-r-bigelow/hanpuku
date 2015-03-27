@@ -288,24 +288,27 @@
         output.rotate = output.rotate.join(',');
         
         
-        // Extract change in scale, rotation, and translation from Illustrator's
-        // matrix property
-        temp = t.parent.textFrames.add();
+        // Extract the absolute scale, rotation, and translation
+        //temp = t.parent.textFrames.add();
         
         scale_x = Math.sqrt(t.matrix.mValueA * t.matrix.mValueA +
                             t.matrix.mValueC * t.matrix.mValueC);
+        //scale_x = t.matrix.mValueA < 0 ? -scale_x : scale_x;
         scale_y = Math.sqrt(t.matrix.mValueB * t.matrix.mValueB +
                             t.matrix.mValueD * t.matrix.mValueD);
+        //scale_y = t.matrix.mValueD < 0 ? -scale_y : scale_y;
         theta = Math.atan2(t.matrix.mValueB, t.matrix.mValueD);
+        x = t.anchor[0];
+        y = t.anchor[1];
         
-        temp.resize(scale_x * 100, scale_y * 100, true, true, true, true, true, Transformation.DOCUMENTORIGIN);
+        /*temp.resize(scale_x * 100, scale_y * 100, true, true, true, true, true, Transformation.DOCUMENTORIGIN);
         temp.rotate(theta * 180 / Math.PI, true, true, true, true, Transformation.DOCUMENTORIGIN);
         
         x = t.matrix.mValueTX - temp.matrix.mValueTX;
         y = t.matrix.mValueTY - temp.matrix.mValueTY;
         
-        temp.remove();
-
+        temp.remove();*/
+        
         output.scale_x_1 = scale_x;
         output.scale_y_1 = scale_y;
         output.theta_1 = theta;
@@ -377,11 +380,15 @@
             
             output = {
                 itemType : 'document',
-                name : activeDoc.name.split('.')[0],
+                name : activeDoc.name.split('.')[0].replace(invalid, '_'),
                 artboards : [],
                 layers : [],
                 selection : []
             };
+            if (alphabetic.test(output.name.charAt(0)) !== true) {
+                // HTML ids must start with an alphabetic
+                output.name = 'Document_' + output.name;
+            }
             
             for (a = 0; a < activeDoc.artboards.length; a += 1) {
                 newBoard = {

@@ -54,6 +54,10 @@
                     window.parent.DATA.loadSampleDataFile('examples/data/flare.json');
                     window.parent.CODE.loadSampleJSFile('examples/scripts/zoomableSunburst.js');
                     window.parent.CODE.loadSampleCSSFile('examples/style/zoomableSunburst.css');
+                } else if (name === 'tolkien') {
+                    window.parent.DATA.loadSampleDataFile('examples/data/middleEarthCharacters.csv');
+                    window.parent.CODE.loadSampleJSFile('examples/scripts/tolkien.js');
+                    window.parent.CODE.loadSampleCSSFile('examples/style/tolkien.css');
                 }
             }
             
@@ -65,11 +69,12 @@
                     'splom' : 'Scatterplot Matrix',
                     'force' : 'Force-directed graph',
                     'streamgraph2' : 'Streamgraph',
+                    'tolkien' : 'Tolkien (VIS paper teaser)',
                     'lineChart' : 'Line Chart',
-                    'multiSeriesLineChart' : 'Multi-Series Line Chart'
-                    //'areaChoropleth' : 'Area Choropleth'
-                    //'hierarchicalEdgeBundling' : 'Hierarchical Edge Bundling',
-                    //'stackedRadialArea' : 'Stacked Radial Area'
+                    'multiSeriesLineChart' : 'Multi-Series Line Chart',
+                    'areaChoropleth' : 'Area Choropleth',
+                    'hierarchicalEdgeBundling' : 'Hierarchical Edge Bundling',
+                    'stackedRadialArea' : 'Stacked Radial Area'
                 },
                 resultText = "",
                 name;

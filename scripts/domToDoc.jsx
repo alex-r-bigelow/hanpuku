@@ -406,37 +406,31 @@
         storeTag(iText, 'hanpuku_internalX', dText.internalX);
         storeTag(iText, 'hanpuku_internalY', dText.internalY);
         
-        // Transformations (this took FOREVER to figure out!! be exceedingly cautious if touching!)
+        // Manually reset position, scale, and rotation before applying the
+        // position information that we're getting from the DOM (this is the
+        // best way I can figure out to set global coordinates)
+        scale_x = Math.sqrt(iText.matrix.mValueA * iText.matrix.mValueA +
+                            iText.matrix.mValueC * iText.matrix.mValueC);
+        //scale_x = iText.matrix.mValueA < 0 ? -scale_x : scale_x;
+        scale_y = Math.sqrt(iText.matrix.mValueB * iText.matrix.mValueB +
+                            iText.matrix.mValueD * iText.matrix.mValueD);
+        //scale_y = iText.matrix.mValueD < 0 ? -scale_y : scale_y;
+        theta = Math.atan2(iText.matrix.mValueB, iText.matrix.mValueD);
+        
+        iText.translate(-iText.anchor[0], -iText.anchor[1]);
+        iText.rotate(-theta * 180 / Math.PI, true, true, true, true, Transformation.DOCUMENTORIGIN);
+        iText.resize(scale_x * 100, scale_y * 100, true, true, true, true, true, Transformation.DOCUMENTORIGIN);
+        
+        // Okay, now apply the values we got from the DOM
         iText.resize(dText.scaleX * 100, dText.scaleY * 100, true, true, true, true, true, Transformation.DOCUMENTORIGIN);
         iText.rotate(dText.theta * 180 / Math.PI, true, true, true, true, Transformation.DOCUMENTORIGIN);
         iText.translate(dText.x, dText.y);
-        
-        // Extract scale, rotation, and translation from Illustrator's
-        // matrix property (in theory I should be able to use the ones
-        // in dText, but Illustrator does strange stuff to its matrices
-        // that I haven't figured out yet). We need to know this to record
-        // any transformations that are made in Illustrator:
-        temp = iText.parent.textFrames.add();
-        
-        scale_x = Math.sqrt(iText.matrix.mValueA * iText.matrix.mValueA +
-                            iText.matrix.mValueC * iText.matrix.mValueC);
-        scale_y = Math.sqrt(iText.matrix.mValueB * iText.matrix.mValueB +
-                            iText.matrix.mValueD * iText.matrix.mValueD);
-        theta = Math.atan2(iText.matrix.mValueB, iText.matrix.mValueD);
-        
-        temp.resize(scale_x * 100, scale_y * 100, true, true, true, true, true, Transformation.DOCUMENTORIGIN);
-        temp.rotate(theta * 180 / Math.PI, true, true, true, true, Transformation.DOCUMENTORIGIN);
-        
-        x = iText.matrix.mValueTX - temp.matrix.mValueTX;
-        y = iText.matrix.mValueTY - temp.matrix.mValueTY;
-        
-        temp.remove();
 
-        storeTag(iText, 'hanpuku_scale_x_0', scale_x);
-        storeTag(iText, 'hanpuku_scale_y_0', scale_y);
-        storeTag(iText, 'hanpuku_theta_0', theta);
-        storeTag(iText, 'hanpuku_x_0', x);
-        storeTag(iText, 'hanpuku_y_0', y);
+        storeTag(iText, 'hanpuku_scale_x_0', dText.scaleX);
+        storeTag(iText, 'hanpuku_scale_y_0', dText.scaleY);
+        storeTag(iText, 'hanpuku_theta_0', dText.theta);
+        storeTag(iText, 'hanpuku_x_0', dText.x);
+        storeTag(iText, 'hanpuku_y_0', dText.y);
         
         // Generic attributes
         applyFillAndStroke(iText.textRange, dText);
