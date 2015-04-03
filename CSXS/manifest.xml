@@ -10,16 +10,16 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
     ]]>
   </Abstract>
   <ExtensionList>
-      <Extension Id="hanpuku.rawData.extension" Version="1.0"/>
-      <Extension Id="hanpuku.spreadsheet.extension" Version="1.0"/>
-      <Extension Id="hanpuku.distribute.extension" Version="1.0"/>
-      <Extension Id="hanpuku.rotate.extension" Version="1.0"/>
-      <Extension Id="hanpuku.scale.extension" Version="1.0"/>
-      <Extension Id="hanpuku.colorScale.extension" Version="1.0"/>
-      <Extension Id="hanpuku.colorSwatch.extension" Version="1.0"/>
-      <Extension Id="hanpuku.library.extension" Version="1.0"/>
-      <Extension Id="hanpuku.javascript.extension" Version="1.0"/>
-      <Extension Id="hanpuku.css.extension" Version="1.0"/>
+      <Extension Id="rawData.hanpuku.extension" Version="1.0"/>
+      <Extension Id="spreadsheet.hanpuku.extension" Version="1.0"/>
+      <Extension Id="distribute.hanpuku.extension" Version="1.0"/>
+      <Extension Id="rotate.hanpuku.extension" Version="1.0"/>
+      <Extension Id="scale.hanpuku.extension" Version="1.0"/>
+      <Extension Id="colorScale.hanpuku.extension" Version="1.0"/>
+      <Extension Id="colorSwatch.hanpuku.extension" Version="1.0"/>
+      <Extension Id="library.hanpuku.extension" Version="1.0"/>
+      <Extension Id="javascript.hanpuku.extension" Version="1.0"/>
+      <Extension Id="css.hanpuku.extension" Version="1.0"/>
   </ExtensionList>
   <ExecutionEnvironment>
     <HostList>
@@ -33,7 +33,7 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
     </RequiredRuntimeList>
   </ExecutionEnvironment>
   <DispatchInfoList>
-    <Extension Id="hanpuku.rawData.extension">
+    <Extension Id="rawData.hanpuku.extension">
       <DispatchInfo>
         <Resources>
           <MainPath>./rawData.html</MainPath>
@@ -61,10 +61,10 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
         </UI>
       </DispatchInfo>
     </Extension>
-      <Extension Id="hanpuku.spreadsheet.extension">
+      <Extension Id="spreadsheet.hanpuku.extension">
       <DispatchInfo>
         <Resources>
-          <MainPath>./rawData.html</MainPath>
+          <MainPath>./spreadsheet.html</MainPath>
         </Resources>
         <UI>
           <Type>Panel</Type>
@@ -89,10 +89,10 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
         </UI>
       </DispatchInfo>
     </Extension>
-      <Extension Id="hanpuku.distribute.extension">
+      <Extension Id="distribute.hanpuku.extension">
       <DispatchInfo>
         <Resources>
-          <MainPath>./rawData.html</MainPath>
+          <MainPath>./distribute.html</MainPath>
         </Resources>
         <UI>
           <Type>Panel</Type>
@@ -117,10 +117,10 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
         </UI>
       </DispatchInfo>
     </Extension>
-      <Extension Id="hanpuku.rotate.extension">
+      <Extension Id="rotate.hanpuku.extension">
       <DispatchInfo>
         <Resources>
-          <MainPath>./rawData.html</MainPath>
+          <MainPath>./rotate.html</MainPath>
         </Resources>
         <UI>
           <Type>Panel</Type>
@@ -145,10 +145,10 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
         </UI>
       </DispatchInfo>
     </Extension>
-      <Extension Id="hanpuku.scale.extension">
+      <Extension Id="scale.hanpuku.extension">
       <DispatchInfo>
         <Resources>
-          <MainPath>./rawData.html</MainPath>
+          <MainPath>./scale.html</MainPath>
         </Resources>
         <UI>
           <Type>Panel</Type>
@@ -173,10 +173,10 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
         </UI>
       </DispatchInfo>
     </Extension>
-      <Extension Id="hanpuku.colorScale.extension">
+      <Extension Id="colorScale.hanpuku.extension">
       <DispatchInfo>
         <Resources>
-          <MainPath>./rawData.html</MainPath>
+          <MainPath>./colorScale.html</MainPath>
         </Resources>
         <UI>
           <Type>Panel</Type>
@@ -201,10 +201,10 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
         </UI>
       </DispatchInfo>
     </Extension>
-      <Extension Id="hanpuku.colorSwatch.extension">
+      <Extension Id="colorSwatch.hanpuku.extension">
       <DispatchInfo>
         <Resources>
-          <MainPath>./rawData.html</MainPath>
+          <MainPath>./colorSwatch.html</MainPath>
         </Resources>
         <UI>
           <Type>Panel</Type>
@@ -229,10 +229,10 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
         </UI>
       </DispatchInfo>
     </Extension>
-      <Extension Id="hanpuku.library.extension">
+      <Extension Id="library.hanpuku.extension">
       <DispatchInfo>
         <Resources>
-          <MainPath>./rawData.html</MainPath>
+          <MainPath>./library.html</MainPath>
         </Resources>
         <UI>
           <Type>Panel</Type>
@@ -257,38 +257,10 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
         </UI>
       </DispatchInfo>
     </Extension>
-      <Extension Id="hanpuku.rawData.extension">
+      <Extension Id="javascript.hanpuku.extension">
       <DispatchInfo>
         <Resources>
-          <MainPath>./rawData.html</MainPath>
-        </Resources>
-        <UI>
-          <Type>Panel</Type>
-          <Menu>hanpuku</Menu>
-          <Geometry>
-            <Size>
-              <Height>900</Height>
-              <Width>1600</Width>
-            </Size>
-            <MinSize>
-              <Height>500</Height>
-              <Width>500</Width>
-            </MinSize>
-          </Geometry>
-          <Icons>
-            <Icon Type="Normal">./img/rawDataLight.png</Icon>
-            <Icon Type="RollOver">./img/rawDataLight.png</Icon>
-            <Icon Type="Disabled">./img/rawDataDark.png</Icon>
-            <Icon Type="DarkNormal">./img/rawDataDark.png</Icon>
-            <Icon Type="DarkRollOver">./img/rawDataDark.png</Icon>
-          </Icons>
-        </UI>
-      </DispatchInfo>
-    </Extension>
-      <Extension Id="hanpuku.javascript.extension">
-      <DispatchInfo>
-        <Resources>
-          <MainPath>./rawData.html</MainPath>
+          <MainPath>./javascript.html</MainPath>
         </Resources>
         <UI>
           <Type>Panel</Type>
@@ -313,10 +285,10 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
         </UI>
       </DispatchInfo>
     </Extension>
-      <Extension Id="hanpuku.css.extension">
+      <Extension Id="css.hanpuku.extension">
       <DispatchInfo>
         <Resources>
-          <MainPath>./rawData.html</MainPath>
+          <MainPath>./css.html</MainPath>
         </Resources>
         <UI>
           <Type>Panel</Type>
