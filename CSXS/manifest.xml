@@ -10,7 +10,16 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
     ]]>
   </Abstract>
   <ExtensionList>
-    <Extension Id="hanpuku.extension" Version="1.0"/>
+      <Extension Id="hanpuku.rawData.extension" Version="1.0"/>
+      <Extension Id="hanpuku.spreadsheet.extension" Version="1.0"/>
+      <Extension Id="hanpuku.distribute.extension" Version="1.0"/>
+      <Extension Id="hanpuku.rotate.extension" Version="1.0"/>
+      <Extension Id="hanpuku.scale.extension" Version="1.0"/>
+      <Extension Id="hanpuku.colorScale.extension" Version="1.0"/>
+      <Extension Id="hanpuku.colorSwatch.extension" Version="1.0"/>
+      <Extension Id="hanpuku.library.extension" Version="1.0"/>
+      <Extension Id="hanpuku.javascript.extension" Version="1.0"/>
+      <Extension Id="hanpuku.css.extension" Version="1.0"/>
   </ExtensionList>
   <ExecutionEnvironment>
     <HostList>
@@ -24,10 +33,10 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
     </RequiredRuntimeList>
   </ExecutionEnvironment>
   <DispatchInfoList>
-    <Extension Id="hanpuku.extension">
+    <Extension Id="hanpuku.rawData.extension">
       <DispatchInfo>
         <Resources>
-          <MainPath>./index.html</MainPath>
+          <MainPath>./rawData.html</MainPath>
         </Resources>
         <UI>
           <Type>Panel</Type>
@@ -43,11 +52,291 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
             </MinSize>
           </Geometry>
           <Icons>
-            <Icon Type="Normal">./img/icon2.png</Icon>
-            <Icon Type="RollOver">./img/icon2.png</Icon>
-            <Icon Type="Disabled">./img/icon.png</Icon>
-            <Icon Type="DarkNormal">./img/icon.png</Icon>
-            <Icon Type="DarkRollOver">./img/icon.png</Icon>
+            <Icon Type="Normal">./img/rawDataLight.png</Icon>
+            <Icon Type="RollOver">./img/rawDataLight.png</Icon>
+            <Icon Type="Disabled">./img/rawDataDark.png</Icon>
+            <Icon Type="DarkNormal">./img/rawDataDark.png</Icon>
+            <Icon Type="DarkRollOver">./img/rawDataDark.png</Icon>
+          </Icons>
+        </UI>
+      </DispatchInfo>
+    </Extension>
+      <Extension Id="hanpuku.spreadsheet.extension">
+      <DispatchInfo>
+        <Resources>
+          <MainPath>./rawData.html</MainPath>
+        </Resources>
+        <UI>
+          <Type>Panel</Type>
+          <Menu>hanpuku</Menu>
+          <Geometry>
+            <Size>
+              <Height>900</Height>
+              <Width>1600</Width>
+            </Size>
+            <MinSize>
+              <Height>500</Height>
+              <Width>500</Width>
+            </MinSize>
+          </Geometry>
+          <Icons>
+            <Icon Type="Normal">./img/spreadsheetLight.png</Icon>
+            <Icon Type="RollOver">./img/spreadsheetLight.png</Icon>
+            <Icon Type="Disabled">./img/spreadsheetDark.png</Icon>
+            <Icon Type="DarkNormal">./img/spreadsheetDark.png</Icon>
+            <Icon Type="DarkRollOver">./img/spreadsheetDark.png</Icon>
+          </Icons>
+        </UI>
+      </DispatchInfo>
+    </Extension>
+      <Extension Id="hanpuku.distribute.extension">
+      <DispatchInfo>
+        <Resources>
+          <MainPath>./rawData.html</MainPath>
+        </Resources>
+        <UI>
+          <Type>Panel</Type>
+          <Menu>hanpuku</Menu>
+          <Geometry>
+            <Size>
+              <Height>900</Height>
+              <Width>1600</Width>
+            </Size>
+            <MinSize>
+              <Height>500</Height>
+              <Width>500</Width>
+            </MinSize>
+          </Geometry>
+          <Icons>
+            <Icon Type="Normal">./img/distributeLight.png</Icon>
+            <Icon Type="RollOver">./img/distributeLight.png</Icon>
+            <Icon Type="Disabled">./img/distributeDark.png</Icon>
+            <Icon Type="DarkNormal">./img/distributeDark.png</Icon>
+            <Icon Type="DarkRollOver">./img/distributeDark.png</Icon>
+          </Icons>
+        </UI>
+      </DispatchInfo>
+    </Extension>
+      <Extension Id="hanpuku.rotate.extension">
+      <DispatchInfo>
+        <Resources>
+          <MainPath>./rawData.html</MainPath>
+        </Resources>
+        <UI>
+          <Type>Panel</Type>
+          <Menu>hanpuku</Menu>
+          <Geometry>
+            <Size>
+              <Height>900</Height>
+              <Width>1600</Width>
+            </Size>
+            <MinSize>
+              <Height>500</Height>
+              <Width>500</Width>
+            </MinSize>
+          </Geometry>
+          <Icons>
+            <Icon Type="Normal">./img/rotateLight.png</Icon>
+            <Icon Type="RollOver">./img/rotateLight.png</Icon>
+            <Icon Type="Disabled">./img/rotateDark.png</Icon>
+            <Icon Type="DarkNormal">./img/rotateDark.png</Icon>
+            <Icon Type="DarkRollOver">./img/rotateDark.png</Icon>
+          </Icons>
+        </UI>
+      </DispatchInfo>
+    </Extension>
+      <Extension Id="hanpuku.scale.extension">
+      <DispatchInfo>
+        <Resources>
+          <MainPath>./rawData.html</MainPath>
+        </Resources>
+        <UI>
+          <Type>Panel</Type>
+          <Menu>hanpuku</Menu>
+          <Geometry>
+            <Size>
+              <Height>900</Height>
+              <Width>1600</Width>
+            </Size>
+            <MinSize>
+              <Height>500</Height>
+              <Width>500</Width>
+            </MinSize>
+          </Geometry>
+          <Icons>
+            <Icon Type="Normal">./img/scaleLight.png</Icon>
+            <Icon Type="RollOver">./img/scaleLight.png</Icon>
+            <Icon Type="Disabled">./img/scaleDark.png</Icon>
+            <Icon Type="DarkNormal">./img/scaleDark.png</Icon>
+            <Icon Type="DarkRollOver">./img/scaleDark.png</Icon>
+          </Icons>
+        </UI>
+      </DispatchInfo>
+    </Extension>
+      <Extension Id="hanpuku.colorScale.extension">
+      <DispatchInfo>
+        <Resources>
+          <MainPath>./rawData.html</MainPath>
+        </Resources>
+        <UI>
+          <Type>Panel</Type>
+          <Menu>hanpuku</Menu>
+          <Geometry>
+            <Size>
+              <Height>900</Height>
+              <Width>1600</Width>
+            </Size>
+            <MinSize>
+              <Height>500</Height>
+              <Width>500</Width>
+            </MinSize>
+          </Geometry>
+          <Icons>
+            <Icon Type="Normal">./img/colorScaleLight.png</Icon>
+            <Icon Type="RollOver">./img/colorScaleLight.png</Icon>
+            <Icon Type="Disabled">./img/colorScaleDark.png</Icon>
+            <Icon Type="DarkNormal">./img/colorScaleDark.png</Icon>
+            <Icon Type="DarkRollOver">./img/colorScaleDark.png</Icon>
+          </Icons>
+        </UI>
+      </DispatchInfo>
+    </Extension>
+      <Extension Id="hanpuku.colorSwatch.extension">
+      <DispatchInfo>
+        <Resources>
+          <MainPath>./rawData.html</MainPath>
+        </Resources>
+        <UI>
+          <Type>Panel</Type>
+          <Menu>hanpuku</Menu>
+          <Geometry>
+            <Size>
+              <Height>900</Height>
+              <Width>1600</Width>
+            </Size>
+            <MinSize>
+              <Height>500</Height>
+              <Width>500</Width>
+            </MinSize>
+          </Geometry>
+          <Icons>
+            <Icon Type="Normal">./img/colorSwatchLight.png</Icon>
+            <Icon Type="RollOver">./img/colorSwatchLight.png</Icon>
+            <Icon Type="Disabled">./img/colorSwatchDark.png</Icon>
+            <Icon Type="DarkNormal">./img/colorSwatchDark.png</Icon>
+            <Icon Type="DarkRollOver">./img/colorSwatchDark.png</Icon>
+          </Icons>
+        </UI>
+      </DispatchInfo>
+    </Extension>
+      <Extension Id="hanpuku.library.extension">
+      <DispatchInfo>
+        <Resources>
+          <MainPath>./rawData.html</MainPath>
+        </Resources>
+        <UI>
+          <Type>Panel</Type>
+          <Menu>hanpuku</Menu>
+          <Geometry>
+            <Size>
+              <Height>900</Height>
+              <Width>1600</Width>
+            </Size>
+            <MinSize>
+              <Height>500</Height>
+              <Width>500</Width>
+            </MinSize>
+          </Geometry>
+          <Icons>
+            <Icon Type="Normal">./img/libraryLight.png</Icon>
+            <Icon Type="RollOver">./img/libraryLight.png</Icon>
+            <Icon Type="Disabled">./img/libraryDark.png</Icon>
+            <Icon Type="DarkNormal">./img/libraryDark.png</Icon>
+            <Icon Type="DarkRollOver">./img/libraryDark.png</Icon>
+          </Icons>
+        </UI>
+      </DispatchInfo>
+    </Extension>
+      <Extension Id="hanpuku.rawData.extension">
+      <DispatchInfo>
+        <Resources>
+          <MainPath>./rawData.html</MainPath>
+        </Resources>
+        <UI>
+          <Type>Panel</Type>
+          <Menu>hanpuku</Menu>
+          <Geometry>
+            <Size>
+              <Height>900</Height>
+              <Width>1600</Width>
+            </Size>
+            <MinSize>
+              <Height>500</Height>
+              <Width>500</Width>
+            </MinSize>
+          </Geometry>
+          <Icons>
+            <Icon Type="Normal">./img/rawDataLight.png</Icon>
+            <Icon Type="RollOver">./img/rawDataLight.png</Icon>
+            <Icon Type="Disabled">./img/rawDataDark.png</Icon>
+            <Icon Type="DarkNormal">./img/rawDataDark.png</Icon>
+            <Icon Type="DarkRollOver">./img/rawDataDark.png</Icon>
+          </Icons>
+        </UI>
+      </DispatchInfo>
+    </Extension>
+      <Extension Id="hanpuku.javascript.extension">
+      <DispatchInfo>
+        <Resources>
+          <MainPath>./rawData.html</MainPath>
+        </Resources>
+        <UI>
+          <Type>Panel</Type>
+          <Menu>hanpuku</Menu>
+          <Geometry>
+            <Size>
+              <Height>900</Height>
+              <Width>1600</Width>
+            </Size>
+            <MinSize>
+              <Height>500</Height>
+              <Width>500</Width>
+            </MinSize>
+          </Geometry>
+          <Icons>
+            <Icon Type="Normal">./img/javascriptLight.png</Icon>
+            <Icon Type="RollOver">./img/javascriptLight.png</Icon>
+            <Icon Type="Disabled">./img/javascriptDark.png</Icon>
+            <Icon Type="DarkNormal">./img/javascriptDark.png</Icon>
+            <Icon Type="DarkRollOver">./img/javascriptDark.png</Icon>
+          </Icons>
+        </UI>
+      </DispatchInfo>
+    </Extension>
+      <Extension Id="hanpuku.css.extension">
+      <DispatchInfo>
+        <Resources>
+          <MainPath>./rawData.html</MainPath>
+        </Resources>
+        <UI>
+          <Type>Panel</Type>
+          <Menu>hanpuku</Menu>
+          <Geometry>
+            <Size>
+              <Height>900</Height>
+              <Width>1600</Width>
+            </Size>
+            <MinSize>
+              <Height>500</Height>
+              <Width>500</Width>
+            </MinSize>
+          </Geometry>
+          <Icons>
+            <Icon Type="Normal">./img/cssLight.png</Icon>
+            <Icon Type="RollOver">./img/cssLight.png</Icon>
+            <Icon Type="Disabled">./img/cssDark.png</Icon>
+            <Icon Type="DarkNormal">./img/cssDark.png</Icon>
+            <Icon Type="DarkRollOver">./img/cssDark.png</Icon>
           </Icons>
         </UI>
       </DispatchInfo>
