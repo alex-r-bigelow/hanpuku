@@ -48,7 +48,8 @@ IllustratorConnection.prototype.loadJSXlibs = function () {
 IllustratorConnection.prototype.runJSX = function (input, path, callback, errorFunction) {
     "use strict";
     var self = this,
-        i;
+        i,
+        s;
     if (self.loadedJSXlibs === false) {
         // Try again in a second...
         window.setTimeout(function () { self.runJSX(input, path, callback, errorFunction); }, 1000);
@@ -74,7 +75,8 @@ IllustratorConnection.prototype.runJSX = function (input, path, callback, errorF
                         }
                         if (result.error !== null) {
                             if (errorFunction) {
-                                errorFunction(result.error);
+                                i = new Error(result.error.message + '\n    (' + path + ':' + result.error.line + ')', path, result.error.line);
+                                errorFunction(i);
                             } else {
                                 throw "JSX Error in " + path + " on line " + result.error.line + ": " + result.error.message;
                             }

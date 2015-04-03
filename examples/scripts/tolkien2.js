@@ -1,4 +1,8 @@
 function sauronInflectionLineGenerator(sourceList, direction, accessorNameFunction) {
+    // The main idea behind this is to bundle the links connected to the middle of the sourceList
+    // so that they separate far away, and have the links connected to the ends of the sourceList
+    // separate close to the sourceList. If the sourceList is a vertical line, and there are two
+    // lists to either side, it should look like Sauron's eye in Lord of the Rings
     if (accessorNameFunction === undefined) {
         accessorNameFunction = function (s) { return s.name; };
     }
@@ -14,9 +18,9 @@ function sauronInflectionLineGenerator(sourceList, direction, accessorNameFuncti
             phi,
             i;
         if (sourceIndex > medianIndex) {
-            inflectionDisplacement = 0.125 + 1.5 * (sourceIndex - Math.ceil(medianIndex)) / sourceList.length;
+            inflectionDisplacement = 0.05 + 1.9 * (sourceIndex - Math.ceil(medianIndex)) / sourceList.length;
         } else {
-            inflectionDisplacement = 0.125 + 1.5 * (Math.floor(medianIndex) - sourceIndex) / sourceList.length;
+            inflectionDisplacement = 0.05 + 1.9 * (Math.floor(medianIndex) - sourceIndex) / sourceList.length;
         }
         c = { x : link.target.x + (link.source.x - link.target.x) * inflectionDisplacement,
               y : link.target.y + (link.source.y - link.target.y) * inflectionDisplacement };
@@ -32,17 +36,16 @@ var artboardBounds = jQuery('.artboard')[0].getBoundingClientRect();
 
 var margin = 40,
     width = artboardBounds.width,
-    protagonistColumn = width / 4,
-    bookColumn = width / 2,
-    antagonistColumn = 3 * width / 4,
     height = artboardBounds.height,
-    textPadding = 20;
+    characterCol = width / 4,
+    bookCol = 5 * width / 8,
+    textPadding = 10;
 
 var color = d3.scale.category20();
 
 var svg = d3.select('#Layer_1');
 
-d3.csv("middleEarthCharacters.csv", function (graph) {
+d3.csv("middleEarthCharactersSmall.csv", function (graph) {
     // Books
     var bookList = Object.keys(graph[0]);
     bookList.splice(bookList.indexOf("Character"), 1);
@@ -57,7 +60,7 @@ d3.csv("middleEarthCharacters.csv", function (graph) {
     bookList.forEach(function (d) {
         bookNodes.push({
             name : d,
-            x : bookColumn,
+            x : bookCol,
             y : bookScale(d)
         });
         bookLookup[d] = bookNodes[bookNodes.length - 1];
@@ -70,7 +73,8 @@ d3.csv("middleEarthCharacters.csv", function (graph) {
     books.exit().remove();
     booksEnter.append("text")
         .text(function (d) { return d.name; })
-        .style("text-anchor", "middle");
+        .attr("x", textPadding)
+        .style("text-anchor", "start");
     books.attr("transform", function (d) {
         return "translate(" + d.x + "," + d.y + ")";
     });
@@ -79,61 +83,37 @@ d3.csv("middleEarthCharacters.csv", function (graph) {
     function alphabeticOrder (a, b) {
         return a.Character.localeCompare(b.Character);
     }
-    var protagonistNodes = graph
-            .filter(function (d) { return d.Role === 'Protagonist'; })
-            .sort(alphabeticOrder),
-        antagonistNodes = graph
-            .filter(function (d) { return d.Role === 'Antagonist'; })
+    var characterNodes = graph
             .sort(alphabeticOrder);
     
     // Calculate Character Positions
-    var protagonistList = [],
-        antagonistList = [];
-    protagonistNodes.forEach(function (d) { protagonistList.push(d.Character); });
-    antagonistNodes.forEach(function (d) { antagonistList.push(d.Character); });
+    var characterList = [];
+    characterNodes.forEach(function (d) { characterList.push(d.Character); });
     
-    var protagonistScale = d3.scale.ordinal()
-            .domain(protagonistList)
-            .rangePoints([margin, height - margin, 1.0]),
-        antagonistScale = d3.scale.ordinal()
-            .domain(antagonistList)
+    var characterScale = d3.scale.ordinal()
+            .domain(characterList)
             .rangePoints([margin, height - margin, 1.0]);
     
-    protagonistNodes.forEach(function (d) {
-        d.x = protagonistColumn;
-        d.y = protagonistScale(d.Character);
-    });
-    antagonistNodes.forEach(function (d) {
-        d.x = antagonistColumn;
-        d.y = antagonistScale(d.Character);
+    characterNodes.forEach(function (d) {
+        d.x = characterCol;
+        d.y = characterScale(d.Character);
     });
     
     // Draw Characters
-    var protagonists = svg.selectAll(".protagonist")
-        .data(protagonistNodes, function (d) { return d.Character; });
-    var protagonistsEnter = protagonists.enter().append("g")
-        .attr("class", "protagonist");
-    protagonists.exit().remove();
-    protagonistsEnter.append("text")
+    var characters = svg.selectAll(".character")
+        .data(characterNodes, function (d) { return d.Character; });
+    var charactersEnter = characters.enter().append("g")
+        .attr("class", "character");
+    characters.exit().remove();
+    charactersEnter.append("text")
         .text(function (d) { return d.Character; })
-        .style("text-anchor", "end");
-    protagonists.attr("transform", function (d) {
+        .attr("x", -textPadding)
+        .style("text-anchor", "end")
+        .style("fill", function (d) { return d.Role === 'Protagonist' ? '#aaa' : '#000'; });
+    characters.attr("transform", function (d) {
         return "translate(" + d.x + "," + d.y + ")";
     });
-    
-    // Antagonists
-    var antagonists = svg.selectAll(".antagonist")
-        .data(antagonistNodes, function (d) { return d.Character; });
-    var antagonistsEnter = antagonists.enter().append("g")
-        .attr("class", "antagonist");
-    antagonists.exit().remove();
-    antagonistsEnter.append("text")
-        .text(function (d) { return d.Character; })
-        .style("text-anchor", "start");
-    antagonists.attr("transform", function (d) {
-        return "translate(" + d.x + "," + d.y + ")";
-    });
-    
+        
     // Extract Links
     var linkList = [],
         makeLink = function (d) {
@@ -147,16 +127,17 @@ d3.csv("middleEarthCharacters.csv", function (graph) {
                 }
             }
         };
-    protagonistNodes.forEach(makeLink);
-    antagonistNodes.forEach(makeLink);
+    characterNodes.forEach(makeLink);
     
     // Line generator
-    var line = sauronInflectionLineGenerator(bookList);
+    var line = sauronInflectionLineGenerator(bookList, 'horizontal');
     
     // Draw links
     var links = svg.selectAll(".link")
-        .data(linkList);
-    links.enter().append("path")
+        .data(linkList, function (d) { return d.source.name + d.target.Character; });
+    var linkEnter = links.enter().append("path")
         .attr("class", "link")
-        .attr("d", line);
+        .style("stroke", function (d) { return d.target.Role === 'Protagonist' ? '#aaa' : '#000'; });
+    links.attr("d", line);
+    links.exit().remove();
 });

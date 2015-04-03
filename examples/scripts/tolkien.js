@@ -34,18 +34,18 @@ function sauronInflectionLineGenerator(sourceList, direction, accessorNameFuncti
 
 var artboardBounds = jQuery('.artboard')[0].getBoundingClientRect();
 
-var margin = 150,
+var margin = 40,
     width = artboardBounds.width,
     height = artboardBounds.height,
-    characterRow = height / 4,
-    bookRow = 3 * height / 4,
-    textPadding = 20;
+    characterCol = width / 4,
+    bookCol = 5 * width / 8,
+    textPadding = 10;
 
 var color = d3.scale.category20();
 
 var svg = d3.select('#Layer_1');
 
-d3.csv("middleEarthCharacters.csv", function (graph) {
+d3.csv("middleEarthCharactersSmall.csv", function (graph) {
     // Books
     var bookList = Object.keys(graph[0]);
     bookList.splice(bookList.indexOf("Character"), 1);
@@ -53,15 +53,15 @@ d3.csv("middleEarthCharacters.csv", function (graph) {
     
     var bookScale = d3.scale.ordinal()
         .domain(bookList)
-        .rangePoints([margin, width - margin], 1.0);
+        .rangePoints([margin, height - margin], 1.0);
     
     var bookNodes = [],
         bookLookup = {};
     bookList.forEach(function (d) {
         bookNodes.push({
             name : d,
-            y : bookRow,
-            x : bookScale(d)
+            x : bookCol,
+            y : bookScale(d)
         });
         bookLookup[d] = bookNodes[bookNodes.length - 1];
     });
@@ -73,8 +73,8 @@ d3.csv("middleEarthCharacters.csv", function (graph) {
     books.exit().remove();
     booksEnter.append("text")
         .text(function (d) { return d.name; })
-        .attr("y", textPadding)
-        .style("text-anchor", "middle");
+        .attr("x", textPadding)
+        .style("text-anchor", "start");
     books.attr("transform", function (d) {
         return "translate(" + d.x + "," + d.y + ")";
     });
@@ -92,11 +92,11 @@ d3.csv("middleEarthCharacters.csv", function (graph) {
     
     var characterScale = d3.scale.ordinal()
             .domain(characterList)
-            .rangePoints([margin, width - margin, 1.0]);
+            .rangePoints([margin, height - margin, 1.0]);
     
     characterNodes.forEach(function (d) {
-        d.y = characterRow;
-        d.x = characterScale(d.Character);
+        d.x = characterCol;
+        d.y = characterScale(d.Character);
     });
     
     // Draw Characters
@@ -107,9 +107,9 @@ d3.csv("middleEarthCharacters.csv", function (graph) {
     characters.exit().remove();
     charactersEnter.append("text")
         .text(function (d) { return d.Character; })
+        .attr("x", -textPadding)
         .style("text-anchor", "end")
-        .style("fill", function (d) { return d.Role === 'Protagonist' ? '#0f0' : '#f00'; })
-        .attr("transform", "rotate(45)");
+        .style("fill", function (d) { return d.Role === 'Protagonist' ? '#aaa' : '#000'; });
     characters.attr("transform", function (d) {
         return "translate(" + d.x + "," + d.y + ")";
     });
@@ -130,14 +130,14 @@ d3.csv("middleEarthCharacters.csv", function (graph) {
     characterNodes.forEach(makeLink);
     
     // Line generator
-    var line = sauronInflectionLineGenerator(bookList, 'vertical');
+    var line = sauronInflectionLineGenerator(bookList, 'horizontal');
     
     // Draw links
     var links = svg.selectAll(".link")
         .data(linkList, function (d) { return d.source.name + d.target.Character; });
     var linkEnter = links.enter().append("path")
         .attr("class", "link")
-        .style("stroke", function (d) { return d.target.Role === 'Protagonist' ? '#0f0' : '#f00'; });
+        .style("stroke", function (d) { return d.target.Role === 'Protagonist' ? '#aaa' : '#000'; });
     links.attr("d", line);
     links.exit().remove();
 });

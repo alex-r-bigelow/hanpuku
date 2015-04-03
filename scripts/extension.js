@@ -1,5 +1,5 @@
 /*jslint evil:true*/
-/*globals jQuery, d3, ejQuery, ed3, ILLUSTRATOR, DATA, DOM, CODE, MAP, ExamplesManager, IllustratorConnection, DataManager, MappingManager, DomManager, CodeManager*/
+/*globals jQuery, d3, ejQuery, ed3, ILLUSTRATOR, DATA, DOM, CODE, MAP, ExamplesManager, IllustratorConnection, DataManager, MappingManager, DomManager, CodeManager, window, XMLHttpRequest, setTimeout, clearTimeout*/
 
 (function () {
     var extensionScope = this;
@@ -128,7 +128,7 @@
         xmlhttp.onreadystatechange = function () {
             if (xmlhttp.readyState === 4) {
                 if (xmlhttp.status === 200 || xmlhttp.status === 0) {
-                    eval.apply(extensionScope, [xmlhttp.responseText]);
+                    eval.apply(extensionScope, [xmlhttp.responseText + '\n//@ sourceURL=' + scriptName]);   // the extra comment enables normal debugging
                 } else {
                     throw new Error('Error ' + xmlhttp.status + ' loading library: ' + scriptName);
                 }
@@ -205,7 +205,7 @@
             }
         }
         self.advancedMode();
-        self.switchTab('Examples');
+        self.switchTab('JS');
         
         // Init the message area
         ejQuery('#messageOverlay').hide();

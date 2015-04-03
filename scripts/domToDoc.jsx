@@ -361,8 +361,7 @@
         iText.contents = dText.contents;
         
         // Fonts
-        
-        iText.textRange.size = parseFloat(dText.fontSize);
+        iText.textRange.characterAttributes.size = parseFloat(dText.fontSize);
         applyFont(iText.textRange,
                   dText.fontFamilies,
                   dText.fontStyle,
@@ -417,9 +416,12 @@
         //scale_y = iText.matrix.mValueD < 0 ? -scale_y : scale_y;
         theta = Math.atan2(iText.matrix.mValueB, iText.matrix.mValueD);
         
+        scale_x = scale_x * iText.textRange.horizontalScale / 100;
+        scale_y = scale_y * iText.textRange.verticalScale / 100;
+        
         iText.translate(-iText.anchor[0], -iText.anchor[1]);
         iText.rotate(-theta * 180 / Math.PI, true, true, true, true, Transformation.DOCUMENTORIGIN);
-        iText.resize(scale_x * 100, scale_y * 100, true, true, true, true, true, Transformation.DOCUMENTORIGIN);
+        iText.resize(100 / scale_x, 100 / scale_y, true, true, true, true, true, Transformation.DOCUMENTORIGIN);
         
         // Okay, now apply the values we got from the DOM
         iText.resize(dText.scaleX * 100, dText.scaleY * 100, true, true, true, true, true, Transformation.DOCUMENTORIGIN);

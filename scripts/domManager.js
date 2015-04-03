@@ -907,55 +907,28 @@ DomManager.prototype.addText = function (parent, text) {
         t.attr('transform', text.reverseTransform);
     }
     
+    text.internalX = Number(text.internalX);
+    text.internalY = Number(text.internalY);
+    
     if (text.x_0 === null) {
-        // This is a new item! Append the absolute transformation AFTER
+        // This is a new item! Append the absolute transformation BEFORE
         // the reverseTransform has been reversed in the docToDom hack
-        sinTheta = Math.sin(text.theta_1);
-        cosTheta = Math.cos(text.theta_1);
-        diffMatrix = [text.scale_x_1 * cosTheta,
-                      -text.scale_y_1 * sinTheta,
-                      text.scale_x_1 * sinTheta,
-                      text.scale_y_1 * cosTheta,
-                      text.x_1,
-                      -text.y_1];
-        t.attr('hanpuku_prependTransform', 'matrix(' + diffMatrix.join(',') + ')');
+        
+        t.attr('hanpuku_prependTransform', 'translate(' + text.x_1 + ',' + (-text.y_1) + ')' +
+                                           'rotate(' + (-180 * text.theta_1 / Math.PI) + ')' +
+                                           'scale(' + text.scale_x_1 + ',' + text.scale_y_1 + ')');
     } else {
         // Extract any transformation changes that were made in Illustrator,
         // and prepend them to the transform attribute AFTER the reverseTransform
         // has been reversed in the docToDom hack
-        if (text.contents === 'Sepal Length (cm)') {
-            console.log(text);
-        }
         
-        text.internalX = Number(text.internalX);
-        text.internalY = Number(text.internalY);
-        
-        t.attr('hanpuku_appendTransform', 'scale(' + (text.scale_x_1 / text.scale_x_0) +
-                                        ',' + (text.scale_y_1 / text.scale_y_0) + ')' +
-                                        'rotate(' + (180 * (text.theta_0 - text.theta_1) / Math.PI) +
+        t.attr('hanpuku_appendTransform', 'translate(' + (text.x_1 - text.x_0) +
+                                        ',' + (text.y_0 - text.y_1) + ')' +
+                                        'rotate(' + (180 * (text.theta_1 - text.theta_0) / Math.PI) +
                                         ',' + text.internalX +
                                         ',' + text.internalY + ')' +
-                                        'translate(' + (text.x_1 - text.x_0) +
-                                        ',' + (text.y_0 - text.y_1) + ')');
-        
-        /*
-        sinTheta = Math.sin(text.theta_1 - text.theta_0);
-        cosTheta = Math.cos(text.theta_1 - text.theta_0);
-        diffMatrix = [text.scale_x_1 * cosTheta / text.scale_x_0,
-                      -text.scale_y_1 * sinTheta / text.scale_y_0,
-                      text.scale_x_1 * sinTheta / text.scale_x_0,
-                      text.scale_y_1 * cosTheta / text.scale_y_0,
-                      text.x_1 - text.x_0,
-                      text.y_0 - text.y_1];*/
-        
-        // Because the
-        // internal x and y were incorporated,
-        // we need to factor them out before applying
-        // any changes (as we're re-applying the x
-        // and y in their original locations)
-        //temp = hanpuku.matMultiply([1, 0, 0, 1, Number(text.internalX), Number(text.internalY)], diffMatrix);
-        //temp = hanpuku.matMultiply(temp, [1, 0, 0, 1, -Number(text.internalX), -Number(text.internalY)]);
-        //t.attr('hanpuku_postTransform', 'matrix(' + temp.join(',') + ')');
+                                        'scale(' + (text.scale_x_1 / text.scale_x_0) +
+                                        ',' + (text.scale_y_1 / text.scale_y_0) + ')');
     }
     
     // Kerning

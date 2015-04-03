@@ -1,32 +1,12 @@
 Character,The Hobbit,The Fellowship of the Ring,The Two Towers,The Return of the King,Role
 Aragorn,0,1,1,1,Protagonist
-Arwen Undómiel,0,1,0,1,Protagonist
-Bard the Bowman,1,0,0,0,Protagonist
-Beorn,1,0,0,0,Protagonist
-Bilbo Baggins,1,1,0,1,Protagonist
-Boromir,0,1,0,0,Protagonist
-Denethor,0,0,0,1,Protagonist
+Bilbo,1,1,0,1,Protagonist
 Elrond,1,1,1,1,Protagonist
-Éomer,0,0,1,1,Protagonist
-Éowyn,0,0,1,1,Protagonist
-Faramir,0,0,1,1,Protagonist
-Frodo Baggins,0,1,1,1,Protagonist
+Frodo,0,1,1,1,Protagonist
 Galadriel,0,1,1,1,Protagonist
 Gandalf,1,1,1,1,Protagonist
-Gimli,0,1,1,1,Protagonist
-Glorfindel,0,1,0,0,Protagonist
 Gollum,1,1,1,1,Antagonist
-Gríma Wormtongue,0,0,1,1,Antagonist
-Legolas Greenleaf,0,1,1,1,Protagonist
-Meriadoc Brandybuck,0,1,1,1,Protagonist
-Peregrin Took,0,1,1,1,Protagonist
-Samwise Gamgee,0,1,1,1,Protagonist
-Saruman the White,0,1,1,1,Antagonist
+Sam,0,1,1,1,Protagonist
+Saruman,0,1,1,1,Antagonist
 Sauron,0,1,1,1,Antagonist
-Smaug,1,0,0,0,Protagonist
-Théoden,0,0,1,1,Protagonist
-Thorin Oakenshield,1,0,0,0,Protagonist
-Thranduil,1,0,0,0,Protagonist
-Tom Bombadil,0,1,0,0,Protagonist
-Treebeard,0,0,1,0,Protagonist
-Witch-king of Angmar,0,1,0,1,Antagonist
+Smaug,1,0,0,0,Antagonist

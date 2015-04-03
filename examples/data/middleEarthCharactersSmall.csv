@@ -1,0 +1,18 @@
+Character,The Silmarillion,The Hobbit,The Fellowship of the Ring,The Two Towers,The Return of the King,Role
+Aragorn,0,0,1,1,1,Protagonist
+Beren,1,0,0,0,0,Protagonist
+Bilbo,0,1,1,0,1,Protagonist
+Eärendil,1,0,0,0,0,Protagonist
+Elrond,1,1,1,1,1,Protagonist
+Frodo,0,0,1,1,1,Protagonist
+Galadriel,1,0,1,1,1,Protagonist
+Gandalf,0,1,1,1,1,Protagonist
+Gollum,0,1,1,1,1,Antagonist
+Lúthien,1,0,0,0,0,Protagonist
+Morgoth,1,0,0,0,0,Antagonist
+Sam,0,0,1,1,1,Protagonist
+Saruman,0,0,1,1,1,Antagonist
+Sauron,1,0,1,1,1,Antagonist
+Smaug,0,1,0,0,0,Antagonist
+Tuor,1,0,0,0,0,Protagonist
+Túrin,1,0,0,0,0,Protagonist

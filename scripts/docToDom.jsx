@@ -298,6 +298,12 @@
                             t.matrix.mValueD * t.matrix.mValueD);
         //scale_y = t.matrix.mValueD < 0 ? -scale_y : scale_y;
         theta = Math.atan2(t.matrix.mValueB, t.matrix.mValueD);
+        
+        // Illustrator actually changes the font size and textRange.horizontalScale (.verticalScale for some asian texts)
+        // in response to scaling... we need to incorporate each of these
+        scale_x = scale_x * t.textRange.horizontalScale / 100;
+        scale_y = scale_y * t.textRange.verticalScale / 100;
+        
         x = t.anchor[0];
         y = t.anchor[1];
         
