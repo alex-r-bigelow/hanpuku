@@ -1,8 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <ExtensionList>
-    <Extension Id="hanpuku.extension">
+    <Extension Id="rawData.hanpuku.extension">
         <HostList>
-           <Host Name="ILST" Port="8088"/> 
+           <Host Name="ILST" Port="46800"/> 
+        </HostList>
+    </Extension>
+    <Extension Id="spreadsheet.hanpuku.extension">
+        <HostList>
+           <Host Name="ILST" Port="46801"/> 
+        </HostList>
+    </Extension>
+    <Extension Id="distribute.hanpuku.extension">
+        <HostList>
+           <Host Name="ILST" Port="46802"/> 
+        </HostList>
+    </Extension>
+    <Extension Id="rotate.hanpuku.extension">
+        <HostList>
+           <Host Name="ILST" Port="46803"/> 
+        </HostList>
+    </Extension>
+    <Extension Id="scale.hanpuku.extension">
+        <HostList>
+           <Host Name="ILST" Port="46804"/> 
+        </HostList>
+    </Extension>
+    <Extension Id="colorScale.hanpuku.extension">
+        <HostList>
+           <Host Name="ILST" Port="46805"/> 
+        </HostList>
+    </Extension>
+    <Extension Id="colorSwatch.hanpuku.extension">
+        <HostList>
+           <Host Name="ILST" Port="46806"/> 
+        </HostList>
+    </Extension>
+    <Extension Id="library.hanpuku.extension">
+        <HostList>
+           <Host Name="ILST" Port="46807"/> 
+        </HostList>
+    </Extension>
+    <Extension Id="javascript.hanpuku.extension">
+        <HostList>
+           <Host Name="ILST" Port="46808"/> 
+        </HostList>
+    </Extension>
+    <Extension Id="css.hanpuku.extension">
+        <HostList>
+           <Host Name="ILST" Port="46809"/> 
         </HostList>
     </Extension>
 </ExtensionList>

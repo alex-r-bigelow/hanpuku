@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+
+<head>
+    <link type="text/css" rel="stylesheet" href="../../common/style.css" />
+    <link type="text/css" rel="stylesheet" href="rawData.css" />
+    <script type="application/javascript" src="../../lib/scriptLoader.js"></script>
+    <script type="application/javascript" src="rawData.js"></script>
+</head>
+
+<body onload="window.illustrator.applyUI();">
+    <span>
+        <select id="currentFile">
+            <optgroup>
+                <option>(embedded data 1)</option>
+                <option>someFlowers.csv</option>
+                <option>allFlowers.csv</option>
+                <option>lesMiserables.json</option>
+            </optgroup>
+            <optgroup>
+                <option>New</option>
+                <option>Load Data File...</option>
+                <option>Database Query...</option>
+                <option>Connect to Stream...</option>
+            </optgroup>
+        </select>
+        <input type="checkbox" id="linkCheck">Link</input>
+    </span>
+</body>
+
+</html>

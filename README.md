@@ -54,6 +54,7 @@ Work in progress:
 - Replace textareas with ace editors
 - Regex search/replace in text editors (esp. data)
 - Circular data in the Data preview (visualize cycles)
+- Data point & shape inference
 - More examples
 - Proper CMYK color
 - Export as/to web page

@@ -4,7 +4,7 @@
   <Contact mailto="abigelow@cs.utah.edu"/>
   <Abstract href="http://alex.bigelowsite.com">
     <![CDATA[
-hanpuku is an interface between d3.js and Adobe Illustrator, enabling a more flexible data visualization workflow. Data bindings no longer disappear when you edit a d3-generated graphic in Illustrator; those bindings now survive custom edits, and even get saved inside native .ai files.
+Hanpuku is an interface between d3.js and Adobe Illustrator, enabling a more flexible data visualization workflow. Data bindings no longer disappear when you edit a d3-generated graphic in Illustrator; those bindings now survive custom edits, and even get saved inside native .ai files.
 
 On the flip side, your custom Illustrator edits will also survive properly-written d3.js scripts: now, when your data changes after you've done lots of hand-crafted awesomeness, you don't have to start over from scratch!
     ]]>
@@ -36,15 +36,15 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
     <Extension Id="rawData.hanpuku.extension">
       <DispatchInfo>
         <Resources>
-          <MainPath>./rawData.html</MainPath>
+          <MainPath>./extensions/rawData/rawData.html</MainPath>
         </Resources>
         <UI>
           <Type>Panel</Type>
-          <Menu>hanpuku</Menu>
+          <Menu>Hanpuku Raw Data</Menu>
           <Geometry>
             <Size>
               <Height>900</Height>
-              <Width>1600</Width>
+              <Width>600</Width>
             </Size>
             <MinSize>
               <Height>500</Height>
@@ -64,15 +64,15 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
       <Extension Id="spreadsheet.hanpuku.extension">
       <DispatchInfo>
         <Resources>
-          <MainPath>./spreadsheet.html</MainPath>
+          <MainPath>./extensions/spreadsheet/spreadsheet.html</MainPath>
         </Resources>
         <UI>
           <Type>Panel</Type>
-          <Menu>hanpuku</Menu>
+          <Menu>Hanpuku Spreadsheet</Menu>
           <Geometry>
             <Size>
               <Height>900</Height>
-              <Width>1600</Width>
+              <Width>600</Width>
             </Size>
             <MinSize>
               <Height>500</Height>
@@ -92,15 +92,15 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
       <Extension Id="distribute.hanpuku.extension">
       <DispatchInfo>
         <Resources>
-          <MainPath>./distribute.html</MainPath>
+          <MainPath>./extensions/distribute/distribute.html</MainPath>
         </Resources>
         <UI>
           <Type>Panel</Type>
-          <Menu>hanpuku</Menu>
+          <Menu>Hanpuku Distribute</Menu>
           <Geometry>
             <Size>
               <Height>900</Height>
-              <Width>1600</Width>
+              <Width>600</Width>
             </Size>
             <MinSize>
               <Height>500</Height>
@@ -120,15 +120,15 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
       <Extension Id="rotate.hanpuku.extension">
       <DispatchInfo>
         <Resources>
-          <MainPath>./rotate.html</MainPath>
+          <MainPath>./extensions/rotate/rotate.html</MainPath>
         </Resources>
         <UI>
           <Type>Panel</Type>
-          <Menu>hanpuku</Menu>
+          <Menu>Hanpuku Rotate</Menu>
           <Geometry>
             <Size>
               <Height>900</Height>
-              <Width>1600</Width>
+              <Width>600</Width>
             </Size>
             <MinSize>
               <Height>500</Height>
@@ -148,15 +148,15 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
       <Extension Id="scale.hanpuku.extension">
       <DispatchInfo>
         <Resources>
-          <MainPath>./scale.html</MainPath>
+          <MainPath>./extensions/scale/scale.html</MainPath>
         </Resources>
         <UI>
           <Type>Panel</Type>
-          <Menu>hanpuku</Menu>
+          <Menu>Hanpuku Scale</Menu>
           <Geometry>
             <Size>
               <Height>900</Height>
-              <Width>1600</Width>
+              <Width>600</Width>
             </Size>
             <MinSize>
               <Height>500</Height>
@@ -176,15 +176,15 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
       <Extension Id="colorScale.hanpuku.extension">
       <DispatchInfo>
         <Resources>
-          <MainPath>./colorScale.html</MainPath>
+          <MainPath>./extensions/colorScale/colorScale.html</MainPath>
         </Resources>
         <UI>
           <Type>Panel</Type>
-          <Menu>hanpuku</Menu>
+          <Menu>Hanpuku Color Scale</Menu>
           <Geometry>
             <Size>
               <Height>900</Height>
-              <Width>1600</Width>
+              <Width>600</Width>
             </Size>
             <MinSize>
               <Height>500</Height>
@@ -204,15 +204,15 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
       <Extension Id="colorSwatch.hanpuku.extension">
       <DispatchInfo>
         <Resources>
-          <MainPath>./colorSwatch.html</MainPath>
+          <MainPath>./extensions/colorSwatch/colorSwatch.html</MainPath>
         </Resources>
         <UI>
           <Type>Panel</Type>
-          <Menu>hanpuku</Menu>
+          <Menu>Hanpuku Color Swatch</Menu>
           <Geometry>
             <Size>
               <Height>900</Height>
-              <Width>1600</Width>
+              <Width>600</Width>
             </Size>
             <MinSize>
               <Height>500</Height>
@@ -232,15 +232,15 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
       <Extension Id="library.hanpuku.extension">
       <DispatchInfo>
         <Resources>
-          <MainPath>./library.html</MainPath>
+          <MainPath>./extensions/library/library.html</MainPath>
         </Resources>
         <UI>
           <Type>Panel</Type>
-          <Menu>hanpuku</Menu>
+          <Menu>Hanpuku Library</Menu>
           <Geometry>
             <Size>
               <Height>900</Height>
-              <Width>1600</Width>
+              <Width>600</Width>
             </Size>
             <MinSize>
               <Height>500</Height>
@@ -260,15 +260,15 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
       <Extension Id="javascript.hanpuku.extension">
       <DispatchInfo>
         <Resources>
-          <MainPath>./javascript.html</MainPath>
+          <MainPath>./extensions/javascript/javascript.html</MainPath>
         </Resources>
         <UI>
           <Type>Panel</Type>
-          <Menu>hanpuku</Menu>
+          <Menu>Hanpuku Javascript</Menu>
           <Geometry>
             <Size>
               <Height>900</Height>
-              <Width>1600</Width>
+              <Width>600</Width>
             </Size>
             <MinSize>
               <Height>500</Height>
@@ -288,15 +288,15 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
       <Extension Id="css.hanpuku.extension">
       <DispatchInfo>
         <Resources>
-          <MainPath>./css.html</MainPath>
+          <MainPath>./extensions/css/css.html</MainPath>
         </Resources>
         <UI>
           <Type>Panel</Type>
-          <Menu>hanpuku</Menu>
+          <Menu>Hanpuku CSS</Menu>
           <Geometry>
             <Size>
               <Height>900</Height>
-              <Width>1600</Width>
+              <Width>600</Width>
             </Size>
             <MinSize>
               <Height>500</Height>
