@@ -43,12 +43,12 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
           <Menu>Hanpuku Raw Data</Menu>
           <Geometry>
             <Size>
-              <Height>900</Height>
-              <Width>600</Width>
-            </Size>
-            <MinSize>
               <Height>500</Height>
               <Width>500</Width>
+            </Size>
+            <MinSize>
+              <Height>350</Height>
+              <Width>380</Width>
             </MinSize>
           </Geometry>
           <Icons>
@@ -71,12 +71,12 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
           <Menu>Hanpuku Spreadsheet</Menu>
           <Geometry>
             <Size>
-              <Height>900</Height>
-              <Width>600</Width>
-            </Size>
-            <MinSize>
               <Height>500</Height>
               <Width>500</Width>
+            </Size>
+            <MinSize>
+              <Height>350</Height>
+              <Width>380</Width>
             </MinSize>
           </Geometry>
           <Icons>
@@ -99,12 +99,12 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
           <Menu>Hanpuku Distribute</Menu>
           <Geometry>
             <Size>
-              <Height>900</Height>
-              <Width>600</Width>
-            </Size>
-            <MinSize>
               <Height>500</Height>
               <Width>500</Width>
+            </Size>
+            <MinSize>
+              <Height>350</Height>
+              <Width>400</Width>
             </MinSize>
           </Geometry>
           <Icons>
@@ -127,12 +127,12 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
           <Menu>Hanpuku Rotate</Menu>
           <Geometry>
             <Size>
-              <Height>900</Height>
-              <Width>600</Width>
-            </Size>
-            <MinSize>
               <Height>500</Height>
               <Width>500</Width>
+            </Size>
+            <MinSize>
+              <Height>350</Height>
+              <Width>380</Width>
             </MinSize>
           </Geometry>
           <Icons>
@@ -155,12 +155,12 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
           <Menu>Hanpuku Scale</Menu>
           <Geometry>
             <Size>
-              <Height>900</Height>
-              <Width>600</Width>
-            </Size>
-            <MinSize>
               <Height>500</Height>
               <Width>500</Width>
+            </Size>
+            <MinSize>
+              <Height>350</Height>
+              <Width>380</Width>
             </MinSize>
           </Geometry>
           <Icons>
@@ -183,12 +183,12 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
           <Menu>Hanpuku Color Scale</Menu>
           <Geometry>
             <Size>
-              <Height>900</Height>
-              <Width>600</Width>
-            </Size>
-            <MinSize>
               <Height>500</Height>
               <Width>500</Width>
+            </Size>
+            <MinSize>
+              <Height>350</Height>
+              <Width>380</Width>
             </MinSize>
           </Geometry>
           <Icons>
@@ -211,12 +211,12 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
           <Menu>Hanpuku Color Swatch</Menu>
           <Geometry>
             <Size>
-              <Height>900</Height>
-              <Width>600</Width>
-            </Size>
-            <MinSize>
               <Height>500</Height>
               <Width>500</Width>
+            </Size>
+            <MinSize>
+              <Height>350</Height>
+              <Width>380</Width>
             </MinSize>
           </Geometry>
           <Icons>
@@ -239,12 +239,12 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
           <Menu>Hanpuku Library</Menu>
           <Geometry>
             <Size>
-              <Height>900</Height>
-              <Width>600</Width>
-            </Size>
-            <MinSize>
               <Height>500</Height>
               <Width>500</Width>
+            </Size>
+            <MinSize>
+              <Height>350</Height>
+              <Width>380</Width>
             </MinSize>
           </Geometry>
           <Icons>
@@ -267,12 +267,12 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
           <Menu>Hanpuku Javascript</Menu>
           <Geometry>
             <Size>
-              <Height>900</Height>
-              <Width>600</Width>
-            </Size>
-            <MinSize>
               <Height>500</Height>
               <Width>500</Width>
+            </Size>
+            <MinSize>
+              <Height>350</Height>
+              <Width>380</Width>
             </MinSize>
           </Geometry>
           <Icons>
@@ -295,12 +295,12 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
           <Menu>Hanpuku CSS</Menu>
           <Geometry>
             <Size>
-              <Height>900</Height>
-              <Width>600</Width>
-            </Size>
-            <MinSize>
               <Height>500</Height>
               <Width>500</Width>
+            </Size>
+            <MinSize>
+              <Height>350</Height>
+              <Width>380</Width>
             </MinSize>
           </Geometry>
           <Icons>

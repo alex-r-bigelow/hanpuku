@@ -5,11 +5,72 @@
     <link type="text/css" rel="stylesheet" href="../../common/style.css" />
     <link type="text/css" rel="stylesheet" href="distribute.css" />
     <script type="application/javascript" src="../../lib/scriptLoader.js"></script>
-    <script type="application/javascript" src="distribute.js"></script>
 </head>
 
 <body onload="window.illustrator.applyUI();">
-    rawData
+    <div id="row0">
+        Use data attribute:
+        <select id="attribute">
+            <option>(Text Contents)</option>
+            <option disabled>&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</option>
+            <option>Name</option>
+            <option>Role</option>
+            <option>Age</option>
+            <option selected>Species</option>
+        </select>
+        <input type="checkbox">Treat Numbers as Ordinal</input>
+    </div>
+    <div id="row1">
+        <span>
+            <img src="alignMenu.png"/><!--
+            <select id="relative">
+                <option>Align to Selection</option>
+                <option selected checked>Align to Key Object</option>
+                <option>Align to Artboard</option>
+            </select>-->
+        </span>
+        <span>
+            <img src="verticalTop.png"/>
+            <img src="verticalMiddle.png"/>
+            <img src="verticalBottom.png"/>
+        </span>
+        <span>
+            <img src="horizontalLeft.png"/>
+            <img src="horizontalCenter.png"/>
+            <img src="horizontalRight.png"/>
+        </span>
+        <span>
+            <img src="pathAnchor.png"/>
+            <img src="path.png" style="border: 1px solid black"/>
+            <img src="pathRotate.png"/>
+        </span>
+    </div>
+    <div id="row2">
+        <img id="slider" src="sampleSlider0.png" width="370" height="120"/>
+    </div>
+    <div id="row3">
+        Value:<input type="text"/>
+        <select id="presets">
+            <option>Apply preset:</option>
+            <option disabled>&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</option>
+            <option>Use Low / High</option>
+            <option>Nearest base 10</option>
+            <option disabled>&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</option>
+            <option>Alphabetize</option>
+        </select>
+    </div>
+    <div id="row4">
+        Warnings:
+        <textarea id="warnings" disabled="true">
+&#9472; GroupItem3 has no bound Species attribute. It will be ignored.
+&#9472; PathItem219's Species value "unknown" is not on the scale. It will be ignored.
+</textarea>
+    </div>
+    <div id="row5">
+        <button id="applyButton">Apply</button>
+    </div>
+    
+    <script type="application/javascript" src="distribute.js"></script>
 </body>
 
 </html>

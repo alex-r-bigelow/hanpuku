@@ -5,11 +5,57 @@
     <link type="text/css" rel="stylesheet" href="../../common/style.css" />
     <link type="text/css" rel="stylesheet" href="colorSwatch.css" />
     <script type="application/javascript" src="../../lib/scriptLoader.js"></script>
-    <script type="application/javascript" src="colorSwatch.js"></script>
 </head>
 
 <body onload="window.illustrator.applyUI();">
-    colorSwatch
+    <div id="row0">
+        Use data attribute:
+        <select id="attribute">
+            <option>(Text Contents)</option>
+            <option disabled>&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</option>
+            <option>Name</option>
+            <option>Role</option>
+            <option>Age</option>
+            <option selected>Species</option>
+        </select>
+        <input type="checkbox" checked="true" disabled="true">Treat Numbers as Ordinal</input>
+    </div>
+    <div id="row1">
+        <table>
+            <tr>
+                <td>Hobbits</td>
+                <td class="square" style="background-color:#4b4e21"></td>
+            </tr>
+            <tr>
+                <td>Elves</td>
+                <td class="square" style="background-color:#bb882c"></td>
+            </tr>
+            <tr>
+                <td>Men</td>
+                <td class="square" style="background-color:#9b5b36"></td>
+            </tr>
+            <tr>
+                <td>Maiar</td>
+                <td class="square" style="background-color:#60312d"></td>
+            </tr>
+            <tr>
+                <td>+</td>
+                <td class="square" style="background-color:#000000"></td>
+            </tr>
+        </table>
+    </div>
+    <div id="row4">
+        Warnings:
+        <textarea id="warnings" disabled="true">
+&#9472; GroupItem3 has no bound Species attribute. It will be ignored.
+&#9472; PathItem219's Species value "unknown" is not on the scale. It will be ignored.
+</textarea>
+    </div>
+    <div id="row5">
+        <button id="applyButton">Apply</button>
+    </div>
+    
+    <script type="application/javascript" src="colorSwatch.js"></script>
 </body>
 
 </html>

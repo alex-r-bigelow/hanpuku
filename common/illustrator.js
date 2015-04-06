@@ -144,18 +144,16 @@ window.scriptLoader.require(['../../lib/CSInterface.js',
                                         0.25 * (background.alpha / 255.0) + ')';
         
         // Apply the font and colors
-        jQuery('body').css('font-family', self.UI.fontFamily)
-                       .css('font-size', self.UI.fontSize)
-                       .css('background-color', self.UI.backgroundColor)
-                       .css('color', self.UI.textColor);
+        jQuery('body, option, button, select')
+            .css('font-family', self.UI.fontFamily)
+            .css('font-size', self.UI.fontSize);
+        jQuery('body, option, button, select, textarea')
+            .css('background-color', self.UI.backgroundColor);
+        jQuery('body, option, textarea, button')
+            .css('color', self.UI.textColor);
         
         jQuery('.halo').css('background-color', self.UI.haloColor)
                        .css('color', self.UI.oppositeTextColor);
-        jQuery('button, select').css('background-color', self.UI.buttonColor);
-        jQuery('textarea').css('background-color', self.UI.textBackgroundColor)
-                          .css('color', self.UI.textColor)
-                          .css('font-size', self.UI.largeFontSize);
-        jQuery('#dataPreview').css('background-color', self.UI.bodyColor);
     };
     
     window.illustrator = new IllustratorConnection();

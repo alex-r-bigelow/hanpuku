@@ -9,23 +9,44 @@
 </head>
 
 <body onload="window.illustrator.applyUI();">
-    <span>
-        <select id="currentFile">
-            <optgroup>
+    <div id="topBar">
+        <div class="left">
+            <select id="currentFile">
                 <option>(embedded data 1)</option>
                 <option>someFlowers.csv</option>
                 <option>allFlowers.csv</option>
                 <option>lesMiserables.json</option>
-            </optgroup>
-            <optgroup>
+                <option disabled>&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</option>
                 <option>New</option>
                 <option>Load Data File...</option>
                 <option>Database Query...</option>
                 <option>Connect to Stream...</option>
-            </optgroup>
-        </select>
-        <input type="checkbox" id="linkCheck">Link</input>
-    </span>
+            </select>
+            <input type="checkbox" id="linkCheck">Link</input>
+        </div>
+        <div class="right">
+            Interpret as:
+            <select id="format">
+                <option>Plain text</option>
+                <option>CSV</option>
+                <option>TSV</option>
+                <option>JSON</option>
+                <option>XML</option>
+                <option>HTML</option>
+                <option>Javascript</option>
+            </select>
+            <img src="successfulParse.png"/>
+        </div>
+    </div>
+    <textarea></textarea>
+    <div id="bottomBar">
+        <span class="left">
+            <img src="search.png"/>
+            <img src="new.png"/>
+            <img src="trash.png"/>
+            <img src="refresh.png"/>
+        </span>
+    </div>
 </body>
 
 </html>
