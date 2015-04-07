@@ -10,7 +10,9 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
     ]]>
   </Abstract>
   <ExtensionList>
-      <Extension Id="rawData.hanpuku.extension" Version="1.0"/>
+      <Extension Id="loadData.hanpuku.extension" Version="1.0"/>
+      <Extension Id="inferData.hanpuku.extension" Version="1.0"/>
+      <Extension Id="query.hanpuku.extension" Version="1.0"/>
       <Extension Id="spreadsheet.hanpuku.extension" Version="1.0"/>
       <Extension Id="distribute.hanpuku.extension" Version="1.0"/>
       <Extension Id="rotate.hanpuku.extension" Version="1.0"/>
@@ -33,14 +35,14 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
     </RequiredRuntimeList>
   </ExecutionEnvironment>
   <DispatchInfoList>
-    <Extension Id="rawData.hanpuku.extension">
+    <Extension Id="loadData.hanpuku.extension">
       <DispatchInfo>
         <Resources>
-          <MainPath>./extensions/rawData/rawData.html</MainPath>
+          <MainPath>./extensions/loadData/loadData.html</MainPath>
         </Resources>
         <UI>
           <Type>Panel</Type>
-          <Menu>Hanpuku Raw Data</Menu>
+          <Menu>Load Data</Menu>
           <Geometry>
             <Size>
               <Height>500</Height>
@@ -52,11 +54,67 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
             </MinSize>
           </Geometry>
           <Icons>
-            <Icon Type="Normal">./img/rawDataLight.png</Icon>
-            <Icon Type="RollOver">./img/rawDataLight.png</Icon>
-            <Icon Type="Disabled">./img/rawDataDark.png</Icon>
-            <Icon Type="DarkNormal">./img/rawDataDark.png</Icon>
-            <Icon Type="DarkRollOver">./img/rawDataDark.png</Icon>
+            <Icon Type="Normal">./img/loadDataLight.png</Icon>
+            <Icon Type="RollOver">./img/loadDataLight.png</Icon>
+            <Icon Type="Disabled">./img/loadDataDark.png</Icon>
+            <Icon Type="DarkNormal">./img/loadDataDark.png</Icon>
+            <Icon Type="DarkRollOver">./img/loadDataDark.png</Icon>
+          </Icons>
+        </UI>
+      </DispatchInfo>
+    </Extension>
+      <Extension Id="inferData.hanpuku.extension">
+      <DispatchInfo>
+        <Resources>
+          <MainPath>./extensions/inferData/inferData.html</MainPath>
+        </Resources>
+        <UI>
+          <Type>Panel</Type>
+          <Menu>Infer Data</Menu>
+          <Geometry>
+            <Size>
+              <Height>500</Height>
+              <Width>500</Width>
+            </Size>
+            <MinSize>
+              <Height>350</Height>
+              <Width>380</Width>
+            </MinSize>
+          </Geometry>
+          <Icons>
+            <Icon Type="Normal">./img/inferDataLight.png</Icon>
+            <Icon Type="RollOver">./img/inferDataLight.png</Icon>
+            <Icon Type="Disabled">./img/inferDataDark.png</Icon>
+            <Icon Type="DarkNormal">./img/inferDataDark.png</Icon>
+            <Icon Type="DarkRollOver">./img/inferDataDark.png</Icon>
+          </Icons>
+        </UI>
+      </DispatchInfo>
+    </Extension>
+      <Extension Id="query.hanpuku.extension">
+      <DispatchInfo>
+        <Resources>
+          <MainPath>./extensions/query/query.html</MainPath>
+        </Resources>
+        <UI>
+          <Type>Panel</Type>
+          <Menu>Data Query</Menu>
+          <Geometry>
+            <Size>
+              <Height>500</Height>
+              <Width>500</Width>
+            </Size>
+            <MinSize>
+              <Height>350</Height>
+              <Width>380</Width>
+            </MinSize>
+          </Geometry>
+          <Icons>
+            <Icon Type="Normal">./img/queryLight.png</Icon>
+            <Icon Type="RollOver">./img/queryLight.png</Icon>
+            <Icon Type="Disabled">./img/queryDark.png</Icon>
+            <Icon Type="DarkNormal">./img/queryDark.png</Icon>
+            <Icon Type="DarkRollOver">./img/queryDark.png</Icon>
           </Icons>
         </UI>
       </DispatchInfo>
@@ -68,7 +126,7 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
         </Resources>
         <UI>
           <Type>Panel</Type>
-          <Menu>Hanpuku Spreadsheet</Menu>
+          <Menu>Data Spreadsheet</Menu>
           <Geometry>
             <Size>
               <Height>500</Height>
@@ -96,7 +154,7 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
         </Resources>
         <UI>
           <Type>Panel</Type>
-          <Menu>Hanpuku Distribute</Menu>
+          <Menu>Data Distribute</Menu>
           <Geometry>
             <Size>
               <Height>500</Height>
@@ -124,7 +182,7 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
         </Resources>
         <UI>
           <Type>Panel</Type>
-          <Menu>Hanpuku Rotate</Menu>
+          <Menu>Data Rotate</Menu>
           <Geometry>
             <Size>
               <Height>500</Height>
@@ -152,7 +210,7 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
         </Resources>
         <UI>
           <Type>Panel</Type>
-          <Menu>Hanpuku Scale</Menu>
+          <Menu>Data Resize</Menu>
           <Geometry>
             <Size>
               <Height>500</Height>
@@ -180,7 +238,7 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
         </Resources>
         <UI>
           <Type>Panel</Type>
-          <Menu>Hanpuku Color Scale</Menu>
+          <Menu>Data Color Scale</Menu>
           <Geometry>
             <Size>
               <Height>500</Height>
@@ -208,7 +266,7 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
         </Resources>
         <UI>
           <Type>Panel</Type>
-          <Menu>Hanpuku Color Swatch</Menu>
+          <Menu>Data Color Swatch</Menu>
           <Geometry>
             <Size>
               <Height>500</Height>
@@ -236,7 +294,7 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
         </Resources>
         <UI>
           <Type>Panel</Type>
-          <Menu>Hanpuku Library</Menu>
+          <Menu>Data Visualization Library</Menu>
           <Geometry>
             <Size>
               <Height>500</Height>
@@ -264,7 +322,7 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
         </Resources>
         <UI>
           <Type>Panel</Type>
-          <Menu>Hanpuku Javascript</Menu>
+          <Menu>Javascript</Menu>
           <Geometry>
             <Size>
               <Height>500</Height>
@@ -292,7 +350,7 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
         </Resources>
         <UI>
           <Type>Panel</Type>
-          <Menu>Hanpuku CSS</Menu>
+          <Menu>CSS</Menu>
           <Geometry>
             <Size>
               <Height>500</Height>

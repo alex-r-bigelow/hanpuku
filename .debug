@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <ExtensionList>
-    <Extension Id="rawData.hanpuku.extension">
+    <Extension Id="loadData.hanpuku.extension">
         <HostList>
            <Host Name="ILST" Port="46800"/> 
         </HostList>
@@ -48,6 +48,16 @@
     <Extension Id="css.hanpuku.extension">
         <HostList>
            <Host Name="ILST" Port="46809"/> 
+        </HostList>
+    </Extension>
+    <Extension Id="query.hanpuku.extension">
+        <HostList>
+           <Host Name="ILST" Port="46810"/> 
+        </HostList>
+    </Extension>
+    <Extension Id="inferData.hanpuku.extension">
+        <HostList>
+           <Host Name="ILST" Port="46811"/> 
         </HostList>
     </Extension>
 </ExtensionList>

@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+
+<head>
+    <link type="text/css" rel="stylesheet" href="../../common/style.css" />
+    <link type="text/css" rel="stylesheet" href="inferData.css" />
+    <script type="application/javascript" src="../../lib/scriptLoader.js"></script>
+</head>
+
+<body onload="window.illustrator.applyUI();">
+    <div id="row0">
+        <input type="radio" name="relative">Extract values relative to selection (%)</input>
+        <input type="radio" name="relative">Extract literal values (px, deg, etc)</input>
+    </div>
+    <div id="row1">
+        Infer values from selection:<br/>
+        <input type="checkbox">Position</input>
+        <input type="checkbox">Height</input>
+        <input type="checkbox">Width</input>
+        <input type="checkbox">Shape Area</input>
+        <input type="checkbox">Rectangular Area</input>
+        <input type="checkbox">Angle</input>
+        <input type="checkbox">Color Hue</input>
+        <input type="checkbox">Color Saturation</input>
+        <input type="checkbox">Color Value</input>
+        <input type="checkbox">Opacity</input>
+    </div>
+    <div id="row4">
+        <input type="checkbox"/>Match and bind to the first item in
+        <select id="currentFile">
+            <option>(embedded data 1)</option>
+            <option>someFlowers.csv</option>
+            <option>allFlowers.csv</option>
+            <option>lesMiserables.json</option>
+        </select>
+        where
+        <select>
+            <option>JS function returns true</option>
+            <option>Simpler conditional</option>
+        </select>
+        <textarea></textarea>
+    </div>
+    <div id="row5">
+        <button id="applyButton">Apply</button>
+    </div>
+    
+    <script type="application/javascript" src="inferData.js"></script>
+</body>
+
+</html>
