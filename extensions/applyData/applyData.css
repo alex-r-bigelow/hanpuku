@@ -1,0 +1,16 @@
+#symbolView {
+    position: absolute;
+    left:3px;
+    right:9px;
+    top:3px;
+    bottom:3px;
+    border: 1px solid #333333;
+    overflow-y: scroll;
+}
+#symbolView img {
+    border: 1px solid #333333;
+}
+.code {
+    font-family: "Consolas", monospace;
+    font-size: 9pt;
+}

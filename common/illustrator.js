@@ -124,8 +124,8 @@ window.scriptLoader.require(['../../lib/CSInterface.js',
             v,
             view;
         
-        self.UI.textColor = useWhite ? '#dadada' : '#000';
-        self.UI.oppositeTextColor = useWhite ? '#000' : '#dadada';
+        self.UI.textColor = useWhite ? '#bcbcbc' : '#000';
+        self.UI.oppositeTextColor = useWhite ? '#000' : '#bcbcbc';
         self.UI.fontFamily = i.baseFontFamily;
         self.UI.fontSize = i.baseFontSize;
         self.UI.largeFontSize = self.fontSize + 2;
@@ -147,10 +147,14 @@ window.scriptLoader.require(['../../lib/CSInterface.js',
         jQuery('body, option, button, select')
             .css('font-family', self.UI.fontFamily)
             .css('font-size', self.UI.fontSize);
-        jQuery('body, option, button, select, textarea')
+        jQuery('body, option')
             .css('background-color', self.UI.backgroundColor);
-        jQuery('body, option, textarea, button')
+        jQuery('button, select, textarea, input')
+            .css('background-color', self.UI.haloColor);
+        jQuery('body, option')
             .css('color', self.UI.textColor);
+        jQuery('button, select, textArea, input')
+            .css('color', self.UI.oppositeTextColor);
         
         jQuery('.halo').css('background-color', self.UI.haloColor)
                        .css('color', self.UI.oppositeTextColor);

@@ -12,6 +12,7 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
   <ExtensionList>
       <Extension Id="loadData.hanpuku.extension" Version="1.0"/>
       <Extension Id="inferData.hanpuku.extension" Version="1.0"/>
+      <Extension Id="applyData.hanpuku.extension" Version="1.0"/>
       <Extension Id="query.hanpuku.extension" Version="1.0"/>
       <Extension Id="spreadsheet.hanpuku.extension" Version="1.0"/>
       <Extension Id="distribute.hanpuku.extension" Version="1.0"/>
@@ -87,6 +88,34 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
             <Icon Type="Disabled">./img/inferDataDark.png</Icon>
             <Icon Type="DarkNormal">./img/inferDataDark.png</Icon>
             <Icon Type="DarkRollOver">./img/inferDataDark.png</Icon>
+          </Icons>
+        </UI>
+      </DispatchInfo>
+    </Extension>
+      <Extension Id="applyData.hanpuku.extension">
+      <DispatchInfo>
+        <Resources>
+          <MainPath>./extensions/applyData/applyData.html</MainPath>
+        </Resources>
+        <UI>
+          <Type>Panel</Type>
+          <Menu>Apply Data</Menu>
+          <Geometry>
+            <Size>
+              <Height>500</Height>
+              <Width>500</Width>
+            </Size>
+            <MinSize>
+              <Height>350</Height>
+              <Width>380</Width>
+            </MinSize>
+          </Geometry>
+          <Icons>
+            <Icon Type="Normal">./img/applyDataLight.png</Icon>
+            <Icon Type="RollOver">./img/applyDataLight.png</Icon>
+            <Icon Type="Disabled">./img/applyDataDark.png</Icon>
+            <Icon Type="DarkNormal">./img/applyDataDark.png</Icon>
+            <Icon Type="DarkRollOver">./img/applyDataDark.png</Icon>
           </Icons>
         </UI>
       </DispatchInfo>

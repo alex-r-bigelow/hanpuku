@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+
+<head>
+    <link type="text/css" rel="stylesheet" href="../../common/style.css" />
+    <link type="text/css" rel="stylesheet" href="applyData.css" />
+    <script type="application/javascript" src="../../lib/scriptLoader.js"></script>
+</head>
+
+<body onload="window.illustrator.applyUI();">
+    <div class="row static">
+        <input type="radio" name="basicOrAdvanced" value="basic" onchange="update()" checked>Basic</input>
+        <input type="radio" name="basicOrAdvanced" value="advanced" onchange="update()">Advanced</input>
+    </div>
+    <hr/>
+    <div class="row static">
+        Dataset:
+        <select id="currentFile">
+            <option>(embedded data 1)</option>
+            <option>someFlowers.csv</option>
+            <option>allFlowers.csv</option>
+            <option>lesMiserables.json</option>
+        </select>
+        Matching on:
+        <select id="attribute">
+            <option selected value="rowNumber">(Row Number)</option>
+            <option disabled>&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</option>
+            <option>Name</option>
+            <option>Role</option>
+            <option>Age</option>
+            <option>Species</option>
+            <option class="advanced" disabled>&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</option>
+            <option class="advanced" value="d3KeyFunction">D3 Key Function</option>
+        </select>
+    </div>
+    <div class="advanced row expanding">
+        <textarea>
+function (data, index) {
+    return index;
+}</textarea>
+    </div>
+    <div class="row static basic">
+        With these settings, there are:
+    </div>
+    <div class="row static">
+        <div class="advanced">Size of <span class="code">selection</span>, not including
+            <span class="code">enter()</span> and
+            <span class="code">exit()</span>:</div>
+        <div id="updateSize">314</div>
+        <div class="basic">selected items that have matching data</div>
+    </div>
+    <div class="row static">
+        <div class="advanced">Size of <span class="code">selection.exit()</span>:</div>
+        <div id="updateSize">159</div>
+        <div class="basic">selected items that have no matching data; <input type="checkbox">delete these items</input></div>
+    </div>
+    <div class="row static">
+        <div class="advanced">Size of <span class="code">selection.enter()</span>:</div>
+        <div id="updateSize">265</div>
+        <div class="basic">new data points</div>
+    </div>
+    <hr/>
+    <div class="row static basic">
+        For each new data point, add this symbol:
+    </div>
+    <div class="row expanding basic">
+        <div id="symbolView"></div>
+    </div>
+    <div class="row expanding advanced">
+        <textarea>
+selection.enter()
+    .append("rect");
+selection.exit()
+    .remove();</textarea>
+    </div>
+    <hr/>
+    <div class="row static">
+        <input type="checkbox" checked/>
+        <div class="basic">Remember this selection with this query label:</div>
+        <div class="advanced">Remember this selection with CSS class name:</div>
+        <input type="text" value="selection123"/>
+    </div>
+    <div class="row static">
+        <input type="checkbox" checked/>
+        <div>Automatically reapply these settings when</div>
+        <div id="inlineFileName">someFlowers.csv</div>
+        <div>is updated.</div>
+    </div>
+    <button id="applyButton">Apply</button>
+    
+    <script type="application/javascript" src="applyData.js"></script>
+</body>
+
+</html>

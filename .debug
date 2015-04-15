@@ -60,4 +60,9 @@
            <Host Name="ILST" Port="46811"/> 
         </HostList>
     </Extension>
+    <Extension Id="applyData.hanpuku.extension">
+        <HostList>
+           <Host Name="ILST" Port="46812"/> 
+        </HostList>
+    </Extension>
 </ExtensionList>

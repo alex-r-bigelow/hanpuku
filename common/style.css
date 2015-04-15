@@ -1,6 +1,57 @@
 body {
     margin: 4px;
 }
-button {
+button, input {
     border: 1px solid black;
+}
+input {
+    padding-top:3px;
+    padding-bottom: 3px;
+    padding-left: 6px;
+    padding-right: 6px;
+}
+.row {
+    position: relative;
+    left: 3px;
+    right: 3px;
+    padding: 3px;
+}
+.row div {
+    display: inline-block;
+    vertical-align: middle;
+}
+textarea {
+    position: absolute;
+    left:0px;
+    right:6px;
+    top:0px;
+    bottom:0px;
+    font-family:"Consolas", monospace;
+    font-size:9pt;
+    border: 1px solid black;
+}
+img {
+    vertical-align: middle;
+}
+hr {
+    position:relative;
+    padding: 0px;
+    border-top: 1px solid #333333;
+    border-bottom: 1px solid rgba(102, 102, 102, 0.5);
+    border-left: none;
+    border-right: none;
+    margin-top: 6px;
+    margin-bottom: 3px;
+    margin-right:6px;
+    left:3px;
+    right:3px;
+}
+#applyButton {
+    position: absolute;
+    right: 6px;
+    bottom: 6px;
+}
+select:disabled, button:disabled, textarea:disabled {
+    border: 1px solid #333333;
+    color: #999999 !important;
 }
