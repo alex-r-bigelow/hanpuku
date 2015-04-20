@@ -12,23 +12,21 @@
     <div id="topBar">
         <div class="left">
             <select id="currentFile">
-                <option>(embedded data 1)</option>
-                <option>someFlowers.csv</option>
-                <option>allFlowers.csv</option>
-                <option>lesMiserables.json</option>
+                <option selected>middleEarth</option>
+                <option>lesMiserables</option>
                 <option disabled>&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</option>
                 <option>New</option>
                 <option>Load Data File...</option>
                 <option>Database Query...</option>
-                <option>Connect to Stream...</option>
+                <option>Get Packet From Stream...</option>
             </select>
-            <input type="checkbox" id="linkCheck">Link</input>
+            <input type="checkbox" id="linkCheck" checked>Save Externally</input>
         </div>
         <div class="right">
             Interpret as:
             <select id="format">
                 <option>Plain text</option>
-                <option>CSV</option>
+                <option selected>CSV</option>
                 <option>TSV</option>
                 <option>JSON</option>
                 <option>XML</option>
@@ -38,7 +36,18 @@
             <img src="successfulParse.png"/>
         </div>
     </div>
-    <textarea></textarea>
+    <textarea>
+Name,Race,Role,Age
+Aragorn,Men,Protagonist,88
+Bilbo,Hobbits,Protagonist,129
+Elrond,Elves,Protagonist,6518
+Frodo,Hobbits,Protagonist,51
+Gandalf,Maiar,Protagonist,inf
+Gollum,Hobbits,Antagonist,589
+Sam,Hobbits,Protagonist,39
+Saruman,Maiar,Antagonist,inf
+Sauron,Maiar,Antagonist,inf
+    </textarea>
     <div id="bottomBar">
         <span class="left">
             <img src="search.png"/>

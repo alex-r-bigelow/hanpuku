@@ -5,11 +5,27 @@
     <link type="text/css" rel="stylesheet" href="../../common/style.css" />
     <link type="text/css" rel="stylesheet" href="query.css" />
     <script type="application/javascript" src="../../lib/scriptLoader.js"></script>
-    <script type="application/javascript" src="query.js"></script>
 </head>
 
 <body onload="window.illustrator.applyUI();">
-    Coming Soon!
+    <div class="row static">
+        <input type="radio" name="newOrModify" checked>New Selection</input>
+        <input type="radio" name="newOrModify">Modify Current Selection</input>
+    </div>
+    <hr/>
+    <div class="row static">
+        <input type="checkbox" id="remember" checked onchange="toggleClassName()"/>
+        Remember this selection with class label:
+        <datalist id="allClassLabels">
+            <option value="lotrCharacterNames"/>
+            <option value="someOtherLabel"/>
+            <option value="whyisntthisworking"/>
+        </datalist>
+        <input list="allClassLabels" id="cssClass" value="lotrCharacterNames"/>
+    </div>
+    <hr/>
+    <button id="applyButton">Apply</button>
+    <script type="application/javascript" src="query.js"></script>
 </body>
 
 </html>

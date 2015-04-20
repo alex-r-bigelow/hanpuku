@@ -43,7 +43,7 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
         </Resources>
         <UI>
           <Type>Panel</Type>
-          <Menu>Load Data</Menu>
+          <Menu>Edit Data</Menu>
           <Geometry>
             <Size>
               <Height>500</Height>
@@ -127,7 +127,7 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
         </Resources>
         <UI>
           <Type>Panel</Type>
-          <Menu>Data Query</Menu>
+          <Menu>Query Data</Menu>
           <Geometry>
             <Size>
               <Height>500</Height>
@@ -155,7 +155,7 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
         </Resources>
         <UI>
           <Type>Panel</Type>
-          <Menu>Data Spreadsheet</Menu>
+          <Menu>Manage Data</Menu>
           <Geometry>
             <Size>
               <Height>500</Height>

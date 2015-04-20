@@ -5,8 +5,6 @@ button, input {
     border: 1px solid black;
 }
 input {
-    padding-top:3px;
-    padding-bottom: 3px;
     padding-left: 6px;
     padding-right: 6px;
 }
@@ -51,7 +49,8 @@ hr {
     right: 6px;
     bottom: 6px;
 }
-select:disabled, button:disabled, textarea:disabled {
+select:disabled, button:disabled, textarea:disabled, input:disabled {
     border: 1px solid #333333;
-    color: #999999 !important;
+    color: #666666 !important;
+    background-color: #999999 !important;
 }

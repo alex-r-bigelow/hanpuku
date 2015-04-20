@@ -18,14 +18,25 @@ function update() {
     updateExpanders();
 }
 
+function toggleClassName() {
+    "use strict";
+    if (jQuery('#remember:checked').length === 1) {
+        jQuery('#reapply, #cssClass').attr('disabled', false);
+    } else {
+        jQuery('#reapply, #cssClass').attr('disabled', true);
+        jQuery('#reapply').attr('checked', false);
+    }
+}
+
 window.scriptLoader.require(['../../common/illustrator.js',
                              '../../common/ui.js'], function () {
     "use strict";
-    var x;
+    var x,
+        temp;
     for (x = 1; x <= 10; x += 1) {
-        var temp = d3.select('#symbolView').append('img').attr('src', 'sampleSymbols/' + x + '.png');
+        temp = d3.select('#symbolView').append('img').attr('src', 'sampleSymbols/' + x + '.png');
         if (x === 7) {
-            temp.style('border','3px solid black');
+            temp.style('border', '3px solid black');
         }
     }
     d3.select('#symbolView').append('img').attr('src', 'none.png');

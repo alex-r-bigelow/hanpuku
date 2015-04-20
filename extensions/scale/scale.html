@@ -8,7 +8,7 @@
 </head>
 
 <body onload="window.illustrator.applyUI();">
-    <div id="row0">
+    <div class="row static">
         Use data attribute:
         <select id="attribute">
             <option>(Text Contents)</option>
@@ -18,21 +18,29 @@
             <option>Age</option>
             <option selected>Species</option>
         </select>
+    </div>
+    <div class="row static">
         <input type="checkbox">Treat Numbers as Ordinal</input>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        Quantitative Scale:
+        <select id="scale">
+            <option>Linear</option>
+            <option>Log</option>
+        </select>
     </div>
-    <div id="row1">
+    <div class="row static">
         <span>
-            <img src="anchor.png"/>
+            Anchor:<img src="anchor.png"/>
         </span>
         <span>
-            <input type="checkbox" checked>Horizontal</input>
-            <input type="checkbox">Vertical</input>
+            <input type="checkbox" checked>Scale Horizontally</input>
+            <input type="checkbox">Scale Vertically</input>
         </span>
     </div>
-    <div id="row2">
+    <div class="row static">
         <img id="slider" src="sampleSlider0.png" width="370" height="120"/>
     </div>
-    <div id="row3">
+    <div class="row static">
         Value:<input type="text"/>
         <select id="presets">
             <option>Apply preset:</option>
@@ -43,16 +51,7 @@
             <option>Alphabetize</option>
         </select>
     </div>
-    <div id="row4">
-        Warnings:
-        <textarea id="warnings" disabled="true">
-&#9472; GroupItem3 has no bound Species attribute. It will be ignored.
-&#9472; PathItem219's Species value "unknown" is not on the scale. It will be ignored.
-</textarea>
-    </div>
-    <div id="row5">
-        <button id="applyButton">Apply</button>
-    </div>
+    <button id="applyButton">Apply</button>
     
     <script type="application/javascript" src="scale.js"></script>
 </body>

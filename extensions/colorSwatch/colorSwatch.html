@@ -8,19 +8,21 @@
 </head>
 
 <body onload="window.illustrator.applyUI();">
-    <div id="row0">
+    <div class="row static">
         Use data attribute:
         <select id="attribute">
-            <option>(Text Contents)</option>
+            <option>(Row Number)</option>
             <option disabled>&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</option>
             <option>Name</option>
+            <option selected>Race</option>
             <option>Role</option>
             <option>Age</option>
-            <option selected>Species</option>
         </select>
+    </div>
+    <div class="row static">
         <input type="checkbox" checked="true" disabled="true">Treat Numbers as Ordinal</input>
     </div>
-    <div id="row1">
+    <div class="row static">
         <table>
             <tr>
                 <td>Hobbits</td>
@@ -44,16 +46,7 @@
             </tr>
         </table>
     </div>
-    <div id="row4">
-        Warnings:
-        <textarea id="warnings" disabled="true">
-&#9472; GroupItem3 has no bound Species attribute. It will be ignored.
-&#9472; PathItem219's Species value "unknown" is not on the scale. It will be ignored.
-</textarea>
-    </div>
-    <div id="row5">
-        <button id="applyButton">Apply</button>
-    </div>
+    <button id="applyButton">Apply</button>
     
     <script type="application/javascript" src="colorSwatch.js"></script>
 </body>

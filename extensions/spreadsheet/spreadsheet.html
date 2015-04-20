@@ -5,11 +5,34 @@
     <link type="text/css" rel="stylesheet" href="../../common/style.css" />
     <link type="text/css" rel="stylesheet" href="spreadsheet.css" />
     <script type="application/javascript" src="../../lib/scriptLoader.js"></script>
-    <script type="application/javascript" src="spreadsheet.js"></script>
 </head>
 
 <body onload="window.illustrator.applyUI();">
-    Coming Soon!
+    <div class="row static">
+        <input type="radio" name="selection" id="selectionRadio"/>
+        <label for="selectionRadio">Selection</label>
+        <input type="radio" name="selection" id="dataRadio" checked/>
+        <label for="dataRadio">Data</label>
+    </div>
+    <div class="row expanding data">
+        <table>
+            <tr>
+                <td><img src="link.png"/></td>
+                <td>middleEarth</td>
+            </tr>
+            <tr><td></td><td><img src="link.png"/></td><td>Name</td><td>Race</td><td>Role</td><td>Age</td></tr>
+            <tr><td></td><td><img src="link.png"/></td><td>Aragorn</td><td>Men</td><td>Protagonist</td><td>88</td></tr>
+            <tr><td></td><td><img src="link.png"/></td><td>Bilbo</td><td>Hobbits</td><td>Protagonist</td><td>129</td></tr>
+            <tr><td></td><td><img src="link.png"/></td><td>Elrond</td><td>Elves</td><td>Protagonist</td><td>6518</td></tr>
+            <tr><td></td><td><img src="link.png"/></td><td>Frodo</td><td>Hobbits</td><td>Protagonist</td><td>51</td></tr>
+            <tr><td></td><td><img src="link.png"/></td><td>Gandalf</td><td>Maiar</td><td>Protagonist</td><td>inf</td></tr>
+            <tr><td></td><td><img src="link.png"/></td><td>Gollum</td><td>Hobbits</td><td>Antagonist</td><td>589</td></tr>
+            <tr><td></td><td><img src="link.png"/></td><td>Sam</td><td>Hobbits</td><td>Protagonist</td><td>39</td></tr>
+            <tr><td></td><td><img src="link.png"/></td><td>Saruman</td><td>Maiar</td><td>Antagonist</td><td>inf</td></tr>
+            <tr><td></td><td><img src="link.png"/></td><td>Sauron</td><td>Maiar</td><td>Antagonist</td><td>inf</td></tr>
+        </table>
+    </div>
+    <script type="application/javascript" src="spreadsheet.js"></script>
 </body>
 
 </html>

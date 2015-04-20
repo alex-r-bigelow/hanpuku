@@ -144,14 +144,14 @@ window.scriptLoader.require(['../../lib/CSInterface.js',
                                         0.25 * (background.alpha / 255.0) + ')';
         
         // Apply the font and colors
-        jQuery('body, option, button, select')
+        jQuery('body, option, optgroup, button, select')
             .css('font-family', self.UI.fontFamily)
             .css('font-size', self.UI.fontSize);
-        jQuery('body, option')
+        jQuery('body, option, optgroup')
             .css('background-color', self.UI.backgroundColor);
         jQuery('button, select, textarea, input')
             .css('background-color', self.UI.haloColor);
-        jQuery('body, option')
+        jQuery('body, option, optgroup')
             .css('color', self.UI.textColor);
         jQuery('button, select, textArea, input')
             .css('color', self.UI.oppositeTextColor);

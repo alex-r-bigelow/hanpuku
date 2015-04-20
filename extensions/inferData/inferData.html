@@ -8,41 +8,120 @@
 </head>
 
 <body onload="window.illustrator.applyUI();">
-    <div id="row0">
-        <input type="radio" name="relative">Extract values relative to selection (%)</input>
-        <input type="radio" name="relative">Extract literal values (px, deg, etc)</input>
+    <div class="row static">
+        For each selected item
+        <input type="radio" name="newOrMatch" value="add" onchange="update()" checked>create a new dataset</input>
+        <input type="radio" name="newOrMatch" value="match" onchange="update()">match existing data (Advanced)</input>
     </div>
-    <div id="row1">
-        Infer values from selection:<br/>
-        <input type="checkbox">Position</input>
-        <input type="checkbox">Height</input>
-        <input type="checkbox">Width</input>
-        <input type="checkbox">Shape Area</input>
-        <input type="checkbox">Rectangular Area</input>
-        <input type="checkbox">Angle</input>
-        <input type="checkbox">Color Hue</input>
-        <input type="checkbox">Color Saturation</input>
-        <input type="checkbox">Color Value</input>
-        <input type="checkbox">Opacity</input>
+    <div class="row static add">
+        Dataset name:
+        <input type="text" value="newData"/>
     </div>
-    <div id="row4">
-        <input type="checkbox"/>Match and bind to the first item in
+    <hr class="add"/>
+    <div class="row static add">
+        Create a new data row with these attributes:
+    </div>
+    <div class="row static add">
+        <div>
+            <img src="anchor.png"/>
+            <input type="checkbox" checked>Illustrator ID</input><br/>
+            <input type="checkbox" checked>Text Contents</input><br/><br/>
+            <input type="checkbox" checked>Opacity</input><br/><br/>
+            <input type="checkbox" checked>X</input>
+            <input type="checkbox" checked>Y</input><br/>
+            <input type="checkbox" checked>Width</input>
+            <input type="checkbox" checked>Height</input>
+        </div>
+        <div>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;
+        </div>
+        <div>
+            <table>
+                <tr>
+                    <th></th>
+                    <th class="rotate"><div><span>Hue</span></div></th>
+                    <th class="rotate"><div><span>Saturation</span></div></th>
+                    <th class="rotate"><div><span>Brightness</span></div></th>
+                    <th class="rotate"><div><span>Red</span></div></th>
+                    <th class="rotate"><div><span>Green</span></div></th>
+                    <th class="rotate"><div><span>Blue</span></div></th>
+                    <th class="rotate"><div><span>Cyan</span></div></th>
+                    <th class="rotate"><div><span>Magenta</span></div></th>
+                    <th class="rotate"><div><span>Yellow</span></div></th>
+                    <th class="rotate"><div><span>blacK</span></div></th>
+                </tr>
+                <tr>
+                    <td>Fill</td>
+                    <td><input type="checkbox" checked/></td>
+                    <td><input type="checkbox" checked/></td>
+                    <td><input type="checkbox" checked/></td>
+                    <td><input type="checkbox"/></td>
+                    <td><input type="checkbox"/></td>
+                    <td><input type="checkbox"/></td>
+                    <td><input type="checkbox"/></td>
+                    <td><input type="checkbox"/></td>
+                    <td><input type="checkbox"/></td>
+                    <td><input type="checkbox"/></td>
+                </tr>
+                <tr>
+                    <td>Stroke</td>
+                    <td><input type="checkbox"/></td>
+                    <td><input type="checkbox"/></td>
+                    <td><input type="checkbox"/></td>
+                    <td><input type="checkbox"/></td>
+                    <td><input type="checkbox"/></td>
+                    <td><input type="checkbox"/></td>
+                    <td><input type="checkbox"/></td>
+                    <td><input type="checkbox"/></td>
+                    <td><input type="checkbox"/></td>
+                    <td><input type="checkbox"/></td>
+                </tr>
+        </table>
+        </div>
+    </div>
+
+
+    <div class="row static match">
+        Match the first data item in
         <select id="currentFile">
-            <option>(embedded data 1)</option>
-            <option>someFlowers.csv</option>
-            <option>allFlowers.csv</option>
-            <option>lesMiserables.json</option>
-        </select>
-        where
-        <select>
-            <option>JS function returns true</option>
-            <option>Simpler conditional</option>
-        </select>
-        <textarea></textarea>
+            <option>middleEarth</option>
+            <option>lesMiserables</option>
+        </select> where:
     </div>
-    <div id="row5">
-        <button id="applyButton">Apply</button>
+    <div class="row expanding match">
+        <textarea>
+function (data, index) {
+    var x_position = this.getBoundingClientRect().left,
+        tolerance = 3;
+    if (x_position &gt;= data.foo - tolerance &amp;&amp;
+        x_position &gt;= data.foo + tolerance) {
+        return true;
+    }
+    return false;
+}
+        </textarea>
     </div>
+    <hr class="match"/>
+    <div class="row static match">
+        There are <div id="updateSize">31</div> matches for existing data items
+    </div>
+    <div class="row static match">
+        <div id="updateSize">41</div> data items do not have a match <input type="checkbox">delete</input>
+    </div>
+    <div class="row static match">
+        There are potentially <div id="exitSize">59</div> new data items:
+    </div>
+    <div class="row expanding match">
+        <textarea>
+function () {
+    var x_position = this.getBoundingClientRect().left;
+    return { foo : x_position };
+}
+        </textarea>
+    </div>
+    <button id="applyButton">Apply</button>
     
     <script type="application/javascript" src="inferData.js"></script>
 </body>

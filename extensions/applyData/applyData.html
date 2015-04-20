@@ -9,30 +9,26 @@
 
 <body onload="window.illustrator.applyUI();">
     <div class="row static">
-        <input type="radio" name="basicOrAdvanced" value="basic" onchange="update()" checked>Basic</input>
-        <input type="radio" name="basicOrAdvanced" value="advanced" onchange="update()">Advanced</input>
-    </div>
-    <hr/>
-    <div class="row static">
         Dataset:
         <select id="currentFile">
-            <option>(embedded data 1)</option>
-            <option>someFlowers.csv</option>
-            <option>allFlowers.csv</option>
-            <option>lesMiserables.json</option>
+            <option>middleEarth</option>
+            <option>lesMiserables</option>
         </select>
         Matching on:
         <select id="attribute">
             <option selected value="rowNumber">(Row Number)</option>
             <option disabled>&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</option>
             <option>Name</option>
+            <option>Race</option>
             <option>Role</option>
             <option>Age</option>
-            <option>Species</option>
             <option class="advanced" disabled>&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</option>
             <option class="advanced" value="d3KeyFunction">D3 Key Function</option>
         </select>
+        <input type="radio" name="basicOrAdvanced" value="basic" onchange="update()" checked>Basic</input>
+        <input type="radio" name="basicOrAdvanced" value="advanced" onchange="update()">Advanced</input>
     </div>
+    <hr/>
     <div class="advanced row expanding">
         <textarea>
 function (data, index) {
@@ -46,22 +42,22 @@ function (data, index) {
         <div class="advanced">Size of <span class="code">selection</span>, not including
             <span class="code">enter()</span> and
             <span class="code">exit()</span>:</div>
-        <div id="updateSize">314</div>
+        <div id="updateSize">31</div>
         <div class="basic">selected items that have matching data</div>
     </div>
     <div class="row static">
-        <div class="advanced">Size of <span class="code">selection.exit()</span>:</div>
-        <div id="updateSize">159</div>
-        <div class="basic">selected items that have no matching data; <input type="checkbox">delete these items</input></div>
+        <div class="advanced">Size of <span class="code">selection.enter()</span>:</div>
+        <div id="enterSize">41</div>
+        <div class="basic">new items to be created</div>
     </div>
     <div class="row static">
-        <div class="advanced">Size of <span class="code">selection.enter()</span>:</div>
-        <div id="updateSize">265</div>
-        <div class="basic">new data points</div>
+        <div class="advanced">Size of <span class="code">selection.exit()</span>:</div>
+        <div id="exitSize">59</div>
+        <div class="basic">selected items that have no matching data <input type="checkbox">delete</input></div>
     </div>
     <hr/>
     <div class="row static basic">
-        For each new data point, add this symbol:
+        For each new item, add this Symbol:
     </div>
     <div class="row expanding basic">
         <div id="symbolView"></div>
@@ -75,15 +71,14 @@ selection.exit()
     </div>
     <hr/>
     <div class="row static">
-        <input type="checkbox" checked/>
-        <div class="basic">Remember this selection with this query label:</div>
-        <div class="advanced">Remember this selection with CSS class name:</div>
-        <input type="text" value="selection123"/>
+        <input type="checkbox" id="remember" checked onchange="toggleClassName()"/>
+        Remember this selection with class label:
+        <input type="text" id="cssClass" value="lotrCharacterNames"/>
     </div>
     <div class="row static">
-        <input type="checkbox" checked/>
+        <input type="checkbox" id="reapply" checked/>
         <div>Automatically reapply these settings when</div>
-        <div id="inlineFileName">someFlowers.csv</div>
+        <div id="inlineFileName">middleEarth</div>
         <div>is updated.</div>
     </div>
     <button id="applyButton">Apply</button>
