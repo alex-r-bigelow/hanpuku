@@ -6,6 +6,7 @@ function updateExpanders() {
         availableHeight;
     if (expanders.length > 0) {
         expanders.hide();
+        console.log(window.innerHeight);
         availableHeight = window.innerHeight - jQuery('body')[0].getBoundingClientRect().height - 60;
         expanders.show();
         expanders.css('height', availableHeight / expanders.length);
