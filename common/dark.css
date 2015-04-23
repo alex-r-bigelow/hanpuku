@@ -1,0 +1,50 @@
+body {
+    color: #c5c5c5;
+}
+hr {
+    border-top-color: #3a3a3a;
+    border-bottom-color: #575757;
+}
+select {
+    color: #c5c5c5;
+    background: -webkit-linear-gradient(#626262,#535353);
+}
+select:hover {
+    background: -webkit-linear-gradient(#6e6e6e,#5f5f5f);
+}
+select:disabled {
+    color: rgba(188, 188, 188, 0.5);
+    background: #767676;
+    border-color: #191919;
+}
+.selectArrow {
+    background: -webkit-linear-gradient(#626262,#535353);
+}
+.selectArrow:hover {
+    background: -webkit-linear-gradient(#6e6e6e,#5f5f5f);
+}
+
+option {
+    color: #c5c5c5;
+    background-color: #575757;
+}
+option:disabled {
+    color: rgba(188, 188, 188, 0.5);
+}
+
+a.button {
+    color: #c5c5c5;
+    background: -webkit-linear-gradient(#626262,#535353);
+}
+a.button:hover {
+    background: -webkit-linear-gradient(#6e6e6e,#5f5f5f);
+}
+a.button:active {
+    background: #3a3a3a;
+}
+
+img.button:hover {
+    border: 1px solid black;
+    padding: 3px;   /* normally 4px */
+    background: -webkit-linear-gradient(#6e6e6e,#5f5f5f);
+}

@@ -1,56 +1,67 @@
 body {
-    margin: 4px;
+    margin: 5px;
+    -webkit-user-select: none;
 }
-button, input {
-    border: 1px solid black;
+div, span, a, p, button, select, option, input {
+    font-family: inherit;
+    font-size: inherit;
 }
-input {
-    padding-left: 6px;
-    padding-right: 6px;
-}
-.row {
-    position: relative;
-    left: 3px;
-    right: 3px;
-    padding: 3px;
-}
-.row div {
-    display: inline-block;
-    vertical-align: middle;
-}
-textarea {
-    position: absolute;
-    left:0px;
-    right:6px;
-    top:0px;
-    bottom:0px;
-    font-family:"Consolas", monospace;
-    font-size:9pt;
-    border: 1px solid black;
+hr {
+    border:1px solid;
+    -webkit-margin-before: 5px;
+    -webkit-margin-after: 5px;
+    border-left-width: 0px;
+    border-right-width: 0px;
 }
 img {
     vertical-align: middle;
 }
-hr {
-    position:relative;
-    padding: 0px;
-    border-top: 1px solid #333333;
-    border-bottom: 1px solid rgba(102, 102, 102, 0.5);
-    border-left: none;
-    border-right: none;
-    margin-top: 6px;
-    margin-bottom: 3px;
-    margin-right:6px;
-    left:3px;
-    right:3px;
+select {
+    -webkit-appearance: none;
+    -webkit-border-radius:0px;
+    padding-top:3px;
+    padding-bottom:3px;
+    padding-left:6px;
+    padding-right:6px;
+    border: 1px solid black;
 }
-#applyButton {
-    position: absolute;
-    right: 6px;
-    bottom: 6px;
+.selectArrow {
+    -webkit-transform: translateX(-1px);
+    border: 1px solid black;
+    vertical-align: top;
 }
-select:disabled, button:disabled, textarea:disabled, input:disabled {
-    border: 1px solid #333333;
-    color: #666666 !important;
-    background-color: #999999 !important;
+
+a.button {
+    padding-top:4px;
+    padding-bottom:4px;
+    padding-left:6px;
+    padding-right:6px;
+    border:1px solid black;
+    color:black;
+    text-decoration: none;
+}
+.row {
+    position: relative;
+    left: 0px;
+    right: 0px;
+    height: auto;
+    vertical-align: middle;
+}
+.row > div {
+    display: inline-block;
+    vertical-align: middle;
+}
+.row.bottom {
+    position: fixed;
+    bottom: 0px;
+    margin: 4px;
+}
+.row.bottom * {
+    position: relative;
+}
+.bottom img {
+    padding: 4px;
+}
+.bottom #applyButton {
+    float: right;
 }

@@ -1,40 +1,35 @@
+#editor {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+}
+
 .left {
-    position:absolute;
+    float:left;
     left:0px;
     top:0px;
-    padding:4px;
 }
 .right {
+    float:right;
+    right:0px;
+    top:0px;
+}
+#connectedLabelsLabel {
     position:absolute;
-    right:0px;
-    top:0px;
-    padding:4px;
+    left: 0px;
+    width: 75px;
+    top: 0px;
+    bottom: 0px;
 }
-#topBar {
-    position: absolute;
-    top:0px;
-    right:0px;
-    left:0px;
-    height:30px;
-}
-textarea {
-    position: absolute;
-    left:2px;
-    right:2px;
-    top:30px;
-    bottom:30px;
-    font-family:"Consolas", monospace;
-    font-size:9pt;
+#connectedLabelsList {
+    position:absolute;
     border: 1px solid black;
-}
-#bottomBar {
-    position: absolute;
-    left:0px;
-    right:0px;
-    bottom:0px;
-    height:30px;
-}
-img {
-    padding: 4px;
-    vertical-align: middle;
+    left: 75px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+    background-color:rgba(0, 0, 0, 0.25);
+    overflow-y:scroll;
 }

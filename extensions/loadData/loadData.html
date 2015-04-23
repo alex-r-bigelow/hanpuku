@@ -5,57 +5,50 @@
     <link type="text/css" rel="stylesheet" href="../../common/style.css" />
     <link type="text/css" rel="stylesheet" href="loadData.css" />
     <script type="application/javascript" src="../../lib/scriptLoader.js"></script>
-    <script type="application/javascript" src="loadData.js"></script>
 </head>
 
 <body onload="window.illustrator.applyUI();">
-    <div id="topBar">
+    <div class="row static" numRows="1">
         <div class="left">
             <select id="currentFile">
-                <option selected>middleEarth</option>
-                <option>lesMiserables</option>
-                <option disabled>&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</option>
-                <option>New</option>
-                <option>Load Data File...</option>
-                <option>Database Query...</option>
-                <option>Get Packet From Stream...</option>
+                <option disabled>No loaded files</option>
             </select>
-            <input type="checkbox" id="linkCheck" checked>Save Externally</input>
+            <input type="checkbox" id="linkCheck">Save Externally</input>
         </div>
         <div class="right">
             Interpret as:
             <select id="format">
-                <option>Plain text</option>
-                <option selected>CSV</option>
-                <option>TSV</option>
-                <option>JSON</option>
-                <option>XML</option>
-                <option>HTML</option>
-                <option>Javascript</option>
+                <option value="txt" selected>Plain text</option>
+                <option value="csv">CSV</option>
+                <option value="tsv">TSV</option>
+                <option value="json">JSON</option>
+                <option value="xml">XML</option>
+                <option value="html">HTML</option>
+                <option value="js">Javascript</option>
             </select>
-            <img src="successfulParse.png"/>
+            <img id="parseIndicator" src="parsing.png"/>
         </div>
     </div>
-    <textarea>
-Name,Race,Role,Age
-Aragorn,Men,Protagonist,88
-Bilbo,Hobbits,Protagonist,129
-Elrond,Elves,Protagonist,6518
-Frodo,Hobbits,Protagonist,51
-Gandalf,Maiar,Protagonist,inf
-Gollum,Hobbits,Antagonist,589
-Sam,Hobbits,Protagonist,39
-Saruman,Maiar,Antagonist,inf
-Sauron,Maiar,Antagonist,inf
-    </textarea>
-    <div id="bottomBar">
-        <span class="left">
-            <img src="search.png"/>
-            <img src="new.png"/>
-            <img src="trash.png"/>
-            <img src="refresh.png"/>
-        </span>
+    <hr/>
+    <div class="row expanding">
+        <div id="editor"></div>
     </div>
+    <hr/>
+    <div class="row static" numRows="3">
+        <div id="connectedLabelsLabel">Connected class labels:</div>
+        <div id="connectedLabelsList"></div>
+    </div>
+    <hr/>
+    <div class="row bottom">
+        <img src="new.png" id="newFileButton" class="button"/>
+        <img src="refresh.png" id="refreshButton" class="button"/>
+        <img src="search.png" id="searchButton" class="button"/>
+        <img src="trash.png" id="trashButton" class="button"/>
+        <a class="button" id="applyButton" href="#">Save Changes</a>
+    </div>
+    
+    <script type="application/javascript" src="../../ace/ace.js"></script>
+    <script type="application/javascript" src="loadData.js"></script>
 </body>
 
 </html>

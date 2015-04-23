@@ -10,8 +10,7 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
     ]]>
   </Abstract>
   <ExtensionList>
-      <Extension Id="loadData.hanpuku.extension" Version="1.0"/>
-      <Extension Id="inferData.hanpuku.extension" Version="1.0"/>
+      <!--<Extension Id="inferData.hanpuku.extension" Version="1.0"/>
       <Extension Id="applyData.hanpuku.extension" Version="1.0"/>
       <Extension Id="query.hanpuku.extension" Version="1.0"/>
       <Extension Id="spreadsheet.hanpuku.extension" Version="1.0"/>
@@ -19,7 +18,8 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
       <Extension Id="rotate.hanpuku.extension" Version="1.0"/>
       <Extension Id="scale.hanpuku.extension" Version="1.0"/>
       <Extension Id="colorScale.hanpuku.extension" Version="1.0"/>
-      <Extension Id="colorSwatch.hanpuku.extension" Version="1.0"/>
+      <Extension Id="colorSwatch.hanpuku.extension" Version="1.0"/>-->
+      <Extension Id="loadData.hanpuku.extension" Version="1.0"/>
       <Extension Id="library.hanpuku.extension" Version="1.0"/>
       <Extension Id="javascript.hanpuku.extension" Version="1.0"/>
       <Extension Id="css.hanpuku.extension" Version="1.0"/>
@@ -36,35 +36,7 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
     </RequiredRuntimeList>
   </ExecutionEnvironment>
   <DispatchInfoList>
-    <Extension Id="loadData.hanpuku.extension">
-      <DispatchInfo>
-        <Resources>
-          <MainPath>./extensions/loadData/loadData.html</MainPath>
-        </Resources>
-        <UI>
-          <Type>Panel</Type>
-          <Menu>Edit Data</Menu>
-          <Geometry>
-            <Size>
-              <Height>500</Height>
-              <Width>500</Width>
-            </Size>
-            <MinSize>
-              <Height>350</Height>
-              <Width>380</Width>
-            </MinSize>
-          </Geometry>
-          <Icons>
-            <Icon Type="Normal">./img/loadDataLight.png</Icon>
-            <Icon Type="RollOver">./img/loadDataLight.png</Icon>
-            <Icon Type="Disabled">./img/loadDataDark.png</Icon>
-            <Icon Type="DarkNormal">./img/loadDataDark.png</Icon>
-            <Icon Type="DarkRollOver">./img/loadDataDark.png</Icon>
-          </Icons>
-        </UI>
-      </DispatchInfo>
-    </Extension>
-      <Extension Id="inferData.hanpuku.extension">
+    <!--<Extension Id="inferData.hanpuku.extension">
       <DispatchInfo>
         <Resources>
           <MainPath>./extensions/inferData/inferData.html</MainPath>
@@ -312,6 +284,34 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
             <Icon Type="Disabled">./img/colorSwatchDark.png</Icon>
             <Icon Type="DarkNormal">./img/colorSwatchDark.png</Icon>
             <Icon Type="DarkRollOver">./img/colorSwatchDark.png</Icon>
+          </Icons>
+        </UI>
+      </DispatchInfo>
+    </Extension>-->
+      <Extension Id="loadData.hanpuku.extension">
+      <DispatchInfo>
+        <Resources>
+          <MainPath>./extensions/loadData/loadData.html</MainPath>
+        </Resources>
+        <UI>
+          <Type>Panel</Type>
+          <Menu>Datasets</Menu>
+          <Geometry>
+            <Size>
+              <Height>500</Height>
+              <Width>500</Width>
+            </Size>
+            <MinSize>
+              <Height>450</Height>
+              <Width>380</Width>
+            </MinSize>
+          </Geometry>
+          <Icons>
+            <Icon Type="Normal">./img/loadDataLight.png</Icon>
+            <Icon Type="RollOver">./img/loadDataLight.png</Icon>
+            <Icon Type="Disabled">./img/loadDataDark.png</Icon>
+            <Icon Type="DarkNormal">./img/loadDataDark.png</Icon>
+            <Icon Type="DarkRollOver">./img/loadDataDark.png</Icon>
           </Icons>
         </UI>
       </DispatchInfo>
