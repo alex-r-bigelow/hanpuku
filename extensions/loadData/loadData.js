@@ -29,10 +29,12 @@ window.scriptLoader.require(['../../common/illustrator.js',
         
         if (manager.currentFile === null) {
             jQuery('#currentFile').append('<option disabled>No files loaded</option>');
-            jQuery('#linkCheck').attr('disabled', '');
-            jQuery('#format').attr('disabled', '');
+            jQuery('#linkCheck').prop('disabled', true);
+            jQuery('#format').prop('disabled', true);
         } else {
             jQuery('#currentFile').val(manager.currentFile.name);
+            jQuery('#currentFile > option')
+                .prop('disabled', false);
             jQuery('#linkCheck')
                 .prop('disabled', false)
                 .attr('checked', !manager.currentFile.isEmbedded());
@@ -45,17 +47,25 @@ window.scriptLoader.require(['../../common/illustrator.js',
     function disableWidget() {
         jQuery('#currentFile, #linkCheck, #format, #applyButton, .button')
             .off()
-            .prop('disabled', true);
+            .attr('disabled', '');  // this is a nonstandard way to disable stuff, but
+                                    // I actually WANT the disabled tags to show up on
+                                    // things like img, as I use them like buttons
         manager.files = {};
         manager.switchFile(null);
     }
 
     function enableWidget() {
-        jQuery('#currentFile, #linkCheck, #format, #applyButton, .button').prop('disabled', false);
+        jQuery('#currentFile, #linkCheck, #format, #applyButton, .button')
+            .off()
+            .prop('disabled', false);
         manager.refreshFiles();
 
         jQuery('#format').on('change', function () {
             manager.currentFile.setFormat(this.value);
+        });
+        
+        jQuery('#linkCheck').on('change', function () {
+            manager.currentFile.toggleEmbedded();
         });
 
         jQuery('#searchButton').on('click', function () { manager.search(); });
@@ -110,12 +120,15 @@ window.scriptLoader.require(['../../common/illustrator.js',
     
     window.illustrator.on('noFile', disableWidget);
     window.illustrator.on('openFile', enableWidget);
+    window.onfocus = function () {
     // Initial test to see if a file is open
-    window.illustrator.checkIfFileIsOpen(function (response) {
-        if (response === 'true') {
-            enableWidget();
-        } else {
-            disableWidget();
-        }
-    });
+        window.illustrator.checkIfFileIsOpen(function (response) {
+            if (response === 'true') {
+                enableWidget();
+            } else {
+                disableWidget();
+            }
+        });
+    }
+    window.onfocus();
 });

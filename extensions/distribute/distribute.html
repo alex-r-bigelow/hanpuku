@@ -8,7 +8,7 @@
 </head>
 
 <body onload="window.illustrator.applyUI();">
-    <div class="row static">
+    <div class="row static" numRows="1">
         Use data attribute:
         <select id="attribute">
             <option>(Row Number)</option>
@@ -19,7 +19,8 @@
             <option selected>Age</option>
         </select>
     </div>
-    <div class="row static">
+    <hr/>
+    <div class="row static" numRows="1.3">
         <span>
             <img src="alignMenu.png"/><!--
             <select id="relative">
@@ -44,7 +45,8 @@
             <img src="pathRotate.png"/>
         </span>
     </div>
-    <div class="row static">
+    <hr/>
+    <div class="row static" numRows="1">
         <input type="checkbox">Treat Numbers as Ordinal</input>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         Quantitative Scale:
@@ -53,10 +55,10 @@
             <option>Log</option>
         </select>
     </div>
-    <div class="row static">
+    <div class="row expanding">
         <img id="slider" src="sampleSlider0.png" width="370" height="120"/>
     </div>
-    <div class="row static">
+    <div class="row static" numRows="1">
         Value:<input type="text"/>
         <select id="presets">
             <option>Apply preset:</option>
@@ -67,7 +69,10 @@
             <option>Alphabetize</option>
         </select>
     </div>
-    <button id="applyButton">Apply</button>
+    <hr/>
+    <div class="row bottom">
+        <a class="button" id="applyButton" href="#">Apply</a>
+    </div>
     
     <script type="application/javascript" src="distribute.js"></script>
 </body>

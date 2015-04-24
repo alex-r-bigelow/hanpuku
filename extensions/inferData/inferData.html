@@ -8,82 +8,79 @@
 </head>
 
 <body onload="window.illustrator.applyUI();">
-    <div class="row static">
+    <div class="row static" numRows="1">
         For each selected item
         <input type="radio" name="newOrMatch" value="add" onchange="update()" checked>create a new dataset</input>
         <input type="radio" name="newOrMatch" value="match" onchange="update()">match existing data (Advanced)</input>
     </div>
-    <div class="row static add">
-        Dataset name:
-        <input type="text" value="newData"/>
+    <hr/>
+    <div class="row static add" numRows="1">
+        For each selected item, create a row with these values:
     </div>
     <hr class="add"/>
-    <div class="row static add">
-        Create a new data row with these attributes:
+    <div class="row static add" numRows="2">
+        <img src="anchor.png"/>
+        <input type="checkbox" checked>X Coordinate</input>
+        <input type="checkbox" checked>Y Coordinate</input>
+        <input type="checkbox" checked>Width</input>
+        <input type="checkbox" checked>Height</input>
     </div>
-    <div class="row static add">
-        <div>
-            <img src="anchor.png"/>
-            <input type="checkbox" checked>Illustrator ID</input><br/>
-            <input type="checkbox" checked>Text Contents</input><br/><br/>
-            <input type="checkbox" checked>Opacity</input><br/><br/>
-            <input type="checkbox" checked>X</input>
-            <input type="checkbox" checked>Y</input><br/>
-            <input type="checkbox" checked>Width</input>
-            <input type="checkbox" checked>Height</input>
-        </div>
-        <div>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            &nbsp;&nbsp;&nbsp;
-        </div>
-        <div>
-            <table>
-                <tr>
-                    <th></th>
-                    <th class="rotate"><div><span>Hue</span></div></th>
-                    <th class="rotate"><div><span>Saturation</span></div></th>
-                    <th class="rotate"><div><span>Brightness</span></div></th>
-                    <th class="rotate"><div><span>Red</span></div></th>
-                    <th class="rotate"><div><span>Green</span></div></th>
-                    <th class="rotate"><div><span>Blue</span></div></th>
-                    <th class="rotate"><div><span>Cyan</span></div></th>
-                    <th class="rotate"><div><span>Magenta</span></div></th>
-                    <th class="rotate"><div><span>Yellow</span></div></th>
-                    <th class="rotate"><div><span>blacK</span></div></th>
-                </tr>
-                <tr>
-                    <td>Fill</td>
-                    <td><input type="checkbox" checked/></td>
-                    <td><input type="checkbox" checked/></td>
-                    <td><input type="checkbox" checked/></td>
-                    <td><input type="checkbox"/></td>
-                    <td><input type="checkbox"/></td>
-                    <td><input type="checkbox"/></td>
-                    <td><input type="checkbox"/></td>
-                    <td><input type="checkbox"/></td>
-                    <td><input type="checkbox"/></td>
-                    <td><input type="checkbox"/></td>
-                </tr>
-                <tr>
-                    <td>Stroke</td>
-                    <td><input type="checkbox"/></td>
-                    <td><input type="checkbox"/></td>
-                    <td><input type="checkbox"/></td>
-                    <td><input type="checkbox"/></td>
-                    <td><input type="checkbox"/></td>
-                    <td><input type="checkbox"/></td>
-                    <td><input type="checkbox"/></td>
-                    <td><input type="checkbox"/></td>
-                    <td><input type="checkbox"/></td>
-                    <td><input type="checkbox"/></td>
-                </tr>
+    <div class="row static add" numRows="1">
+        <input type="checkbox" checked>Illustrator ID</input>
+        <input type="checkbox" checked>Text Contents</input>
+        <input type="checkbox" checked>Opacity</input>
+    </div>
+    <div class="row expanding add">
+        <table>
+            <tr>
+                <th></th>
+                <th class="rotate"><div><span>Hue</span></div></th>
+                <th class="rotate"><div><span>Saturation</span></div></th>
+                <th class="rotate"><div><span>Brightness</span></div></th>
+                <th class="rotate"><div><span>Red</span></div></th>
+                <th class="rotate"><div><span>Green</span></div></th>
+                <th class="rotate"><div><span>Blue</span></div></th>
+                <th class="rotate"><div><span>Cyan</span></div></th>
+                <th class="rotate"><div><span>Magenta</span></div></th>
+                <th class="rotate"><div><span>Yellow</span></div></th>
+                <th class="rotate"><div><span>blacK</span></div></th>
+            </tr>
+            <tr>
+                <td>Fill</td>
+                <td><input type="checkbox" checked/></td>
+                <td><input type="checkbox" checked/></td>
+                <td><input type="checkbox" checked/></td>
+                <td><input type="checkbox"/></td>
+                <td><input type="checkbox"/></td>
+                <td><input type="checkbox"/></td>
+                <td><input type="checkbox"/></td>
+                <td><input type="checkbox"/></td>
+                <td><input type="checkbox"/></td>
+                <td><input type="checkbox"/></td>
+            </tr>
+            <tr>
+                <td>Stroke</td>
+                <td><input type="checkbox"/></td>
+                <td><input type="checkbox"/></td>
+                <td><input type="checkbox"/></td>
+                <td><input type="checkbox"/></td>
+                <td><input type="checkbox"/></td>
+                <td><input type="checkbox"/></td>
+                <td><input type="checkbox"/></td>
+                <td><input type="checkbox"/></td>
+                <td><input type="checkbox"/></td>
+                <td><input type="checkbox"/></td>
+            </tr>
         </table>
-        </div>
+    </div>
+    <hr class="add"/>
+    <div class="row static add" numRows="1">
+        New dataset name:
+        <input type="text" value="newData"/>
     </div>
 
 
-    <div class="row static match">
+    <div class="row static match" numRows="1">
         Match the first data item in
         <select id="currentFile">
             <option>middleEarth</option>
@@ -91,38 +88,38 @@
         </select> where:
     </div>
     <div class="row expanding match">
-        <textarea>
-function (data, index) {
+        <div id="matchingEditor">function (data, index) {
     var x_position = this.getBoundingClientRect().left,
         tolerance = 3;
     if (x_position &gt;= data.foo - tolerance &amp;&amp;
-        x_position &gt;= data.foo + tolerance) {
+        x_position &lt;= data.foo + tolerance) {
         return true;
     }
     return false;
-}
-        </textarea>
+}</div>
     </div>
     <hr class="match"/>
-    <div class="row static match">
+    <div class="row static match" numRows="1">
         There are <div id="updateSize">31</div> matches for existing data items
     </div>
-    <div class="row static match">
-        <div id="updateSize">41</div> data items do not have a match <input type="checkbox">delete</input>
+    <div class="row static match" numRows="1">
+        <div id="updateSize">41</div> data items do not have a match&nbsp;&nbsp;&nbsp;
+        <input type="checkbox">Delete these data items</input>
     </div>
-    <div class="row static match">
+    <div class="row static match" numRows="1">
         There are potentially <div id="exitSize">59</div> new data items:
     </div>
     <div class="row expanding match">
-        <textarea>
-function () {
+        <div id="mappingEditor">function () {
     var x_position = this.getBoundingClientRect().left;
     return { foo : x_position };
-}
-        </textarea>
+}</div>
     </div>
-    <button id="applyButton">Apply</button>
+    <div class="row bottom">
+        <a class="button" id="applyButton" href="#">Apply</a>
+    </div>
     
+    <script type="application/javascript" src="../../ace/ace.js"></script>
     <script type="application/javascript" src="inferData.js"></script>
 </body>
 

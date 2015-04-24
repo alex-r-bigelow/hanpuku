@@ -1,4 +1,4 @@
-/*globals window, console, document, jQuery, d3*/
+/*globals window, console, document, jQuery, d3, updateRows*/
 var linear = false;
 
 function update() {
@@ -27,8 +27,6 @@ function update() {
         svg.attr('width', width);
         svg.attr('height', height);
         
-        
-        
         // add the new event handlers
         jQuery('polygon').on('click', function () {
             jQuery('polygon').attr('fill', '#bcbcbc').attr('stroke', '#333333');
@@ -39,6 +37,8 @@ function update() {
         });
         
     }, 'xml');
+    
+    updateRows();
 }
 
 window.scriptLoader.require(['../../common/illustrator.js',

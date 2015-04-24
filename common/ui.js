@@ -25,10 +25,10 @@ function updateRows() {
     if (expanders.length > 0) {
         availableHeight = window.innerHeight;
         availableHeight -= resized * jQuery('.bottom')[0].getBoundingClientRect().height;
-        jQuery('hr').each(function (i, e) {
+        jQuery('hr:visible').each(function (i, e) {
             availableHeight -= e.getBoundingClientRect().height;
         });
-        jQuery('.static').each(function (i, e) {
+        jQuery('.static:visible').each(function (i, e) {
             jQuery(e).height(rowHeight * e.getAttribute('numRows'));
             availableHeight -= e.getBoundingClientRect().height;
             availableHeight -= rowPadding;

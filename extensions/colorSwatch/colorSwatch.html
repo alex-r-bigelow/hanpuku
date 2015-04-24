@@ -8,7 +8,7 @@
 </head>
 
 <body onload="window.illustrator.applyUI();">
-    <div class="row static">
+    <div class="row static" numRows="1">
         Use data attribute:
         <select id="attribute">
             <option>(Row Number)</option>
@@ -19,34 +19,37 @@
             <option>Age</option>
         </select>
     </div>
-    <div class="row static">
+    <hr/>
+    <div class="row static" numRows="1">
         <input type="checkbox" checked="true" disabled="true">Treat Numbers as Ordinal</input>
     </div>
-    <div class="row static">
+    <div class="row expanding">
         <table>
             <tr>
-                <td>Hobbits</td>
+                <td class="input">Hobbits</td>
                 <td class="square" style="background-color:#4b4e21"></td>
             </tr>
             <tr>
-                <td>Elves</td>
+                <td class="input">Elves</td>
                 <td class="square" style="background-color:#bb882c"></td>
             </tr>
             <tr>
-                <td>Men</td>
+                <td class="input">Men</td>
                 <td class="square" style="background-color:#9b5b36"></td>
             </tr>
             <tr>
-                <td>Maiar</td>
+                <td class="input">Maiar</td>
                 <td class="square" style="background-color:#60312d"></td>
             </tr>
             <tr>
-                <td>+</td>
-                <td class="square" style="background-color:#000000"></td>
+                <td class="addCell"><a class="button" id="addButton" href="#">+</a></td>
             </tr>
         </table>
     </div>
-    <button id="applyButton">Apply</button>
+    <hr/>
+    <div class="row bottom">
+        <a class="button" id="applyButton" href="#">Apply</a>
+    </div>
     
     <script type="application/javascript" src="colorSwatch.js"></script>
 </body>

@@ -8,7 +8,7 @@
 </head>
 
 <body onload="window.illustrator.applyUI();">
-    <div class="row static">
+    <div class="row static" numRows="1">
         Use data attribute:
         <select id="attribute">
             <option>(Text Contents)</option>
@@ -19,28 +19,36 @@
             <option selected>Species</option>
         </select>
     </div>
-    <div class="row static">
-        <input type="checkbox">Treat Numbers as Ordinal</input>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        Quantitative Scale:
-        <select id="scale">
-            <option>Linear</option>
-            <option>Log</option>
-        </select>
-    </div>
-    <div class="row static">
+    <hr/>
+    <div class="row static" numRows="1.2">
         <span>
             Anchor:<img src="anchor.png"/>
         </span>
         <span>
             <input type="checkbox" checked>Scale Horizontally</input>
+        </span>
+        <span>
             <input type="checkbox">Scale Vertically</input>
         </span>
     </div>
-    <div class="row static">
+    <hr/>
+    <div class="row static" numRows="1">
+        <span>
+            <input type="checkbox">Treat Numbers as Ordinal</input>
+        </span>
+        <span>
+            Quantitative Scale:
+            <select id="scale">
+                <option>Linear</option>
+                <option>Log</option>
+            </select>
+        </span>
+    </div>
+    
+    <div class="row expanding">
         <img id="slider" src="sampleSlider0.png" width="370" height="120"/>
     </div>
-    <div class="row static">
+    <div class="row static" numRows="1">
         Value:<input type="text"/>
         <select id="presets">
             <option>Apply preset:</option>
@@ -51,7 +59,10 @@
             <option>Alphabetize</option>
         </select>
     </div>
-    <button id="applyButton">Apply</button>
+    <hr/>
+    <div class="row bottom">
+        <a class="button" id="applyButton" href="#">Apply</a>
+    </div>
     
     <script type="application/javascript" src="scale.js"></script>
 </body>

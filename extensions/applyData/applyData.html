@@ -8,7 +8,7 @@
 </head>
 
 <body onload="window.illustrator.applyUI();">
-    <div class="row static">
+    <div class="row static" numRows="1">
         Dataset:
         <select id="currentFile">
             <option>middleEarth</option>
@@ -30,59 +30,64 @@
     </div>
     <hr/>
     <div class="advanced row expanding">
-        <textarea>
-function (data, index) {
+        <div id="keyEditor">function (data, index) {
     return index;
-}</textarea>
+}</div>
     </div>
-    <div class="row static basic">
+    <div class="row static basic" numRows="1">
         With these settings, there are:
     </div>
-    <div class="row static">
+    <div class="row static" numRows="1">
         <div class="advanced">Size of <span class="code">selection</span>, not including
             <span class="code">enter()</span> and
             <span class="code">exit()</span>:</div>
         <div id="updateSize">31</div>
         <div class="basic">selected items that have matching data</div>
     </div>
-    <div class="row static">
+    <div class="row static" numRows="1">
         <div class="advanced">Size of <span class="code">selection.enter()</span>:</div>
         <div id="enterSize">41</div>
         <div class="basic">new items to be created</div>
     </div>
-    <div class="row static">
+    <div class="row static" numRows="1">
         <div class="advanced">Size of <span class="code">selection.exit()</span>:</div>
         <div id="exitSize">59</div>
-        <div class="basic">selected items that have no matching data <input type="checkbox">delete</input></div>
+        <div class="basic">selected items that have no matching data&nbsp;&nbsp;&nbsp;
+            <input type="checkbox">Delete these items</input></div>
     </div>
     <hr/>
-    <div class="row static basic">
+    <div class="row static basic" numRows="1">
         For each new item, add this Symbol:
     </div>
     <div class="row expanding basic">
         <div id="symbolView"></div>
     </div>
     <div class="row expanding advanced">
-        <textarea>
-selection.enter()
+        <div id="d3Editor">selection.enter()
     .append("rect");
 selection.exit()
-    .remove();</textarea>
+    .remove();
+selection.attr("x", function (d) {
+        return d.foo;
+    });</div>
     </div>
     <hr/>
-    <div class="row static">
+    <div class="row static" numRows="1">
         <input type="checkbox" id="remember" checked onchange="toggleClassName()"/>
         Remember this selection with class label:
         <input type="text" id="cssClass" value="lotrCharacterNames"/>
     </div>
-    <div class="row static">
+    <div class="row static" numRows="1">
         <input type="checkbox" id="reapply" checked/>
         <div>Automatically reapply these settings when</div>
         <div id="inlineFileName">middleEarth</div>
         <div>is updated.</div>
     </div>
-    <button id="applyButton">Apply</button>
+    <div class="row bottom">
+        <a class="button" id="applyButton" href="#">Apply</a>
+    </div>
     
+    <script type="application/javascript" src="../../ace/ace.js"></script>
     <script type="application/javascript" src="applyData.js"></script>
 </body>
 

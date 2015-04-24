@@ -1,58 +1,23 @@
-#row0 {
-    position: absolute;
-    top:0px;
-    height:30px;
-    left:2px;
-    right:2px;
-}
-#row1 {
-    position: absolute;
-    top:30px;
-    bottom:49%;
-    left:4px;
-    right:4px;
-    overflow-y: scroll;
-    border: 1px solid black;
-}
-#row4 {
-    position: absolute;
-    top:51%;
-    bottom:30px;
-    left:4px;
-    right:4px;
-}
-#row5 {
-    position: absolute;
-    bottom:0px;
-    height:30px;
-    left:2px;
-    right:2px;
-}
-td {
-    border: 1px solid #bcbcbc;
-    font-weight: bold;
-}
 .square {
     width:1em;
     height:1em;
 }
-img {
-    vertical-align: middle;
-}
-textarea {
-    position: absolute;
-    left:0px;
-    right:0px;
-    top:15px;
-    bottom:0px;
-    font-family:"Consolas", monospace;
-    font-size:9pt;
-    border: 1px solid black;
-}
+
 span {
-    padding: 6px;
+    padding-right:14px;
 }
-#applyButton {
-    float: right;
-    margin:4px;
+
+.input {
+    border: 1px solid black;
+    background-color: #a1a1a1;
+    color: black;
+}
+
+.addCell {
+    padding-left: 0px;
+    padding-top: 5px;
+}
+
+td {
+    padding: 4px;
 }

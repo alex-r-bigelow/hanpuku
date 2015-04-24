@@ -1,4 +1,7 @@
-/*globals window, console, document, jQuery, d3, updateExpanders*/
+/*globals window, console, document, jQuery, d3, updateRows, ace*/
+
+var keyEditor,
+    d3Editor;
 
 function update() {
     "use strict";
@@ -15,7 +18,11 @@ function update() {
     mode = mode === 'advanced' ? 'basic' : 'advanced';
     jQuery('.' + mode).hide();
     
-    updateExpanders();
+    updateRows();
+    
+    // tell the editors to refresh
+    keyEditor.resize();
+    d3Editor.resize();
 }
 
 function toggleClassName() {
@@ -33,6 +40,17 @@ window.scriptLoader.require(['../../common/illustrator.js',
     "use strict";
     var x,
         temp;
+    keyEditor = ace.edit('keyEditor');
+    d3Editor = ace.edit('d3Editor');
+    
+    window.illustrator.aceEditors.push(keyEditor);
+    keyEditor.$blockScrolling = Infinity;
+    keyEditor.getSession().setMode("ace/mode/javascript");
+    
+    window.illustrator.aceEditors.push(d3Editor);
+    d3Editor.$blockScrolling = Infinity;
+    d3Editor.getSession().setMode("ace/mode/javascript");
+    
     for (x = 1; x <= 10; x += 1) {
         temp = d3.select('#symbolView').append('img').attr('src', 'sampleSymbols/' + x + '.png');
         if (x === 7) {

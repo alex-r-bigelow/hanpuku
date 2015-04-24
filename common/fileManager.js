@@ -193,6 +193,7 @@ File.prototype.saveAs = function () {
                                              "Save",
                                              "Save As");
     if (newPath.data === "") {
+        self.onUpdate();
         return;
     }
     
@@ -202,15 +203,15 @@ File.prototype.saveAs = function () {
         throw "Could not write to linked file " + newPath;
     }
     
-    // Clean up whatever references we left behind
-    if (self.path === File.EMBEDDED) {
-        window.illustrator.callFunction('deleteEmbeddedFile', [self.role, self.name], finish);
-    } else {
-        window.illustrator.callFunction('removeLinkedFile', [self.role, self.name], finish);
-    }
-    
-    // Add a link to the external file
-    window.illustrator.callFunction('addLinkedFile', [self.role, self.name, newPath.data]);
+    // Add the link to the external file
+    window.illustrator.callFunction('addLinkedFile', [self.role, self.name, newPath.data], function () {
+        // Clean up whatever references we left behind
+        if (self.path === File.EMBEDDED) {
+            window.illustrator.callFunction('deleteEmbeddedFile', [self.role, self.name], finish);
+        } else {
+            window.illustrator.callFunction('removeLinkedFile', [self.role, self.name], finish);
+        }
+    });
 };
 File.prototype.rename = function () {
     "use strict";
