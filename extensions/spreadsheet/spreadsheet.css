@@ -1,0 +1,21 @@
+.square {
+    position: relative;
+    background-color: white;
+    border:1px solid black;
+    padding:8px;
+}
+table {
+    display: inline-block;
+    vertical-align: middle;
+}
+td {
+    border: none;
+    padding:6px;
+}
+th {
+    text-align: left;
+    font-weight: lighter;
+    font-style: italic;
+    opacity: 50%;
+    padding:6px;
+}

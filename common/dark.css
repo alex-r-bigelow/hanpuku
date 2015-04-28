@@ -32,11 +32,12 @@ option:disabled {
     color: rgba(188, 188, 188, 0.5);
 }
 
-input {
+input, td.input {
     border: 1px solid black;
+    color: black;
     background-color: #a1a1a1;
 }
-input:disabled {
+input:disabled, td.input:disabled {
     background-color: #767676;
 }
 

@@ -8,23 +8,17 @@
 </head>
 
 <body onload="window.illustrator.applyUI();">
-    <div class="row static">
+    <div class="row static" numrows="1">
         <input type="radio" name="newOrModify" checked>New Selection</input>
         <input type="radio" name="newOrModify">Modify Current Selection</input>
     </div>
     <hr/>
-    <div class="row static">
-        <input type="checkbox" id="remember" checked onchange="toggleClassName()"/>
-        Remember this selection with class label:
-        <datalist id="allClassLabels">
-            <option value="lotrCharacterNames"/>
-            <option value="someOtherLabel"/>
-            <option value="whyisntthisworking"/>
-        </datalist>
-        <input list="allClassLabels" id="cssClass" value="lotrCharacterNames"/>
+    <div id="queryList" class="row expanding">
     </div>
     <hr/>
-    <button id="applyButton">Apply</button>
+    <div class="row bottom">
+        <a class="button" id="applyButton" href="#">Apply</a>
+    </div>
     <script type="application/javascript" src="query.js"></script>
 </body>
 

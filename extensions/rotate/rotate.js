@@ -29,9 +29,8 @@ function update() {
         
         // add the new event handlers
         jQuery('polygon').on('click', function () {
-            jQuery('polygon').attr('fill', '#bcbcbc').attr('stroke', '#333333');
-            this.setAttribute('fill', '#333333');
-            this.setAttribute('stroke', '#bcbcbc');
+            jQuery('polygon').attr('stroke-width', '1px');
+            this.setAttribute('stroke-width', '5px');
             
             jQuery('#valueEdit').val(this.getAttribute('class'));
         });

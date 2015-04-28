@@ -72,19 +72,18 @@ function lookupAttrType(attrName) {
 
 function update() {
     "use strict";
-    var q = d3.select('body').selectAll('.query').data(queries, function (d, i) {
+    var q = d3.select('#queryList').selectAll('.query').data(queries, function (d, i) {
             return i;
         }),
         e = q.enter().append('div')
-            .attr('class', 'row static query'),
+            .attr('class', 'query'),
         appendFilter = e.append('span')
             .attr('class', 'appendFilterRadios'),
         attribute = e.append('select')
             .attr('class', 'attribute'),
         queryType = e.append('select')
             .attr('class', 'queryType'),
-        buttons = e.append('span')
-            .attr('class', 'addRemoveButtons');
+        buttons;
     
     q.exit().remove();
     
@@ -145,27 +144,6 @@ function update() {
             }
         });
     
-    buttons.append('button').text('+')
-        .on('click', function (d, i) {
-            queries.splice(i + 1, 0, {
-                append : d.append,
-                attribute: d.attribute,
-                queryType : d.queryType,
-                queryValue : ''
-            });
-            update();
-        });
-    buttons.append('button').text('-')
-        .attr('class', 'removeButton')
-        .on('click', function (d, i) {
-            queries.splice(i, 1);
-            update();
-        });
-    if (queries.length === 1) {
-        jQuery('.removeButton')[0].setAttribute('disabled', '');
-    } else {
-        jQuery('.removeButton')[0].removeAttribute('disabled');
-    }
     
     attribute.on('change', function (d, i) {
         var attrType = lookupAttrType(this.value);
@@ -204,6 +182,31 @@ function update() {
         .selectAll('option').data(function (d) { return d.value; })
         .enter().append('option')
         .text(function (d) { return d; });
+    
+    buttons = e.append('span')
+            .attr('class', 'addRemoveButtons');
+    buttons.append('a').text('+')
+        .attr('class', 'small button')
+        .on('click', function (d, i) {
+            queries.splice(i + 1, 0, {
+                append : d.append,
+                attribute: d.attribute,
+                queryType : d.queryType,
+                queryValue : ''
+            });
+            update();
+        });
+    buttons.append('a').text('-')
+        .attr('class', 'removeButton small button')
+        .on('click', function (d, i) {
+            queries.splice(i, 1);
+            update();
+        });
+    if (queries.length === 1) {
+        jQuery('.removeButton')[0].setAttribute('disabled', '');
+    } else {
+        jQuery('.removeButton')[0].removeAttribute('disabled');
+    }
     
     d3.selectAll('.queryType').selectAll('option').each(function (d) {
         var queryData = d3.select(this.parentNode.parentNode.parentNode).datum(),

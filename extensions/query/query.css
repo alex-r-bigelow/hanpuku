@@ -1,4 +1,6 @@
-.addRemoveButtons {
-    position: absolute;
-    right: 4px;
+.query {
+}
+.query > * {
+    padding: 4px;
+    margin-right: 4px;
 }
