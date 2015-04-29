@@ -35,22 +35,22 @@
             
             <h2>Getting Started</h2>
             <p>Try loading an existing chart from our <a href="samples.html">sample library</a>, and press
-            "Run" in the JS tab. To use your own data, follow these steps. Note that these steps still work
+            "Apply" in the Code tab. To use your own data, follow these steps. Note that these steps still work
             even <strong>after</strong> you've changed stuff with Illustrator tools!
             </p>
             <ol>
-                <li>Click "Refresh From Document" (Illustrator doesn't yet have a clean way to automate this
-                when you change things in your document)</li>
                 <li>Load / paste / edit the data in the Data tab</li>
-                <li>Press "Run" in the JS tab (the same script should still be loaded)</li>
-                <li>If things updated as you expected, press "Apply"</li>
+                <li>Press "Apply" in the JS tab (the same script should still be loaded)</li>
             </ol>
             <p>The scripts are written to affect only the data-relevant bits (in the scatterplot example,
             only the position and fill of the dots are affected. If you change the shape of a few
             points and re-run the script with new data, your custom shapes will be preserved, though
             they may be moved or re-colored according to the data changes). If things <i>don't</i>
-            behave as you expect, just click "Refresh From Document" instead of the "Apply" button.
-            Your document won't change until you tell it to.</p>
+            behave as you expect, you can always undo and try again.</p>
+            <p>Note that some scripts are interactive; for example, you can drag around nodes in the
+            force-directed graph. To interact with a visualization before you apply it, check the
+            "Show Mirror DOM" option in the Code tab. If you're using this mode, click "Run" before
+            clicking "Apply." If you want to start over from your document's current state, click "Refresh DOM"</p>
             <p>Of course, feel free to try hacking the javascript or CSS if you're feeling adventurous.
             Remember, nothing will change in your actual document until you click the "Apply" button,
             so feel free to explore! The hanpuku sample library is still pretty small, but most
@@ -60,16 +60,16 @@
             <h2>For programmers - Things to be aware of</h2>
             <p>There are several quirks for d3 code that are introduced by integrating
             d3.js with Illustrator. Hanpuku includes a DOM, rendered using Adobe's built-in,
-            Google Chrome-based extension engine. The "Refresh From Document" button clears the DOM in hanpuku, and reverts
+            Google Chrome-based extension engine. The "Refresh DOM" button clears the DOM in hanpuku, and reverts
             the widget back to the current state of the Illustrator document. "Apply"
             maps any changes that have been made to the hanpuku DOM to the currently active Illustrator document,
-            and then updates the hanpuku DOM to match the Illustrator document's state.</p>
+            and then refreshes the hanpuku DOM to match the Illustrator document's state.</p>
             <p>These cycles between a real DOM and an Illustrator document have some nuances
             and speed bumps. Some functionality has been added to d3, and some additional
             global variables exist (see the list below). Some incompatibilities also exist
             in the conversion; hopefully this will get smoother with future updates, and as
             Adobe's extension API expands.</p>
-            <p>In the mean time, I have listed all the difficulties you are likely to
+            <p>In the mean time, I have listed some difficulties you are likely to
             encounter in the conversion.</p>
             
             <h2>Included libraries</h2>
@@ -91,9 +91,8 @@
                     file name of the current Illustrator document. Any changes outside this
                     SVG element will be ignored (if, for example, you add HTML buttons outside the SVG element to control
                     an interactive visualization, they will be lost after clicking "Apply" &mdash; of course, you can
-                    always restore them in your script if they are created with d3 enter() code).
-                    Its immediate
-                    children are:</p>
+                    always restore them in your script if they are created with d3 <code>enter()</code> code).
+                    Its immediate children are:</p>
                     <ul>
                         <li>&lt;rect&gt; elements of class "artboard"<br/></li>
                         <li>&lt;g&gt; elements representing each layer<br/></li>
@@ -101,12 +100,13 @@
                     <p>Every element's id in the DOM will be the same as the object's
                     name in Illustrator's Layers widget, however, hanpuku may modify
                     these names to ensure that all ids are unique and compatible with HTML.</p>
-                    <p>You can manipulate the .artboard elements, and your changes
-                    will be reflected in the document, however, Illustrator does not have a mechanism
-                    for embedding d3 data or transform or class attributes in Layer groups.
+                    <p>You can manipulate, or even create "artboard"-classed rectangle elements, and your changes
+                        will be reflected in the document.<p>
+                    </p>Layers are represented as SVG groups, however,
+                        Illustrator does not have a mechanism for attaching tags to Layer objects, so
+                        <i>any transformations, data bindings, or class attributes applied to a Layer group will be lost
+                    once "Apply" is clicked!</i>
                     </p>
-                    <p><i>Any attributes applied to a Layer group will be lost
-                    once "Apply" is clicked!</i></p>
                 </li>
                 <li><h3>Global variables</h3><br/>
                     <p>You can both use and modify the global <code>selection</code> variable. This is a
@@ -124,8 +124,8 @@
                     <p>Note that this may break some rules in CSS stylesheets that expect specifically
                     line, circle, or rect elements &mdash; at the moment, the best way around this is to
                     simply avoid explicit references to these tags in CSS selectors.</p>
-                    <p>In some situations, this can also make for confusing or even impossible update code; to
-                    mitigate this a little, we have monkey-patched
+                    <p>In some situations, this can also make update code confusing or even impossible;
+                    to mitigate this a little, we have monkey-patched
                     these functions onto d3 selections that allow you to manipulate paths as if
                     they were lines, circles, rectangles, or non-cubic paths:</p>
                     <ul>
@@ -188,9 +188,10 @@
                         in SVG that <i>will not render correctly in the DOM preview</i>, though they will be preserved
                         on the return trip to Illustrator (incidentally, \n characters in this type of SVG text will be
                         handled as expected in Illustrator).</p>
-                        <p>Unlike paths, Illustrator does not have native text coordinates; while hanpuku maintains its
-                        pattern and makes the SVG x and y attributes global, it also adds three attributes to text elements:
-                        hanpuku_scale_x, hanpuku_scale_y, and hanpuku_rotation.</p>
+                        <p>Unlike paths, Illustrator does not have native text coordinates; instead, we do some very
+                        complex bookkeeping of text elements' coordinates and transformations. There are several bugs
+                        remaining, especially with regard to scaling text. As stretching text this way is generally
+                        considered a horrible design decision in the first place, it probably will not be fixed soon (sorry!).</p>
                         <p><i>textLength, lengthAdjust, and additional x and y attributes are
                         discarded</i>. Only the first x and y coordinates will be used and preserved. Per-character
                         attributes, such as dy (baseline shift), dx (kerning), and rotate (per-character rotation)
@@ -215,13 +216,11 @@
                 <li><h3>Colors and Opacity</h3>
                     <p>Currently, most browsers (including Adobe's internal Chrome engine) do not yet support
                     CMYK colors in the DOM. On the flip side, Illustrator does not natively support web-style, hexidecimal
-                    colors in documents. Furthermore, Illustrator does not support different opacity settings for stroke
-                    and fill.</p>
-                    <p>Hanpuku's current solution is to convert all colors to rgb(0-255,0-255,0-255) format, and opacities
-                    are stored separately. Note that this will do funny things to CMYK colors; for now, set your
+                    colors in documents.</p>
+                    <p>Hanpuku's current solution is to convert all colors to rgb(0-255,0-255,0-255) format. Note that this
+                    will do funny things to CMYK colors; for now, set your
                     Document Color Mode (Edit Menu) to RGB Color for best results. The compromises are obviously less
-                    than ideal; the CMYK issues are waiting on Chrome supporting device-cmyk in CSS, but the
-                    opacity issues should be addressed relatively soon.</p>
+                    than ideal; the CMYK issues are waiting on Chrome supporting device-cmyk in CSS.</p>
                 </li>
                 <li><h3>Debugging</h3>
                     <p>I plan to embed Chrome's developer tools inside the widget when I can figure out how to do it
