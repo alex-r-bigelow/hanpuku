@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Menu>
+    <MenuItem Id="New" Label="New" Enabled="true" Checked="false" />
+
+    <MenuItem Label="---" />
+
+    <MenuItem Id="Open" Label="Open..." Enabled="true" Checked="false" />
+    <MenuItem Id="DB" Label="Get Database Query..." Enabled="false" Checked="false" />
+    <MenuItem Id="StreamPacket" Label="Get Packet From Stream..." Enabled="false" Checked="false" />
+
+    <MenuItem Label="---" />
+
+    <MenuItem Id="Save" Label="Save" Enabled="true" Checked="false" />
+    <MenuItem Id="SaveAs" Label="Save As..." Enabled="true" Checked="false" />
+
+    <MenuItem Label="---" />
+
+    <MenuItem Id="Rename" Label="Rename..." Enabled="true" Checked="false" />
+    <MenuItem Id="Refresh" Label="Refresh" Enabled="true" Checked="false" />
+    <MenuItem Id="Delete" Label="Delete" Enabled="true" Checked="false" />
+
+    <MenuItem Label="---" />
+
+    <MenuItem Id="Find" Label="Find..." Enabled="true" Checked="false" />
+</Menu>
