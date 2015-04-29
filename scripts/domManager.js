@@ -635,7 +635,7 @@ DomManager.prototype.extractDocument = function () {
     
     return output;
 };
-DomManager.prototype.domToDoc = function () {
+DomManager.prototype.domToDoc = function (callback) {
     "use strict";
     var self = this,
         i;
@@ -655,7 +655,9 @@ DomManager.prototype.domToDoc = function () {
     self.interval = null;
     if (self.timeout !== null) {
         for (i = window.setTimeout(DomManager.NOOP); i > self.timeout; i -= 1) {
-            window.clearTimeout(i);
+            if (i !== EXTENSION.combinedApplyTimeout) {
+                window.clearTimeout(i);
+            }
         }
     }
     self.timeout = null;
@@ -663,7 +665,8 @@ DomManager.prototype.domToDoc = function () {
     // Throw away all the selection rectangles
     jQuery('#hanpuku_selectionLayer').remove();
     
-    ILLUSTRATOR.runJSX(self.extractDocument(), 'scripts/domToDoc.jsx', function (result) {},
+    callback = callback === undefined ? function () {} : callback;
+    ILLUSTRATOR.runJSX(self.extractDocument(), 'scripts/domToDoc.jsx', callback,
         function (error) {
             // Something went wrong...
             if (error.message.search('Hanpuku ') === 0) {
@@ -679,7 +682,7 @@ DomManager.prototype.domToDoc = function () {
  * docToDom
  *
  **/
-DomManager.prototype.docToDom = function () {
+DomManager.prototype.docToDom = function (callback) {
     "use strict";
     var self = this;
     
@@ -812,6 +815,9 @@ DomManager.prototype.docToDom = function () {
             self.viewBounds = undefined;
         }
         EXTENSION.notifyRefresh();
+        if (callback !== undefined) {
+            callback();
+        }
     }, function (error) {
         // Something went wrong...
         if (error.message.search('Hanpuku ') === 0) {

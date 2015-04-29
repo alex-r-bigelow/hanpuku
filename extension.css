@@ -26,6 +26,7 @@ input[type="file"] {
     left: 0px;
     top: 0px;
     width: 100%;
+    padding-left:10px;
 }
 #views {
     position: absolute;

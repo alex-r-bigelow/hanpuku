@@ -31,6 +31,9 @@
         
         self.messages = [];
         self.messageTimer = undefined;
+        
+        self.showDom = false;
+        self.combinedApplyTimeout = null;
     }
     ExtensionManager.MESSAGE_DELAY = 5000;
     ExtensionManager.ANIMATION_DELAY = 700;
@@ -55,7 +58,7 @@
     ];
     ExtensionManager.PANELS = {
         "Examples" : {
-            "advanced" : true,
+            "advanced" : false,
             "views" : {
                 "examplesView" : {
                     "bounds" : ['0px', '0px', '0px', '0px']
@@ -74,51 +77,28 @@
                 }
             }
         },
-        "Bindings" : {
+        "Code" : {
             "advanced" : false,
             "views" : {
-                "domPreview" : {
-                    "bounds" : ['0px', '0px', '50%', '200px']
+                "jsEditor" : {
+                    "bounds" : ['0px', '0px', '0px', '50%']
                 },
-                "selectionQueryTools" : {
-                    "bounds" : ['0px', 'calc(100% - 200px)', '50%', '0px']
-                },
-                "dataPreview" : {
-                    "bounds" : ['50%', '0px', '0px', '0px'],
-                    "showSelection" : true
+                "cssEditor" : {
+                    "bounds" : ['0px', '50%', '0px', '0px']
                 }
             }
         },
-        "Influence" : {
+        "CodeWDom" : {
             "advanced" : false,
-            "views" : {
-                "domPreview" : {
-                    "bounds" : ['0px', '0px', '50%', '0px']
-                },
-                "influenceTools" : {
-                    "bounds" : ['50%', '0px', '0px', '0px']
-                }
-            }
-        },
-        "JS" : {
-            "advanced" : true,
             "views" : {
                 "domPreview" : {
                     "bounds" : ['0px', '0px', '50%', '0px']
                 },
                 "jsEditor" : {
-                    "bounds" : ['50%', '0px', '0px', '0px']
-                }
-            }
-        },
-        "CSS" : {
-            "advanced" : true,
-            "views" : {
-                "domPreview" : {
-                    "bounds" : ['0px', '0px', '50%', '0px']
+                    "bounds" : ['50%', '0px', '0px', '50%']
                 },
                 "cssEditor" : {
-                    "bounds" : ['50%', '0px', '0px', '0px']
+                    "bounds" : ['50%', '50%', '0px', '0px']
                 }
             }
         }
@@ -205,10 +185,20 @@
             }
         }
         self.advancedMode();
-        self.switchTab('JS');
+        self.switchTab('Examples');
         
         // Init the message area
         ejQuery('#messageOverlay').hide();
+    };
+    ExtensionManager.prototype.combinedApply = function () {
+        var self = this;
+        ILLUSTRATOR.refresh(function () {
+            CODE.runJS();
+            CODE.updateCSS();
+            // in case this was an animated / interactive visualization,
+            // give everything a chance to settle before applying
+            self.combinedApplyTimeout = window.setTimeout(function () { ILLUSTRATOR.apply(); }, 2000);
+        });
     };
     ExtensionManager.prototype.displayError = function (message) {
         "use strict";
@@ -268,7 +258,11 @@
         self.messages = [];
         ejQuery('#messageOverlay').html("").hide();
     };
-    ExtensionManager.prototype.switchTab = function (tabId) {
+    ExtensionManager.prototype.toggleDom = function () {
+        var self = this;
+        self.switchTab('Code', true);
+    };
+    ExtensionManager.prototype.switchTab = function (tabId, toggleDom) {
         var self = this,
             oldTab = ejQuery('#extensionControls button.active').attr('id'),
             button,
@@ -276,12 +270,16 @@
             view,
             viewElement;
         
+        
         if (oldTab !== undefined) {
             button = ejQuery('#' + oldTab);
             button.attr('class', null);
             button.css('color', self.oppositeTextColor);
             
             oldTab = oldTab.substring(0, oldTab.length - 12);
+            if (oldTab === 'Code' && self.showDom === true) {
+                oldTab = 'CodeWDom';
+            }
             for (v in ExtensionManager.PANELS[oldTab].views) {
                 if (ExtensionManager.PANELS[oldTab].views.hasOwnProperty(v)) {
                     ejQuery('#' + v).hide();
@@ -289,10 +287,27 @@
             }
         }
         
+        if (toggleDom === true) {
+            self.showDom = !self.showDom;
+        }
+        
         button = ejQuery('#' + tabId + '_PanelButton');
         button.attr('class', 'active');
         button.css('color', self.textColor);
         
+        if (tabId === 'Code') {
+            if (self.showDom === true) {
+                tabId = 'CodeWDom';
+                ejQuery('#DomButtons').show();
+                ejQuery('#CombinedButtons').hide();
+            } else {
+                ejQuery('#DomButtons').hide();
+                ejQuery('#CombinedButtons').show();
+            }
+        } else {
+            ejQuery('#DomButtons').hide();
+            ejQuery('#CombinedButtons').hide();
+        }
         for (v in ExtensionManager.PANELS[tabId].views) {
             if (ExtensionManager.PANELS[tabId].views.hasOwnProperty(v)) {
                 view = ExtensionManager.PANELS[tabId].views[v];
@@ -351,10 +366,10 @@
         }
     };
     ExtensionManager.prototype.disableUI = function () {
-        ejQuery('#applyButton').attr('disabled', true);
+        ejQuery('#applyButton, #combinedApplyButton').attr('disabled', true);
     };
     ExtensionManager.prototype.onRefresh = function () {
-        ejQuery('#applyButton').attr('disabled', false);
+        ejQuery('#applyButton, #combinedApplyButton').attr('disabled', false);
     };
     
     ExtensionManager.prototype.notifyNewData = function () {

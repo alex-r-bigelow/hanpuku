@@ -34,12 +34,12 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
           <Menu>hanpuku</Menu>
           <Geometry>
             <Size>
-              <Height>900</Height>
-              <Width>1600</Width>
+              <Height>500</Height>
+              <Width>775</Width>
             </Size>
             <MinSize>
               <Height>500</Height>
-              <Width>500</Width>
+              <Width>535</Width>
             </MinSize>
           </Geometry>
           <Icons>

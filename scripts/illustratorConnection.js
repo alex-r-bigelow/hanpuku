@@ -124,13 +124,16 @@ IllustratorConnection.prototype.updateSelection = function (d3selection) {
         });
     }
 };
-IllustratorConnection.prototype.refresh = function () {
+IllustratorConnection.prototype.refresh = function (callback) {
     "use strict";
-    DOM.docToDom();
-    EXTENSION.notifyRefresh();
+    DOM.docToDom(function () {
+        EXTENSION.notifyRefresh();
+        if (callback !== undefined) {
+            callback();
+        }
+    });
 };
-IllustratorConnection.prototype.apply = function () {
+IllustratorConnection.prototype.apply = function (callback) {
     "use strict";
-    DOM.domToDoc();
-    DOM.docToDom();
+    DOM.domToDoc(function () { DOM.docToDom(callback); });
 };

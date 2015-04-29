@@ -1,5 +1,5 @@
 /*jslint evil:true*/
-/*globals ejQuery, jQuery, EXTENSION, DOM, FileReader, TYPING_INTERVAL*/
+/*globals ejQuery, jQuery, EXTENSION, DOM, FileReader, TYPING_INTERVAL, clearTimeout, setTimeout*/
 
 function CodeManager() {
     "use strict";
