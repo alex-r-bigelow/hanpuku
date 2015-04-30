@@ -8,12 +8,9 @@ svg {
   shape-rendering: crispEdges;
 }
 
-.axis line {
+.axis path, .axis line {
   stroke: #ddd;
-}
-
-.axis path {
-  display: none;
+    fill: none;
 }
 
 .frame {
@@ -22,7 +19,7 @@ svg {
 }
 
 circle {
-  fill-opacity: .7;
+  opacity: .7;
 }
 
 circle.hidden {
@@ -31,6 +28,6 @@ circle.hidden {
 
 .extent {
   fill: #000;
-  fill-opacity: .125;
+  opacity: .125;
   stroke: #fff;
 }

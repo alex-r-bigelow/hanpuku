@@ -25,10 +25,10 @@ var yAxis = d3.svg.axis()
     .tickFormat(d3.format(".2s"));
 
 // Get our container, apply the margin if it's the first time
-var svg = d3.select('#Layer_1').selectAll('.scatterplot').data([0]);
+var svg = d3.select('#Layer_1').selectAll('.barchart').data([0]);
 var svgEnter = svg.enter();
 svgEnter.append('g')
-   .attr('class', 'scatterplot')
+   .attr('class', 'barchart')
    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
 d3.csv("statePopulation.csv", function(error, data) {
