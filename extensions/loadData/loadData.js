@@ -1,7 +1,7 @@
 /*globals window, console, document, jQuery, d3, FileManager, File, XMLSerializer*/
 
 var manager,
-    menu,
+    menu = null,
     menuParser = new XMLSerializer();
 
 function updateManager() {
@@ -24,6 +24,7 @@ function updateManager() {
         jQuery('#currentFile').append('<option disabled>No files loaded</option>');
         jQuery('#linkCheck').prop('disabled', true);
         jQuery('#format').prop('disabled', true);
+        jQuery('#applyButton').attr('disabled', '');    // nonstandard on purpose
     } else {
         jQuery('#currentFile').val(manager.currentFile.name);
         jQuery('#currentFile > option')
@@ -34,6 +35,11 @@ function updateManager() {
         jQuery('#format')
             .prop('disabled', false)
             .val(manager.currentFile.format);
+        if (manager.currentFile.saved === true) {
+            jQuery('#applyButton').attr('disabled', '');
+        } else {
+            jQuery('#applyButton').removeAttr('disabled');
+        }
     }
 }
 
@@ -61,7 +67,7 @@ function enableWidget() {
     "use strict";
     jQuery('#currentFile, #linkCheck, #format, #applyButton, .button')
         .off()
-        .prop('disabled', false);
+        .removeAttr('disabled');
     manager.refreshFiles();
     updateMenu();
 
@@ -79,6 +85,15 @@ function enableWidget() {
     jQuery('#applyButton').on('click', function () { manager.saveFile(); });
     
     updateMenu(true);
+}
+
+function finishLoading() {
+    "use strict";
+    if (menu === null) {
+        window.setTimeout(finishLoading, 200);
+    } else {
+        window.illustrator.applyUI();
+    }
 }
 
 window.scriptLoader.require(['../../common/illustrator.js',
@@ -120,7 +135,7 @@ window.scriptLoader.require(['../../common/illustrator.js',
         window.illustrator.on('noFile', disableWidget);
         window.illustrator.on('openFile', enableWidget);
         window.onfocus = function () {
-        // Initial test to see if a file is open
+            // Initial test to see if a file is open
             window.illustrator.checkIfFileIsOpen(function (response) {
                 if (response === 'true') {
                     enableWidget();

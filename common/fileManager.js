@@ -125,8 +125,8 @@ File.prototype.read = function () {
                 self.parsed = null;
                 self.valid = null;
                 self.raw = contents.data;
-                self.onUpdate();
             }
+            self.onUpdate();
         };
     
     if (self.path === File.EMBEDDED) {
@@ -267,7 +267,7 @@ File.prototype.toggleEmbedded = function () {
         self.saveAs();
     } else {
         window.illustrator.callFunction('writeEmbeddedFile', [self.role, self.name, self.raw], function () {
-            window.illustrator.callFunction('deleteLinkedFile', [self.role, self.name], function () {
+            window.illustrator.callFunction('removeLinkedFile', [self.role, self.name], function () {
                 self.path = File.EMBEDDED;
                 self.onUpdate();
             });
@@ -281,6 +281,7 @@ File.prototype.setFormat = function (newFormat) {
         self.format = newFormat;
         self.parsed = null;
         self.valid = null;
+        self.saved = false;
         self.onFormatChange();
     }
 };
@@ -307,6 +308,9 @@ function FileManager(placeholderId, roleName, validFormats) {
     self.editor.$blockScrolling = Infinity;
     self.editor.getSession().setMode("ace/mode/text");
     window.illustrator.aceEditors.push(self.editor);    // let Illustrator set the theme
+    self.editor.on('change', function () {
+        self.currentFile.setText(self.editor.getValue());
+    });
 }
 FileManager.TYPING_DELAY = 20000;
 FileManager.EDITOR_SETTINGS = {
@@ -367,32 +371,53 @@ FileManager.prototype.switchFile = function (fileName) {
         self.currentFile.onRemove = function () { self.remove(); };
         self.currentFile.onEvaluate = self.onUpdate;
     }
-    
+    console.log(self.currentFile);
     self.onUpdate();
 };
+
+FileManager.prototype.asyncLoadingSwitchFile = function (fileName) {
+    "use strict";
+    var self = this;
+    
+    if (fileName === null || (self.files.hasOwnProperty(fileName) === true && self.files[fileName].saved === true)) {
+        self.switchFile(fileName);
+    } else {
+        window.setTimeout(self.asyncSwitchFile, 200);
+    }
+};
+
 
 FileManager.prototype.refreshFiles = function () {
     "use strict";
     var self = this;
-    window.illustrator.callFunction('getFileList', ['data'], function (fileList) {
+    window.illustrator.callFunction('getFileList', [self.roleName], function (fileList) {
         var foundFiles = {},
             arbitraryFile = null,
-            f;
+            temp,
+            f,
+            newFile;
+        
         for (f = 0; f < fileList.length; f += 1) {
             if (self.files.hasOwnProperty(fileList[f].name)) {
                 arbitraryFile = fileList[f].name;
                 // there's a match...
                 // TODO: ask whether to refresh if the actual file has changed
             } else {
-                if (fileList[f].embedded === true) {
-                    // embedded exists, no list entry exists (just read it)
-                    self.loadEmbeddedFile(fileList[f].name);
+                // an embedded or linked file exists, but we have no list entry... just read it
+                newFile = new File(fileList[f].name, 'txt', self.roleName);
+                newFile.onUpdate = self.onUpdate;
+                self.files[newFile.name] = newFile;
+                if (fileList[f].embedded !== true) {
+                    newFile.read();
                 } else {
-                    // link exists, no list entry exists (just open it)
-                    window.illustrator.callFunction('getFileLink', [fileList[f].name, 'data'], function (path) {
-                        self.loadLinkedFile(path, fileList[f].name);
+                    window.illustrator.callFunction('getFileLink', [self.roleName, fileList[f].name], function (path) {
+                        temp = self.inferNameAndFormat(path);
+                        newFile.path = path;
+                        newFile.format = temp.format;
+                        newFile.read();
                     });
                 }
+                
                 arbitraryFile = fileList[f].name;
             }
             foundFiles[fileList[f].name] = true;
@@ -407,41 +432,25 @@ FileManager.prototype.refreshFiles = function () {
         }
         
         if (self.currentFile === null && arbitraryFile !== null) {
-            self.switchFile(arbitraryFile);
+            self.asyncLoadingSwitchFile(arbitraryFile);
         } else if (arbitraryFile === null) {
-            self.switchFile(arbitraryFile);
+            self.asyncLoadingSwitchFile(arbitraryFile);
         }
-
-        self.onUpdate();
     });
 };
 
-FileManager.prototype.loadEmbeddedFile = function (fileName) {
-    "use strict";
-    var self = this,
-        newFile = new File(fileName, 'txt', self.roleName);
-    newFile.read();
-    self.files[fileName] = newFile;
-};
-FileManager.prototype.loadLinkedFile = function (path, fileName) {
+FileManager.prototype.inferNameAndFormat = function (path) {
     "use strict";
     var self = this,
         temp = path.split('/'),
         format,
         newFile;
-    
     temp = temp[temp.length - 1].split('.');
     format = File.FORMAT_LOOKUP[temp.splice(-1)];
-    fileName = fileName === undefined ? temp.join('.') : fileName;
-    
-    newFile = new File(fileName, format, self.roleName, path);
-    
-    // Add a link to the external file
-    window.illustrator.callFunction('addLinkedFile', [self.roleName, fileName, path]);
-    
-    self.files[fileName] = newFile;
-    
-    return fileName;
+    return {
+        format : format,
+        fileName : temp.join('.')
+    };
 };
 
 FileManager.prototype.remove = function () {
@@ -461,6 +470,7 @@ FileManager.prototype.updateFormat = function () {
     "use strict";
     var self = this;
     self.editor.getSession().setMode(FileManager.EDITOR_SETTINGS[self.currentFile.format].mode);
+    self.onUpdate();
 };
 
 
@@ -474,12 +484,15 @@ FileManager.prototype.newFile = function () {
     
     if (fileName !== null) {
         self.files[fileName] = new File(fileName, 'txt', self.roleName);
+        self.files[fileName].onUpdate = self.onUpdate;
         self.switchFile(fileName);
     }
 };
 FileManager.prototype.openFile = function () {
     "use strict";
     var self = this,
+        newFile,
+        temp,
         result = window.cep.fs.showOpenDialogEx(false,
                                                 false,
                                                 'Open',
@@ -488,7 +501,13 @@ FileManager.prototype.openFile = function () {
                                                 self.roleName + ' files',
                                                 'Open');
     if (result.data.length > 0) {
-        self.switchFile(self.loadLinkedFile(result.data[0]));
+        temp = self.inferNameAndFormat(result.data[0]);
+        window.illustrator.callFunction('addLinkedFile', [self.roleName, temp.fileName, result.data[0]], function () {
+            newFile = new File(temp.fileName, temp.format, self.roleName, result.data[0]);
+            newFile.onUpdate = self.onUpdate;
+            self.files[newFile.name] = newFile;
+            self.switchFile(newFile.name);
+        });
     }
 };
 FileManager.prototype.saveFile = function () {
