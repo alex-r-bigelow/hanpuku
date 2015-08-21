@@ -1,3 +1,5 @@
+/*globals ejQuery, clearTimeout, setTimeout, DataManager, CODE, DATA*/
+
 function ExamplesManager () {
     var self = this;
     

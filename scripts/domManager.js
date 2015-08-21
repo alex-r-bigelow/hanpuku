@@ -1,5 +1,5 @@
 /*jslint evil:true*/
-/*globals ejQuery, jQuery, ed3, d3, DATA, EXTENSION, ILLUSTRATOR, JsonCircular, console, convertUnits, phrogz, hanpuku, document, window*/
+/*globals ejQuery, jQuery, ed3, d3, DATA, EXTENSION, ILLUSTRATOR, JsonCircular, console, convertUnits, phrogz, hanpuku, document, window, alert*/
 
 /*
  * The purpose of this class is to act as an intermediary between
@@ -991,4 +991,85 @@ DomManager.prototype.addGroup = function (parent, group) {
             throw "Unknown itemType: " + children[c];
         }
     }
+};
+
+/*
+ * Import / export HTML
+ **/
+function download(filename, text) {
+  var element = document.createElement('a');
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+  element.setAttribute('download', filename);
+
+  element.style.display = 'none';
+  document.body.appendChild(element);
+
+  element.click();
+
+  document.body.removeChild(element);
+}
+DomManager.prototype.exportHTML = function () {
+    "use strict";
+    var self = this,
+        contentDoc = ejQuery('#domPreviewContent > iframe')[0].contentDocument,
+        allNodes = contentDoc.getElementsByTagName('*'),
+        node,
+        datum,
+        i,
+        result,
+        filePath = window.cep.fs.showSaveDialogEx("Export HTML",
+                    "", ["html"], self.docName + ".html", "", "Save", "File name:").data;
+    for (i = 0; i < allNodes.length; i += 1) {
+        node = d3.select(allNodes[i]);
+        datum = node.datum();
+        if (datum === undefined) {
+            node.attr('__data__', null);
+        } else {
+            node.attr('__data__', JSON.stringify(datum));
+        }
+    }
+    
+    result = window.cep.fs.writeFile(filePath,
+        '<!DOCTYPE html><html><head>\n' +
+        contentDoc.head.innerHTML +
+        '</head><body>' +
+        contentDoc.body.innerHTML +
+        '</body></html>');
+    
+    if (result.err !== 0){
+        alert("Sorry, something went wrong when trying to save the file.");
+    }
+};
+DomManager.prototype.importHTML = function () {
+    "use strict";
+    var self = this,
+        filePath = window.cep.fs.showOpenDialogEx(false, false, "Import HTML", "", ["html"], "", "OK").data[0],
+        result = window.cep.fs.readFile(filePath).data,
+        contentDoc = ejQuery('#domPreviewContent > iframe')[0].contentDocument,
+        allNodes,
+        i,
+        node,
+        datum;
+    
+    console.log(filePath, result);
+    
+    contentDoc.write(result);
+    
+    allNodes = contentDoc.getElementsByTagName('*');
+    
+    for (i = 0; i < allNodes.length; i += 1) {
+        node = d3.select(allNodes[i]);
+        datum = node.attr('__data__');
+        if (datum !== null) {
+            node.datum(JSON.parse(datum));
+        }
+        node.attr('__data__', null);
+    }
+};
+DomManager.prototype.combinedExportHTML = function () {
+    "use strict";
+    var self = this;
+};
+DomManager.prototype.combinedImportHTML = function () {
+    var self = this;
 };

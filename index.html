@@ -12,11 +12,15 @@
         <button id="Data_PanelButton" onclick="EXTENSION.switchTab('Data');">Data</button>
         <button id="Code_PanelButton" onclick="EXTENSION.switchTab('Code');">Code</button>
         <span id="DomButtons" style="float:right">
+            <button id="exportHtmlButton" onclick="DOM.exportHTML();">Export DOM as HTML</button>
+            <button id="importHtmlButton" onclick="DOM.importHTML();">Import HTML as DOM</button>
             <button id="refreshButton" onclick="ILLUSTRATOR.refresh();">Refresh DOM</button>
             <button id="runButton" onclick="CODE.runJS();">Run Script</button>
             <button id="applyButton" onclick="ILLUSTRATOR.apply();">Apply</button>
         </span>
         <span id="CombinedButtons" style="float:right">
+            <!--button id="combinedExportHtmlButton" onclick="DOM.combinedExportHTML();">Export as HTML</button-->
+            <!--button id="combinedImportHtmlButton" onclick="DOM.combinedImportHTML();">Import HTML</button-->
             <button id="combinedApplyButton" onclick="EXTENSION.combinedApply();">Apply</button>
         </span>
     </div>
