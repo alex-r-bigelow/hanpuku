@@ -55,7 +55,7 @@
                     window.parent.CODE.loadSampleJSFile('examples/scripts/zoomableSunburst.js');
                     window.parent.CODE.loadSampleCSSFile('examples/style/zoomableSunburst.css');
                 } else if (name === 'tolkien') {
-                    window.parent.DATA.loadSampleDataFile('examples/data/middleEarthCharacters.csv');
+                    window.parent.DATA.loadSampleDataFile('examples/data/middleEarthCharactersFull.csv');
                     window.parent.DATA.loadSampleDataFile('examples/data/middleEarthCharactersSmall.csv');
                     window.parent.CODE.loadSampleJSFile('examples/scripts/tolkien.js');
                     window.parent.CODE.loadSampleCSSFile('examples/style/tolkien.css');
@@ -73,13 +73,13 @@
                     'splom' : 'Scatterplot Matrix',
                     'force' : 'Force-directed graph',
                     'streamgraph2' : 'Streamgraph',
-                    //'tolkien' : 'Tolkien (VIS paper teaser)',
+                    'tolkien' : 'Tolkien Characters',
                     //'lineChart' : 'Line Chart',
                     //'multiSeriesLineChart' : 'Multi-Series Line Chart',
                     //'areaChoropleth' : 'Area Choropleth',
                     //'hierarchicalEdgeBundling' : 'Hierarchical Edge Bundling',
                     //'stackedRadialArea' : 'Stacked Radial Area',
-                    'hboRecycling' : 'HBO Recycling'
+                    'hboRecycling' : 'The HBO Recycling Program'
                 },
                 resultText = "",
                 name;
@@ -88,7 +88,7 @@
                 if (sampleNames.hasOwnProperty(name)) {
                     resultText += '<div class="sample">' + sampleNames[name] +
                                   '<button onclick="loadSample(\'' + name + '\')">Load</button>' +
-                                  '<img src="thumbnails/' + name + '.png"/>' +
+                                  '<img src="thumbnails/' + name + '.png" width="230"/>' +
                                   '</div>';
                 }
             }

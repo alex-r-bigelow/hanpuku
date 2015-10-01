@@ -1,4 +1,7 @@
-/*globals d3*/
+/*
+    This example (and dataset) were inspired / extracted from this infographic:
+    http://grantland.com/features/the-hbo-recycling-program/
+*/
 var temp,
     shows,
     actors,
