@@ -35,14 +35,26 @@ More videos:
 
 Work in progress:
 -----------------
+#### Crazy ideas to explore
+- Sync with Chrome dev tools (create a Hanpuku Chrome extension for smooth two-way transitions?)
+- Add better, cleaner import / export / copy / paste features for full HTML or SVG snippets
+  - Provide more user control about what gets imported / exported / copied / pasted:
+    - Options to handle CSS rules that apply to snippets (but the rules themselves may live off in a stylesheet somewhere)?
+    - Options to control whether / how D3 bindings, event bindings, and other javascript properties that aren't in the HTML can be preserved
+      - (does any of this change with Illustrator's new-ish, yet still freakishly limiting variable / "graph" data binding approaches? Is there a better way to integrate?)
+    - Other options besides my mandatory SVG element = Illustrator artboard interpretation
+    - Controls to preserve rects as rects instead of converting everything to paths all the time?
+    - Text conversion issues are extremely messy internally - I should probably expose these issues rather than impose them myself
+
 #### Known bugs
 - Text rotation / scale bugs
 - Links to Swatch colors are lost (need to do a true diff model...?)
 - Arc approximation irregularities
 - Duplicate path endpoints
-- Need to turn off perspective grid temporarily (if it's on) in domToDoc
+- Need to turn off perspective grid or isolation mode temporarily (if they're on) in domToDoc, or stuff dies (how to do this with jsx?)
 
 #### High priority
+- Replace textareas with ace editors, better file saving / organization / syncing
 - Better font support
 - Bitmap support
 - Gradient support
@@ -51,7 +63,6 @@ Work in progress:
 - Stroke properties (dashes, caps, etc.)
 
 #### Medium priority
-- Replace textareas with ace editors
 - Regex search/replace in text editors (esp. data)
 - Circular data in the Data preview (visualize cycles)
 - More examples
