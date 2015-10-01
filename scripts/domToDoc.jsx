@@ -353,8 +353,6 @@
             scale_x,
             scale_y,
             theta,
-            x,
-            y,
             temp;
         
         iText.name = dText.name;

@@ -59,6 +59,9 @@
                     window.parent.DATA.loadSampleDataFile('examples/data/middleEarthCharactersSmall.csv');
                     window.parent.CODE.loadSampleJSFile('examples/scripts/tolkien.js');
                     window.parent.CODE.loadSampleCSSFile('examples/style/tolkien.css');
+                } else if (name === 'hboRecycling') {
+                    window.parent.DATA.loadSampleDataFile('examples/data/hboRecyclingMatrix.csv');
+                    window.parent.CODE.loadSampleJSFile('examples/scripts/hboRecycling.js');
                 }
             }
             
@@ -75,7 +78,8 @@
                     //'multiSeriesLineChart' : 'Multi-Series Line Chart',
                     //'areaChoropleth' : 'Area Choropleth',
                     //'hierarchicalEdgeBundling' : 'Hierarchical Edge Bundling',
-                    //'stackedRadialArea' : 'Stacked Radial Area'
+                    //'stackedRadialArea' : 'Stacked Radial Area',
+                    'hboRecycling' : 'HBO Recycling'
                 },
                 resultText = "",
                 name;

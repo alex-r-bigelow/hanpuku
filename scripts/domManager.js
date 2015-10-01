@@ -640,7 +640,7 @@ DomManager.prototype.domToDoc = function (callback) {
     var self = this,
         i;
     
-    // Need to clear out any "processes" that are running
+    // Need to clear out any "processes" that are running (like a force-directed layout)
     if (self.animationFrame !== null) {
         for (i = window.requestAnimationFrame(DomManager.NOOP); i > self.animationFrame; i -= 1) {
             window.cancelAnimationFrame(i);
@@ -662,7 +662,7 @@ DomManager.prototype.domToDoc = function (callback) {
     }
     self.timeout = null;
     
-    // Throw away all the selection rectangles
+    // Throw away all the selection overlay rectangles
     jQuery('#hanpuku_selectionLayer').remove();
     
     callback = callback === undefined ? function () {} : callback;
@@ -899,7 +899,8 @@ DomManager.prototype.addText = function (parent, text) {
         t.attr('text-anchor', 'start');
     }
     
-    // Font properties
+    // Font properties (it's important to set these BEFORE figuring out .internalX and .internalY, in case
+    // they use em units)
     t.style('font-size', text.fontSize)
         .style('font-family', text.fontFamily);
     
@@ -913,9 +914,8 @@ DomManager.prototype.addText = function (parent, text) {
         t.attr('transform', text.reverseTransform);
     }
     
-    text.internalX = Number(text.internalX);
-    text.internalY = Number(text.internalY);
-    
+    text.internalX = parseFloat(convertUnits(t[0][0], text.internalX, 'px')); // need to send the actual DOM element, not the d3 selection
+    text.internalY = parseFloat(convertUnits(t[0][0], text.internalY, 'px'));
     if (text.x_0 === null) {
         // This is a new item! Append the absolute transformation BEFORE
         // the reverseTransform has been reversed in the docToDom hack
@@ -1050,8 +1050,6 @@ DomManager.prototype.importHTML = function () {
         i,
         node,
         datum;
-    
-    console.log(filePath, result);
     
     contentDoc.write(result);
     
