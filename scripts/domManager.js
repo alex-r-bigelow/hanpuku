@@ -914,6 +914,9 @@ DomManager.prototype.addText = function (parent, text) {
         t.attr('transform', text.reverseTransform);
     }
     
+    text.internalX = !text.internalX ? '0' : text.internalX;
+    text.internalY = !text.internalY ? '0' : text.internalY;
+    
     text.internalX = parseFloat(convertUnits(t[0][0], text.internalX, 'px')); // need to send the actual DOM element, not the d3 selection
     text.internalY = parseFloat(convertUnits(t[0][0], text.internalY, 'px'));
     if (text.x_0 === null) {

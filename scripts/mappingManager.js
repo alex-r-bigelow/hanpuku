@@ -1,3 +1,4 @@
+/*globals DATA, EXTENSION, ed3*/
 /*jslint evil:true*/
 function Datum (parent, key, name, data, bindable) {
     var self = this;
@@ -52,12 +53,13 @@ Datum.INIT = function () {
     var root = new Datum(null, 'DATA.allFiles', 'Loaded Files', DATA.allFiles, false),
         queue = [],
         data,
+        key,
         datum,
         childName,
         childKey,
         childDatum;
     
-    Datum.ALL['DATA.allFiles'] = root;
+    Datum.ALL = {'DATA.allFiles' : root};
     Datum.BFS = ['DATA.allFiles'];
     
     // Populate the queue with files
@@ -113,8 +115,7 @@ Datum.INIT = function () {
                 for (childName in data) {
                     if (data.hasOwnProperty(childName) && childName !== 'hanpuku_key') {
                         childKey = datum.key + '["' + childName + '"]';
-                        
-                        if (data[childName].hasOwnProperty('hanpuku_key')) {
+                        if (data[childName] && data[childName].hasOwnProperty('hanpuku_key')) {
                             childDatum = Datum.ALL[data[childName].hanpuku_key];
                             childDatum.aliases.push(childKey);
                         } else {
@@ -138,7 +139,9 @@ Datum.INIT = function () {
     for (key in Datum.ALL) {
         if (Datum.ALL.hasOwnProperty(key)) {
             data = Datum.ALL[key].getValue();
-            delete data.hanpuku_key;
+            if (data && data.hasOwnProperty('hanpuku_key')) {
+                delete data.hanpuku_key;
+            }
         }
     }
 };
@@ -203,7 +206,9 @@ DataRow.INIT = function () {
         datum,
         childIndex,
         childRow,
-        alias;
+        alias,
+        i,
+        ancestor;
     
     // Store which keys were expanded before
     if (DataRow.LAST_EXPANSIONS === null) {

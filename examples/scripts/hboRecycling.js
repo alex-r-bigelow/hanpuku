@@ -1,7 +1,4 @@
-/*
-    This example (and dataset) were inspired / extracted from this infographic:
-    http://grantland.com/features/the-hbo-recycling-program/
-*/
+/*globals d3*/
 var temp,
     shows,
     actors,
@@ -10,11 +7,10 @@ var temp,
     allLinks,
     width = 612,
     height = 792,
-    top = 75,
-    bottom = height - top,
-    leftColumn = width / 3.75,
-    rightColumn = width - leftColumn;
-
+    topBorder = 75,
+    bottomBorder = height - topBorder,
+    leftColumn = 150,
+    rightColumn = width - 175;
 
 d3.csv("hboRecyclingMatrix.csv", function (matrixData) {
     temp = matrixData;
@@ -31,7 +27,7 @@ d3.csv("hboRecyclingMatrix.csv", function (matrixData) {
         maxActorLinks = 0;
     
     temp.forEach(function (d) {
-        var a = d[""];
+        var a = d["Actor Name"];
         actors.push(a);
         shows.forEach(function (s) {
             if (showsToActors.hasOwnProperty(s) === false) {
@@ -52,6 +48,7 @@ d3.csv("hboRecyclingMatrix.csv", function (matrixData) {
             maxActorLinks = Math.max(maxActorLinks, actorsToShows[a].length);
         });
     });
+    //actors = actors.sort();
     
     var groups = d3.select("#Layer_1").selectAll("g").data(['links', 'nodes']);
     groups.enter().append('g')
@@ -84,8 +81,8 @@ d3.csv("hboRecyclingMatrix.csv", function (matrixData) {
     var showSizes = d3.scale.linear().domain([1, maxShowLinks]).range([2,900]),
         actorSizes = d3.scale.linear().domain([1, maxActorLinks]).range([2,30]);
     
-    var verticalShowScale = d3.scale.ordinal().domain(shows).rangeRoundBands([top,bottom], 0.1);
-    var verticalActorScale = d3.scale.ordinal().domain(actors).rangeRoundBands([top,bottom], 0.1);
+    var verticalShowScale = d3.scale.ordinal().domain(shows).rangeRoundBands([topBorder,bottomBorder], 0.1);
+    var verticalActorScale = d3.scale.ordinal().domain(actors).rangeRoundBands([topBorder,bottomBorder], 0.1);
     function getPosition (d) {
         if (showsToActors.hasOwnProperty(d) === true) {
             return [rightColumn, verticalShowScale(d)];
@@ -118,16 +115,14 @@ d3.csv("hboRecyclingMatrix.csv", function (matrixData) {
         .attr('d', circleGenerator)
         .attr('fill', 'black');
     actorNodes.select('text')
-        .attr('x', -15)
+        .attr('x', -10)
         .attr('y', '0.25em')
         .attr('text-anchor', 'end')
-        .style('font-size', '8px')
-        .style('font-family', 'Cooper Hewitt Light')
         .text(function (d) { return d; });
     
     var showNodes = d3.select("#nodes").selectAll("g.show").data(shows);
     var newShowNodes = showNodes.enter().append('g')
-        .attr('class', 'actor');
+        .attr('class', 'show');
     newShowNodes.append('path');
     newShowNodes.append('text');
     
@@ -136,12 +131,10 @@ d3.csv("hboRecyclingMatrix.csv", function (matrixData) {
     showNodes.attr("transform", getTranslation);
     showNodes.select('path')
         .attr('d', circleGenerator)
-        .attr("fill", colorScale);
+        /*.attr("fill", colorScale)*/;
     showNodes.select('text')
-        .attr('x', 15)
+        .attr('x', 22)
         .attr('y', '0.25em')
-        .style('font-size', '8px')
-        .style('font-family', 'Cooper Hewitt Light')
         .text(function (d) { return d; });
     
     var linkLines = d3.select("#links").selectAll("path").data(allLinks);
@@ -150,7 +143,8 @@ d3.csv("hboRecyclingMatrix.csv", function (matrixData) {
     
     linkLines.attr("fill", "none")
         .attr("stroke", function (d) {
-            return colorScale(d.source);
+            //return colorScale(d.source);
+            return 'black';
         })
         .attr("d", function (d) {
             var source = getPosition(d.source),
