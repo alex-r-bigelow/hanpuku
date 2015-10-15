@@ -19,11 +19,7 @@ Download the latest bundled extension [here](http://www.cs.utah.edu/~abigelow/#h
 See it in action:
 -----------------
 
-<video width="320" height="240" controls>
-<source src="http://www.cs.utah.edu/~abigelow/Downloads/hanpuku/hanpuku.mp4" type="video/mp4">
-<source src="http://www.cs.utah.edu/~abigelow/Downloads/hanpuku/hanpuku.ogg" type="video/ogg">
-Your browser does not support the video tag.
-</video>
+[General overview](https://youtu.be/J8hN_A1heic)
 
 More videos:
 ------------
