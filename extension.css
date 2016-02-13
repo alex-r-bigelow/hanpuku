@@ -95,7 +95,7 @@ textarea {
     position: absolute;
     top:30px;
     left:0px;
-    right:0px;
+    width:100%;
     bottom:0px;
     font-family: Consolas, monospace;
     border: none;
