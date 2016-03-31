@@ -1,56 +1,56 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<ExtensionManifest ExtensionBundleId="hanpuku" ExtensionBundleName="hanpuku" ExtensionBundleVersion="0.1" Version="4.0">
-  <Author>Alex Bigelow</Author>
-  <Contact mailto="abigelow@cs.utah.edu"/>
-  <Abstract href="http://alex.bigelowsite.com">
-    <![CDATA[
-hanpuku is an interface between d3.js and Adobe Illustrator, enabling a more flexible data visualization workflow. Data bindings no longer disappear when you edit a d3-generated graphic in Illustrator; those bindings now survive custom edits, and even get saved inside native .ai files.
+  <ExtensionManifest ExtensionBundleId="hanpuku" ExtensionBundleName="hanpuku" ExtensionBundleVersion="0.1" Version="5.0">
+    <Author>Alex Bigelow</Author>
+    <Contact mailto="abigelow@cs.utah.edu" />
+    <Abstract href="http://alex.bigelowsite.com">
+      <![CDATA[
+Hanpuku is an interface between d3.js and Adobe Illustrator, enabling a more flexible data visualization workflow. Data bindings no longer disappear when you edit a d3-generated graphic in Illustrator; those bindings now survive custom edits, and even get saved inside native .ai files.
 
 On the flip side, your custom Illustrator edits will also survive properly-written d3.js scripts: now, when your data changes after you've done lots of hand-crafted awesomeness, you don't have to start over from scratch!
     ]]>
-  </Abstract>
-  <ExtensionList>
-    <Extension Id="hanpuku.extension" Version="1.0"/>
-  </ExtensionList>
-  <ExecutionEnvironment>
-    <HostList>
-      <Host Name="ILST" Version="[19.0,19.9]"/>
-    </HostList>
-    <LocaleList>
-      <Locale Code="All"/>
-    </LocaleList>
-    <RequiredRuntimeList>
-      <RequiredRuntime Name="CSXS" Version="6.0"/>
-    </RequiredRuntimeList>
-  </ExecutionEnvironment>
-  <DispatchInfoList>
-    <Extension Id="hanpuku.extension">
-      <DispatchInfo>
-        <Resources>
-          <MainPath>./index.html</MainPath>
-        </Resources>
-        <UI>
-          <Type>Panel</Type>
-          <Menu>hanpuku</Menu>
-          <Geometry>
-            <Size>
-              <Height>500</Height>
-              <Width>775</Width>
-            </Size>
-            <MinSize>
-              <Height>500</Height>
-              <Width>535</Width>
-            </MinSize>
-          </Geometry>
-          <Icons>
-            <Icon Type="Normal">./img/icon2.png</Icon>
-            <Icon Type="RollOver">./img/icon2.png</Icon>
-            <Icon Type="Disabled">./img/icon.png</Icon>
-            <Icon Type="DarkNormal">./img/icon.png</Icon>
-            <Icon Type="DarkRollOver">./img/icon.png</Icon>
-          </Icons>
-        </UI>
-      </DispatchInfo>
-    </Extension>
-  </DispatchInfoList>
-</ExtensionManifest>
+    </Abstract>
+    <ExtensionList>
+      <Extension Id="hanpuku.extension" Version="1.0" />
+    </ExtensionList>
+    <ExecutionEnvironment>
+      <HostList>
+        <Host Name="ILST" Version="[19.0,19.9]" />
+      </HostList>
+      <LocaleList>
+        <Locale Code="All" />
+      </LocaleList>
+      <RequiredRuntimeList>
+        <RequiredRuntime Name="CSXS" Version="6.0" />
+      </RequiredRuntimeList>
+    </ExecutionEnvironment>
+    <DispatchInfoList>
+      <Extension Id="hanpuku.extension">
+        <DispatchInfo>
+          <Resources>
+            <MainPath>./index.html</MainPath>
+          </Resources>
+          <UI>
+            <Type>Panel</Type>
+            <Menu>hanpuku</Menu>
+            <Geometry>
+              <Size>
+                <Height>500</Height>
+                <Width>775</Width>
+              </Size>
+              <MinSize>
+                <Height>500</Height>
+                <Width>535</Width>
+              </MinSize>
+            </Geometry>
+            <Icons>
+              <Icon Type="Normal">./img/icon2.png</Icon>
+              <Icon Type="RollOver">./img/icon2.png</Icon>
+              <Icon Type="Disabled">./img/icon.png</Icon>
+              <Icon Type="DarkNormal">./img/icon.png</Icon>
+              <Icon Type="DarkRollOver">./img/icon.png</Icon>
+            </Icons>
+          </UI>
+        </DispatchInfo>
+      </Extension>
+    </DispatchInfoList>
+  </ExtensionManifest>
