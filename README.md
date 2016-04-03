@@ -1,5 +1,7 @@
 # hanpuku #
 
+<i style="color:#e7298a">Note: Adobe has discontinued their Extension Manager, so you may encounter difficulties installing the ZXP extension directly. Until I find time to roll my own installer, you can install Hanpuku following [these](https://github.com/alex-r-bigelow/hanpuku/issues/1#issuecomment-197873242) instructions on OS X (let me know if you have problems on Windows... I haven't gotten a chance to test the extension there)</i>
+
 Hanpuku is an interface between d3.js and Adobe Illustrator, enabling a more flexible
 data visualization workflow. Data bindings no longer disappear when you edit a d3-generated
 graphic in Illustrator; those bindings now survive custom edits, and even
@@ -14,15 +16,19 @@ set attributes for stuff you have selected in Illustrator like a normal d3.js se
 even filter the current Illustrator selection based on data, or perform complex selections right from
 the code!
 
-Download the latest bundled extension [here](http://www.cs.utah.edu/~abigelow/#hanpuku).
+Download the latest bundled extension [here](http://alex-r-bigelow.github.io/projects/hanpuku.html).
 
 See it in action:
 -----------------
 
-[General overview](https://youtu.be/J8hN_A1heic)
+[Infovis 2016 Submission Video](https://www.youtube.com/watch?v=eNoDZcs7vVs)
 
 More videos:
 ------------
+
+[Streamgraph example](https://www.youtube.com/watch?v=uYQ-RLT5AVA)
+
+[Les Miserables demo](https://www.youtube.com/watch?v=BBY0-AopdQ8)
 
 [Tweaking the geometry of a node](http://youtu.be/xuBMgR6ElR4)
 
