@@ -1,7 +1,5 @@
 # hanpuku #
 
-<i style="color:#e7298a">Note: Adobe has discontinued their Extension Manager, so you may encounter difficulties installing the ZXP extension directly. Until I find time to roll my own installer, you can install Hanpuku following [these](https://github.com/alex-r-bigelow/hanpuku/issues/1#issuecomment-197873242) instructions on OS X (let me know if you have problems on Windows... I haven't gotten a chance to test the extension there)</i>
-
 Hanpuku is an interface between d3.js and Adobe Illustrator, enabling a more flexible
 data visualization workflow. Data bindings no longer disappear when you edit a d3-generated
 graphic in Illustrator; those bindings now survive custom edits, and even
@@ -16,10 +14,45 @@ set attributes for stuff you have selected in Illustrator like a normal d3.js se
 even filter the current Illustrator selection based on data, or perform complex selections right from
 the code!
 
-Download the latest bundled extension [here](http://alex-r-bigelow.github.io/projects/hanpuku.html).
+Installation
+------------
+<i style="color:#e7298a">Adobe has discontinued their Extension Manager, so you may encounter difficulties installing the bundled [ZXP extension](http://www.cs.utah.edu/~abigelow/Downloads/hanpuku/hanpuku.0.1.8.zxp) directly. Until I find time to roll my own installer, you can install Hanpuku following these instructions on OS X (let me know if you have problems on Windows... I haven't gotten a chance to test the extension there):</i>
 
-See it in action:
------------------
+#### Step 1
+With Illustrator closed, open the terminal and type or paste these commands:
+
+```
+cd ~/Library/Application\ Support/Adobe/
+mkdir CEP
+mkdir CEP/extensions
+cd CEP/extensions
+git clone https://github.com/alex-r-bigelow/hanpuku.git
+```
+
+If you don't have git installed on your system, you can download the [zipped source code](https://github.com/alex-r-bigelow/hanpuku/archive/master.zip), extract it, and type this instead of the last line:
+```
+mv ~/Downloads/hanpuku-master ~/Library/Application\ Support/Adobe/CEP/extensions/hanpuku
+```
+
+#### Step 2
+Illustrator won't normally load the extension unless it's cryptographically signed. The old Extension Manager way of installing handled this for you, but until we get a better fix, you'll have to disable this check.
+
+Open `~/Library/Preferences/com.adobe.CSXS.6.plist`
+
+Add a row with key `PlayerDebugMode` of type String:
+
+![Screenshot](img/install1.png)
+
+Set its value to 1:
+
+![Screenshot](img/install2.png)
+
+#### Step 3
+You should now be able to launch Illustrator and open the Hanpuku extension window.
+
+
+See Hanpuku in action:
+----------------------
 
 [Infovis 2016 Submission Video](https://www.youtube.com/watch?v=eNoDZcs7vVs)
 
