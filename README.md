@@ -41,11 +41,11 @@ Open `~/Library/Preferences/com.adobe.CSXS.6.plist`
 
 Add a row with key `PlayerDebugMode` of type String:
 
-![Screenshot](img/install1.png)
+![Screenshot](https://raw.githubusercontent.com/alex-r-bigelow/hanpuku/master/img/install1.png)
 
 Set its value to 1:
 
-![Screenshot](img/install2.png)
+![Screenshot](https://raw.githubusercontent.com/alex-r-bigelow/hanpuku/master/img/install2.png)
 
 #### Step 3
 You should now be able to launch Illustrator and open the Hanpuku extension window.
