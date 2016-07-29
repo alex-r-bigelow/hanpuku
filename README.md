@@ -16,9 +16,9 @@ the code!
 
 Installation
 ------------
-The easiest way to install Hanpuku is via the [Adobe Add-ons](https://creative.adobe.com/addons/products/15087) page.
+The easiest way to install Hanpuku is via the [Adobe Add-ons](https://creative.adobe.com/addons/products/15087) page. Note that, for hard-core developers, you will probably still need to follow Step 2 below to peek at the DOM with Chrome's developer tools.
 
-<i style="color:#e7298a">Note that Adobe has discontinued their Extension Manager, so you may encounter difficulties installing the bundled [ZXP extension](http://www.cs.utah.edu/~abigelow/Downloads/hanpuku/hanpuku.0.1.8.zxp) directly. This process may be more effective:</i>
+If, for whatever reason, you prefer to install the bundled [ZXP extension](http://www.cs.utah.edu/~abigelow/Downloads/hanpuku/hanpuku.0.1.8.zxp) directly, Adobe's Extension Manager will likely refuse to cooperate. Instead, you'll want to follow these steps:
 
 #### Step 1
 With Illustrator closed, open the terminal and type or paste these commands:
@@ -39,15 +39,22 @@ mv ~/Downloads/hanpuku-master ~/Library/Application\ Support/Adobe/CEP/extension
 #### Step 2
 Illustrator won't normally load the extension unless it's cryptographically signed. The old Extension Manager way of installing handled this for you, but until we get a better fix, you'll have to disable this check.
 
-Open `~/Library/Preferences/com.adobe.CSXS.6.plist` with XCode (you should be able to do the same thing with a plain text editor if necessary):
+Open `~/Library/Preferences/com.adobe.CSXS.6.plist` with a plain text editor (TextEdit *won't* do this correctly; use something like TextWrangler). To find the file in the Finder, you might need to hit `Command+Shift+G`, and paste that path.
 
-Add a row with key `PlayerDebugMode` of type String:
+Add `<key>PlayerDebugMode</key>` and `<string>1</string>` so the file looks like this:
 
-![Screenshot](https://raw.githubusercontent.com/alex-r-bigelow/hanpuku/master/img/install1.png)
-
-Set its value to 1:
-
-![Screenshot](https://raw.githubusercontent.com/alex-r-bigelow/hanpuku/master/img/install2.png)
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>LogLevel</key>
+	<string>1</string>
+	<key>PlayerDebugMode</key>
+	<string>1</string>
+</dict>
+</plist>
+```
 
 #### Step 3
 You should now be able to launch Illustrator and open the Hanpuku extension window.
