@@ -16,7 +16,9 @@ the code!
 
 Installation
 ------------
-<i style="color:#e7298a">Adobe has discontinued their Extension Manager, so you may encounter difficulties installing the bundled [ZXP extension](http://www.cs.utah.edu/~abigelow/Downloads/hanpuku/hanpuku.0.1.8.zxp) directly. Until I find time to roll my own installer, you can install Hanpuku following these instructions on OS X (let me know if you have problems on Windows... I haven't gotten a chance to test the extension there):</i>
+The easiest way to install Hanpuku is via the [Adobe Add-ons](https://creative.adobe.com/addons/products/15087) page.
+
+<i style="color:#e7298a">Note that Adobe has discontinued their Extension Manager, so you may encounter difficulties installing the bundled [ZXP extension](http://www.cs.utah.edu/~abigelow/Downloads/hanpuku/hanpuku.0.1.8.zxp) directly. This process may be more effective:</i>
 
 #### Step 1
 With Illustrator closed, open the terminal and type or paste these commands:
@@ -37,7 +39,7 @@ mv ~/Downloads/hanpuku-master ~/Library/Application\ Support/Adobe/CEP/extension
 #### Step 2
 Illustrator won't normally load the extension unless it's cryptographically signed. The old Extension Manager way of installing handled this for you, but until we get a better fix, you'll have to disable this check.
 
-Open `~/Library/Preferences/com.adobe.CSXS.6.plist`
+Open `~/Library/Preferences/com.adobe.CSXS.6.plist` with XCode (you should be able to do the same thing with a plain text editor if necessary):
 
 Add a row with key `PlayerDebugMode` of type String:
 
