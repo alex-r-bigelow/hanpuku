@@ -39,7 +39,7 @@ mv ~/Downloads/hanpuku-master ~/Library/Application\ Support/Adobe/CEP/extension
 #### Step 2
 Illustrator won't normally load the extension unless it's cryptographically signed. The old Extension Manager way of installing handled this for you, but until we get a better fix, you'll have to disable this check.
 
-Open `~/Library/Preferences/com.adobe.CSXS.6.plist` with a plain text editor (TextEdit *won't* do this correctly; use something like TextWrangler). To find the file in the Finder, you might need to hit `Command+Shift+G`, and paste that path.
+Open `~/Library/Preferences/com.adobe.CSXS.7.plist` with a plain text editor (TextEdit *won't* do this correctly; use something like TextWrangler). To find the file in the Finder, you might need to hit `Command+Shift+G`, and paste that path.
 
 Add `<key>PlayerDebugMode</key>` and `<string>1</string>` so the file looks like this:
 

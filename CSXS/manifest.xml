@@ -14,13 +14,13 @@ On the flip side, your custom Illustrator edits will also survive properly-writt
     </ExtensionList>
     <ExecutionEnvironment>
       <HostList>
-        <Host Name="ILST" Version="[19.0,19.9]" />
+        <Host Name="ILST" Version="[20.0,20.9]" />
       </HostList>
       <LocaleList>
         <Locale Code="All" />
       </LocaleList>
       <RequiredRuntimeList>
-        <RequiredRuntime Name="CSXS" Version="6.0" />
+        <RequiredRuntime Name="CSXS" Version="7.0" />
       </RequiredRuntimeList>
     </ExecutionEnvironment>
     <DispatchInfoList>
