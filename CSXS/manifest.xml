@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-  <ExtensionManifest ExtensionBundleId="hanpuku" ExtensionBundleName="hanpuku" ExtensionBundleVersion="0.1" Version="5.0">
+  <ExtensionManifest ExtensionBundleId="hanpuku" ExtensionBundleName="hanpuku" ExtensionBundleVersion="0.1.9" Version="5.0">
     <Author>Alex Bigelow</Author>
     <Contact mailto="abigelow@cs.utah.edu" />
     <Abstract href="http://alex.bigelowsite.com">
