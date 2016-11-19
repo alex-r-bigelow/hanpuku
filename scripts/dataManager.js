@@ -3,14 +3,14 @@
 function DataFile(name, type, raw) {
     "use strict";
     var self = this;
-    
+
     self.name = name;
     self.type = type;
     self.raw = raw;
     self.embed = false;
     self.valid = false;
     self.parsed = null;
-    
+
     self.evaluate();
 }
 DataFile.prototype.evaluate = function () {
@@ -19,7 +19,7 @@ DataFile.prototype.evaluate = function () {
         temp;
     self.parsed = null;
     self.valid = false;
-    
+
     try {
         if (self.type === 'text/js') {
             self.parsed = eval(self.raw);
@@ -52,7 +52,7 @@ function OrphanFile() {
     "use strict";
     DataFile.call(this, 'default', 'text/json', '{}');
     var self = this;
-    
+
     self.embed = true;
 }
 OrphanFile.prototype = Object.create(DataFile.prototype);
@@ -66,12 +66,12 @@ OrphanFile.prototype.constructor = OrphanFile;
 function DataManager() {
     "use strict";
     var self = this;
-    
+
     self.allFiles = [];
     self.fileLookup = {};
-    
+
     self.currentFile = undefined;
-    
+
     self.typingTimer = undefined;
 }
 
@@ -117,18 +117,18 @@ DataManager.prototype.updatePanel = function () {
         //embedBox = ejQuery('#embedFileCheckBox'),
         dataTypeSelect = ejQuery('#dataTypeSelect'),
         optionText = "";
-    
+
     // Inject a fresh invisible file uploading control
     ejQuery('#dataFileInput').remove();
     ejQuery('#dataEditorControls').append('<input id="dataFileInput" type="file" onchange="DATA.loadFiles();" multiple style="visibility:hidden"/>');
-    
+
     // Update the visible controls (rebuild the file selection menu from scratch)
     currentDataFile.find('option').remove();
-    
+
     for (i = 0; i < self.allFiles.length; i += 1) {
         f = self.allFiles[i];
         optionText = '<option value="' + f.name + '"';
-        
+
         if (self.currentFile === f.name) {
             optionText += ' selected';
             editor.val(f.raw);
@@ -140,7 +140,7 @@ DataManager.prototype.updatePanel = function () {
         optionText += '>' + f.name + '</option>';
         currentDataFile.append(optionText);
     }
-    
+
     currentDataFile.append('<option value="loadNewFile">Load...</option>');
 };
 DataManager.prototype.edit = function () {
@@ -157,7 +157,7 @@ DataManager.prototype.switchFile = function () {
     "use strict";
     var self = this,
         newFile = ejQuery('#currentDataFile').val();
-    
+
     if (newFile === 'loadNewFile') {
         // It will take a while for the user to pick some files, so for now,
         // revert back to the previous file in case they don't pick anything
@@ -188,7 +188,7 @@ DataManager.prototype.changeType = function () {
 DataManager.prototype.addFile = function (newFile) {
     "use strict";
     var self = this;
-    
+
     if (self.fileLookup.hasOwnProperty(newFile.name)) {
         self.allFiles[self.fileLookup[newFile.name]] = newFile;
     } else {
@@ -213,7 +213,7 @@ DataManager.prototype.loadSampleDataFile = function (url) {
         var parts = url.split('/'),
             name = parts[parts.length - 1],
             extension = name.split('.');
-        
+
         extension = extension[extension.length - 1];
         extension = DataManager.FORMAT_LOOKUP[extension.toLowerCase()];
         if (typeof dataString !== 'string') {
@@ -245,7 +245,7 @@ DataManager.prototype.loadFiles = function () {
         warnedAboutFiles = false,
         unloadedFiles = [],
         lastFile = self.currentFile;
-    
+
     for (i = 0; i < newFiles.length; i += 1) {
         if (DataManager.FORMAT_LOOKUP.hasOwnProperty(newFiles[i].type) === false) {
             if (warnedAboutFiles === false) {
@@ -297,7 +297,7 @@ DataManager.prototype.createLoadingFunction = function (nativeFunc) {
     // json : error, response
     // xml : error, response
     // html : error, response
-    // csv : 
+    // csv :
     return function (url, a, b) {
         var callback = arguments.length === 3 ? b : a,
             file = self.getFile(url);

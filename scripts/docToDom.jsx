@@ -12,7 +12,7 @@
         alphabetic = new RegExp('[A-Za-z]'),
         invalid = new RegExp('[^A-Za-z0-9-_]', 'g');
     // Technically, HTML ids are pretty permissive, however, jQuery chokes on periods and colons
-    
+
     function getTag(item, name) {
         try {
             return item.tags.getByName(name).value;
@@ -20,22 +20,22 @@
             return null;
         }
     }
-    
+
     function standardize(activeDoc) {
         var nameLookup = {};
-        
+
         function standardizeItems(items) {
             var i,
                 oldName,
                 name,
                 newName,
                 freeId = 1;
-            
+
             for (i = 0; i < items.length; i += 1) {
                 // Make sure item names begin with [A-Za-z] and contain only [A-Za-z0-9\-\_]
                 // (jQuery / old DOM restrictions), and are unique (case-insensitive)
                 oldName = items[i].name;
-                
+
                 // Enforce strict rules about valid characters (for jQuery's sake)
                 name = oldName.replace(invalid, '_');
                 if (name.length === 0) {
@@ -44,7 +44,7 @@
                     // HTML ids must start with an alphabetic
                     name = items[i].constructor.name + '_' + name;
                 }
-                
+
                 newName = name;
                 while (reservedNames.hasOwnProperty(newName) || nameLookup.hasOwnProperty(newName)) {
                     newName = name + '_' + freeId;
@@ -54,17 +54,17 @@
                 nameLookup[newName] = items[i];
             }
         }
-        
+
         standardizeItems(activeDoc.artboards);
         standardizeItems(activeDoc.layers);
         standardizeItems(activeDoc.pathItems);
         standardizeItems(activeDoc.compoundPathItems);
         standardizeItems(activeDoc.groupItems);
         standardizeItems(activeDoc.textFrames);
-        
+
         return nameLookup;
     }
-    
+
     function extractColor(e, attr) {
         var color;
         // TODO: If the activeDocument is in CMYK mode, add
@@ -78,13 +78,13 @@
         } else if (e.hasOwnProperty(attr) === false) {
             throw new Error(e.name + ' does not have color attribute: ' + attr);
         }
-        
+
         if (e[attr].typename === 'SpotColor') {
             color = e[attr].spot.color;
         } else {
             color = e[attr];
         }
-        
+
         if (color.typename === 'RGBColor') {
             return 'rgb(' + color.red + ',' +
                             color.green + ',' +
@@ -97,7 +97,7 @@
             return 'rgb(' + Math.floor(0.0255 * (100 - color.cyan) * (100 - color.black)) +
                       ',' + Math.floor(0.0255 * (100 - color.magenta) * (100 - color.black)) +
                       ',' + Math.floor(0.0255 * (100 - color.yellow) * (100 - color.black)) + ') /*hanpuku_untouched*/';
-            
+
             // TODO: switch to this once Chrome supports it
             //return 'device-cmyk(' + color.cyan + ',' +
             //                        color.magenta + ',' +
@@ -117,7 +117,7 @@
             return 'rgb(0,0,0) /*hanpuku_unsupported:' + color.typename + '*/';
         }
     }
-    
+
     function extractZPosition(e) {
         try {
             return e.absoluteZOrderPosition;
@@ -129,7 +129,7 @@
             }
         }
     }
-    
+
     function extractPathSegment(p) {
         var result = {
                 points : [],
@@ -137,7 +137,7 @@
             },
             pt,
             controlPoint;
-        
+
         for (pt = 0; pt < p.pathPoints.length; pt += 1) {
             result.points.push({
                 anchor : p.pathPoints[pt].anchor,
@@ -151,10 +151,10 @@
                 }
             }
         }
-        
+
         return result;
     }
-    
+
     function extractPath(p) {
         var output = {
             itemType : 'path',
@@ -168,12 +168,12 @@
             reverseTransform : getTag(p, 'hanpuku_reverseTransform'),
             zIndex : extractZPosition(p)
         };
-        
+
         output.strokeWidth = output.stroke === 'none' ? 0 : p.strokeWidth;
-        
+
         return output;
     }
-    
+
     function extractCompoundPath(p) {
         var s,
             output = {
@@ -188,16 +188,16 @@
                 reverseTransform : getTag(p, 'hanpuku_reverseTransform'),
                 zIndex : extractZPosition(p)
             };
-        
+
         output.strokeWidth = output.stroke === 'none' ? 0 : p.pathItems[0].strokeWidth;
-        
+
         for (s = 0; s < p.pathItems.length; s += 1) {
             output.segments.push(extractPathSegment(p.pathItems[s]));
         }
-        
+
         return output;
     }
-    
+
     function extractText(t) {
         var temp,
             currentShift,
@@ -231,9 +231,9 @@
                 fontSize : t.textRange.size,
                 fontFamily : t.textRange.textFont.name
             };
-        
+
         output.strokeWidth = output.stroke === 'none' ? 0 : t.textRange.strokeWeight;
-        
+
         // Extract justification
         if (output.contents.length === 0 || t.paragraphs[0].justification === Justification.LEFT) {
             output.justification = 'LEFT';
@@ -245,13 +245,13 @@
             // TODO: support things like FULLJUSTIFYLASTLINELEFT?
             output.justification = 'LEFT';
         }
-        
+
         // Extract per-character kerning, tracking, baseline shift, and rotation
         output.kerning = [];
         output.baselineShift = [];
         currentShift = 0;
         output.rotate = [];
-        
+
         for (i = 0; i < t.characters.length; i += 1) {
             try {
                 temp = t.characters[i].kerning;
@@ -259,14 +259,14 @@
                 temp = 0;   // TODO: support auto, optical
             }
             output.kerning.push(temp * 1000 + 'em');
-            
+
             output.baselineShift.push((-t.characters[i].baselineShift - currentShift) + 'pt');
             currentShift = -t.characters[i].baselineShift;
-            
+
             output.rotate.push(t.characters[i].rotation + 'deg');
         }
         i = k = b = r = t.characters.length - 1;
-        
+
         while (i >= 0) {
             if (i === k && output.kerning[i] === '0em') {
                 k -= 1;
@@ -279,18 +279,18 @@
             }
             i -= 1;
         }
-        
+
         output.kerning.splice(k + 1);
         output.kerning = output.kerning.join(',');
         output.baselineShift.splice(b + 1);
         output.baselineShift = output.baselineShift.join(',');
         output.rotate.splice(r + 1);
         output.rotate = output.rotate.join(',');
-        
-        
+
+
         // Extract the absolute scale, rotation, and translation
         //temp = t.parent.textFrames.add();
-        
+
         scale_x = Math.sqrt(t.matrix.mValueA * t.matrix.mValueA +
                             t.matrix.mValueC * t.matrix.mValueC);
         //scale_x = t.matrix.mValueA < 0 ? -scale_x : scale_x;
@@ -298,33 +298,33 @@
                             t.matrix.mValueD * t.matrix.mValueD);
         //scale_y = t.matrix.mValueD < 0 ? -scale_y : scale_y;
         theta = Math.atan2(t.matrix.mValueB, t.matrix.mValueD);
-        
+
         // Illustrator actually changes the font size and textRange.horizontalScale (.verticalScale for some asian texts)
         // in response to scaling... we need to incorporate each of these
         scale_x = scale_x * t.textRange.horizontalScale / 100;
         scale_y = scale_y * t.textRange.verticalScale / 100;
-        
+
         x = t.anchor[0];
         y = t.anchor[1];
-        
+
         /*temp.resize(scale_x * 100, scale_y * 100, true, true, true, true, true, Transformation.DOCUMENTORIGIN);
         temp.rotate(theta * 180 / Math.PI, true, true, true, true, Transformation.DOCUMENTORIGIN);
-        
+
         x = t.matrix.mValueTX - temp.matrix.mValueTX;
         y = t.matrix.mValueTY - temp.matrix.mValueTY;
-        
+
         temp.remove();*/
-        
+
         output.scale_x_1 = scale_x;
         output.scale_y_1 = scale_y;
         output.theta_1 = theta;
         output.x_1 = x;
         output.y_1 = y;
-        
+
         // TODO: convert more text properties!
         return output;
     }
-    
+
     function extractGroup(g, iType) {
         var output = {
             itemType : iType,
@@ -338,13 +338,13 @@
             s,
             p,
             t;
-        
+
         if (iType === 'group') {
             output.data = getTag(g, 'hanpuku_data');
             output.classNames = getTag(g, 'hanpuku_classNames');
             output.reverseTransform = getTag(g, 'hanpuku_reverseTransform');
         }
-        
+
         for (s = 0; s < g.groupItems.length; s += 1) {
             output.groups.push(extractGroup(g.groupItems[s], 'group'));
         }
@@ -362,7 +362,7 @@
         }
         return output;
     }
-    
+
     function extractDocument() {
         var output = null,
             activeDoc,
@@ -374,16 +374,16 @@
             a,
             l,
             s;
-    
+
         if (app.documents.length > 0) {
             activeDoc = app.activeDocument;
-            
+
             if (activeDoc.activeLayer.name === 'Isolation Mode') {
                 return "Isolation Mode Error";
             }
-            
+
             standardize(activeDoc);
-            
+
             output = {
                 itemType : 'document',
                 name : activeDoc.name.split('.')[0].replace(invalid, '_'),
@@ -395,7 +395,7 @@
                 // HTML ids must start with an alphabetic
                 output.name = 'Document_' + output.name;
             }
-            
+
             for (a = 0; a < activeDoc.artboards.length; a += 1) {
                 newBoard = {
                     name: activeDoc.artboards[a].name,
@@ -404,7 +404,7 @@
                 // Illustrator has inverted Y coordinates
                 newBoard.rect[1] = -newBoard.rect[1];
                 newBoard.rect[3] = -newBoard.rect[3];
-                
+
                 // Update the bounds of the whole document
                 if (left === undefined || left > newBoard.rect[0]) {
                     left = newBoard.rect[0];
@@ -418,7 +418,7 @@
                 if (bottom === undefined || bottom < newBoard.rect[3]) {
                     bottom = newBoard.rect[3];
                 }
-                
+
                 output.artboards.push(newBoard);
             }
             output.left = left;
@@ -435,10 +435,10 @@
                 }
             }
         }
-        
+
         return output;
     }
-    
+
     try {
         console.setOutput(extractDocument());
     } catch (e) {

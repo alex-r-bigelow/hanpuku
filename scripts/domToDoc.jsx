@@ -43,17 +43,20 @@
     //for (i = 0; i < app.textFonts.length; i += 1) {
         //FONT_LOOKUP[]
     //}
-    
+
     function COMPARE_Z(a, b) {
         return a.zIndex - b.zIndex;
     }
-    
+
     function storeTag(item, name, value) {
+        if (value === undefined) {
+          value = null;
+        }
         i = item.tags.add();
         i.name = name;
         i.value = String(value);
     }
-    
+
     function applyFont(iTextRange, fontFamilies, fontStyle, fontWeight) {
         var i,
             f,
@@ -74,7 +77,7 @@
         // app.textFonts[301].family === 'Helvetica Neue'
         // app.textFonts[301].name === 'HelveticaNeue-UltraLightItalic'
         // app.textFonts[301].style === 'UltraLight Italic')
-        
+
         // from the DOM, we get
         // fontStyle (normal, italic, oblique)
         // fontWeight (normal, bold, bolder, lighter, 100-900)
@@ -83,17 +86,17 @@
         // ...though Adobe's font names as fontFamily work, though if you set something like
         // fontWeight on TOP of a weighted Adobe fontFamily, it will still override it
         // ... and dText.fontStretch actually doesn't.
-        
+
         if (fontLookup.hasOwnProperty(lookupString)) {
             if (fontLookup[lookupString] !== null) {
                 iTextRange.textFont = fontLookup[lookupString];
             }
             return;
         }
-        
+
         for (f = 0; f < fontFamilies.length; f += 1) {
             fontFamily = fontFamilies[f].trim();
-            
+
             // Use adobe's defaults for generic browser font families
             base = fontFamily.toLowerCase();
             if (base === 'sans-serif') {
@@ -103,10 +106,10 @@
                 foundFont = app.textFonts.getByName('MinionPro-Regular');
                 break;
             }
-            
+
             // Figure out the actual base font name
             base = fontFamily.split('-')[0].replace(/\s/, '');
-            
+
             // Figure out font-stretch (Chrome doesn't support the font-stretch css property,
             // so we only use the font family string itself)
             i = fontFamily.search('Condensed');
@@ -120,7 +123,7 @@
                     stretch = "";
                 }
             }
-            
+
             // Apply any overrides
             if (fontStyle !== 'normal' || fontWeight !== 'normal') {
                 // Figure out fontStyle
@@ -138,7 +141,7 @@
                         fontStyle = FONT_STYLES[fontStyle][0];
                     }
                 }
-                
+
                 // Figure out fontWeight
                 if (fontWeight === 'normal') {
                     // Whatever is left of the string...
@@ -150,7 +153,7 @@
                     }
                 }
             }
-            
+
             // First try the most specific name we can
             fontFamily = base + '-' + stretch + fontWeight + fontStyle;
             // TODO: try out different variants of style names (use dicts at the beginning of the file)
@@ -168,7 +171,7 @@
                 }
             }
         }
-        
+
         if (foundFont === null) {
             // Fail quietly
             console.logError({
@@ -178,25 +181,25 @@
         } else {
             iTextRange.textFont = foundFont;
         }
-        
+
         fontLookup[lookupString] = foundFont;
     }
-    
+
     function applyColor(iC, dC) {
         var red, green, blue, black;
-        
+
         if (dC.split('(').length < 2) {
             console.warn("Bad color:" + String(dC));
         }
         dC = dC.split('(')[1];
         dC = dC.split(')')[0];
         dC = dC.split(', ');
-        
+
         red = Number(dC[0]);
         green = Number(dC[1]);
         blue = Number(dC[2]);
         black = 1;
-        
+
         if (activeDoc.documentColorSpace === DocumentColorSpace.RGB) {
             iC.red = red;
             iC.green = green;
@@ -206,7 +209,7 @@
             red /= 255;
             green /= 255;
             blue /= 255;
-            
+
             if (red > green && red > blue) {
                 black = 1 - red;
             } else if (green > red && green > blue) {
@@ -214,9 +217,9 @@
             } else {
                 black = 1 - blue;
             }
-            
+
             iC.black = 100 * black;
-            
+
             if (black === 1) {
                 iC.cyan = 0;
                 iC.magenta = 0;
@@ -228,7 +231,7 @@
             }
         }
     }
-    
+
     function applyFillAndStroke(iItem, dItem) {
         var color;
         if (dItem.fill === 'none') {
@@ -249,7 +252,7 @@
             }
             applyColor(color, dItem.fill);
         }
-        
+
         if (dItem.stroke === 'none') {
             if (iItem.typename === 'TextFrame') {
                 iItem.strokeWeight = 0;
@@ -264,7 +267,7 @@
             } else {
                 iItem.strokeWidth = dItem.strokeWidth;
             }
-            
+
             if (iItem.strokeColor === undefined) {
                 iItem.strokeColor = new RGBColor();
                 color = iItem.strokeColor;
@@ -279,27 +282,27 @@
             }
             applyColor(color, dItem.stroke);
         }
-        
+
         iItem.opacity = dItem.opacity * 100;
     }
-    
+
     function applyBasics(iItem, dItem) {
         storeTag(iItem, 'hanpuku_data', JSON.stringify(dItem.data));
         storeTag(iItem, 'hanpuku_classNames', dItem.classNames);
         storeTag(iItem, 'hanpuku_reverseTransform', dItem.reverseTransform);
-        
+
         if (doc.selection.indexOf(dItem.name) !== -1) {
             iItem.selected = true;
         }
     }
-    
+
     function setPathPoints(iPath, segment) {
         var anchorList = [];
-        
+
         for (i = 0; i < segment.points.length; i += 1) {
             anchorList.push(segment.points[i].anchor);
         }
-        
+
         iPath.setEntirePath(anchorList);
         for (i = 0; i < segment.points.length; i += 1) {
             iPath.pathPoints[i].leftDirection = segment.points[i].leftDirection;
@@ -307,20 +310,20 @@
         }
         iPath.closed = segment.closed;
     }
-    
+
     function applyPath(iPath, dPath) {
         iPath.name = dPath.name;
-        
+
         setPathPoints(iPath, dPath.segments[0]);
-        
+
         applyFillAndStroke(iPath, dPath);
         applyBasics(iPath, dPath);
     }
-    
+
     function applyCompoundPath(iCompPath, dCompPath) {
         var i,
             segment;
-        
+
         iCompPath.name = dCompPath.name;
         // I can be cavalier about not matching the appropriate
         // segments, because attributes are shared across all segments
@@ -338,14 +341,14 @@
             // Clean up any leftover pathItems
             iCompPath.pathItems[i].remove();
         }
-        
+
         // The compound path doesn't possess any visual styles of its own;
         // instead, Illustrator propagates style changes to one pathItem to all
         // of them
         applyFillAndStroke(iCompPath.pathItems[0], dCompPath);
         applyBasics(iCompPath, dCompPath);
     }
-    
+
     function applyText(iText, dText) {
         var i,
             j,
@@ -354,10 +357,10 @@
             scale_y,
             theta,
             temp;
-        
+
         iText.name = dText.name;
         iText.contents = dText.contents;
-        
+
         // Fonts
         iText.textRange.characterAttributes.size = parseFloat(dText.fontSize);
         applyFont(iText.textRange,
@@ -365,9 +368,9 @@
                   dText.fontStyle,
                   dText.fontWeight);
                   // dText.fontStretch);   // still unsupported in Chrome
-        
+
         // TODO: dText.fontVariant (normal, small-caps)
-        
+
         // Justification
         if (dText.justification === 'CENTER') {
             j = Justification.CENTER;
@@ -377,13 +380,13 @@
             j = Justification.LEFT;
         }
         iText.textRange.justification = j;
-        
+
         // Apply per-character kerning, tracking, baseline shift, and rotation
         dText.kerning = dText.kerning.split(/,|\s+/);
         dText.baselineShift = dText.baselineShift.split(/,|\s+/);
         dText.rotate = dText.rotate.split(/,|\s+/);
         currentShift = 0;
-        
+
         for (i = 0; i < iText.characters.length; i += 1) {
             if (dText.kerning.length > i) {
                 iText.characters[i].kerning = 1000 * parseFloat(dText.kerning[i]);    // We need thousandths of an em
@@ -396,13 +399,13 @@
                 iText.characters[i].characterAttributes.rotation = parseFloat(dText.rotate[i]);  // Already in degrees
             }
         }
-        
+
         // In addition to data, we have to freeze internal x and y coordinates
         // so that the SVG DOM doesn't lose them (we don't use them in Illustrator,
         // but we have to pass them along)
         storeTag(iText, 'hanpuku_internalX', dText.internalX);
         storeTag(iText, 'hanpuku_internalY', dText.internalY);
-        
+
         // Manually reset position, scale, and rotation before applying the
         // position information that we're getting from the DOM (this is the
         // best way I can figure out to set global coordinates)
@@ -413,14 +416,14 @@
                             iText.matrix.mValueD * iText.matrix.mValueD);
         //scale_y = iText.matrix.mValueD < 0 ? -scale_y : scale_y;
         theta = Math.atan2(iText.matrix.mValueB, iText.matrix.mValueD);
-        
+
         scale_x = scale_x * iText.textRange.horizontalScale / 100;
         scale_y = scale_y * iText.textRange.verticalScale / 100;
-        
+
         iText.translate(-iText.anchor[0], -iText.anchor[1]);
         iText.rotate(-theta * 180 / Math.PI, true, true, true, true, Transformation.DOCUMENTORIGIN);
         iText.resize(100 / scale_x, 100 / scale_y, true, true, true, true, true, Transformation.DOCUMENTORIGIN);
-        
+
         // Okay, now apply the values we got from the DOM
         iText.resize(dText.scaleX * 100, dText.scaleY * 100, true, true, true, true, true, Transformation.DOCUMENTORIGIN);
         iText.rotate(dText.theta * 180 / Math.PI, true, true, true, true, Transformation.DOCUMENTORIGIN);
@@ -431,22 +434,22 @@
         storeTag(iText, 'hanpuku_theta_0', dText.theta);
         storeTag(iText, 'hanpuku_x_0', dText.x);
         storeTag(iText, 'hanpuku_y_0', dText.y);
-        
+
         // Generic attributes
         applyFillAndStroke(iText.textRange, dText);
         applyBasics(iText, dText);
     }
-    
+
     function applyGroup(iGroup, dGroup) {
         //var itemOrder = dGroup.groups.concat(dGroup.paths, dGroup.text).sort(COMPARE_Z),
         var itemOrder = dGroup.groups.concat(dGroup.paths).concat(dGroup.text).sort(COMPARE_Z),
             i,
             j,
             newItem;
-        
+
         iGroup.name = dGroup.name;
         iGroup.opacity = dGroup.opacity * 100;
-        
+
         // Modify / add needed groups, paths, and text items in order
         for (i = 0; i < itemOrder.length; i += 1) {
             if (itemOrder[i].itemType === 'group') {
@@ -487,7 +490,7 @@
                             // the compoundPathItem with a regular pathItem instead of just using
                             // the first one inside the compoundPathItem:
                             //newItem.remove();
-                            
+
                             for (j = 1; j < newItem.pathItems.length; j += 1) {
                                 newItem.pathItems[j].remove();
                             }
@@ -508,20 +511,20 @@
             }
             newItem.zOrder(ZOrderMethod.BRINGTOFRONT);
         }
-        
+
         // Generic attributes (Layers don't support tags :-( TODO: hack them into activeDoc.XMPString?))
         if (dGroup.itemType === 'group') {
             applyBasics(iGroup, dGroup);
         }
     }
-    
+
     function applyDocument() {
         if (app.documents.length === 0) {
             app.documents.add();
         }
         activeDoc = app.activeDocument;
         var a, artboard, l, layer;
-        
+
         // Modify / add needed artboards
         for (a = 0; a < doc.artboards.length; a += 1) {
             try {
@@ -532,7 +535,7 @@
             artboard.artboardRect = doc.artboards[a].rect;
             artboard.name = doc.artboards[a].name;
         }
-        
+
         // Modify / add needed layers in order
         doc.layers = doc.layers.sort(COMPARE_Z);
         for (l = 0; l < doc.layers.length; l += 1) {
@@ -551,7 +554,7 @@
             } catch (e3) {}
         }
     }
-    
+
     try {
         applyDocument();
         app.redraw();
