@@ -62,9 +62,14 @@
                 } else if (name === 'hboRecycling') {
                     window.parent.DATA.loadSampleDataFile('examples/data/hboRecyclingMatrix.csv');
                     window.parent.CODE.loadSampleJSFile('examples/scripts/hboRecycling.js');
+                } else if (name === 'genomeBrowser') {
+                    window.parent.DATA.loadSampleDataFile('examples/data/fig2.csv');
+                    window.parent.DATA.loadSampleDataFile('examples/data/genes.json');
+                    window.parent.CODE.loadSampleJSFile('examples/scripts/casp8.js');
+                    window.parent.CODE.loadSampleCSSFile('examples/style/casp8.css');
                 }
             }
-            
+
             var sampleNames = {
                     'scatterplot' : 'Scatterplot',
                     'groupedBars' : 'Grouped Bar Chart',
@@ -79,11 +84,12 @@
                     //'areaChoropleth' : 'Area Choropleth',
                     //'hierarchicalEdgeBundling' : 'Hierarchical Edge Bundling',
                     //'stackedRadialArea' : 'Stacked Radial Area',
-                    'hboRecycling' : 'The HBO Recycling Program'
+                    'hboRecycling' : 'The HBO Recycling Program',
+                    'genomeBrowser' : 'Genome Browser'
                 },
                 resultText = "",
                 name;
-            
+
             for (name in sampleNames) {
                 if (sampleNames.hasOwnProperty(name)) {
                     resultText += '<div class="sample">' + sampleNames[name] +

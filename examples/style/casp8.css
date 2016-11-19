@@ -1,0 +1,41 @@
+.glyph {
+	fill: none;
+	stroke-width: 1.5;
+	stroke: black;
+}
+.CFLARnormal .glyph {
+	stroke: #33a02c;
+}
+.CFLARtumor .glyph {
+	stroke: #b2df8a;
+}
+.CASP10normal .glyph {
+	stroke: #1f78b4;
+}
+.CASP10tumor .glyph {
+	stroke: #a6cee3;
+}
+.CASP8normal .glyph {
+	stroke: #e31a1c;
+}
+.CASP8tumor .glyph {
+	stroke: #fb9a99;
+}
+.dnaseq .glyph {
+	stroke: #000000;
+}
+
+svg .exon {
+	fill: black;
+	shape-rendering: crispEdges;
+}
+svg .centerLine {
+	fill: black;
+	shape-rendering: crispEdges;
+}
+svg .axis path,
+.axis line {
+	fill: none;
+	stroke: black;
+	shape-rendering: crispEdges;
+}
