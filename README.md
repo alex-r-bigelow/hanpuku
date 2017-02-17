@@ -17,12 +17,15 @@ the code!
 Installation
 ------------
 
-### Installing the Adobe Add-on
-The easiest way\* to install Hanpuku is via the [Adobe Add-ons](https://creative.adobe.com/addons/products/15087) page. Note that, for hard-core developers, you will probably still need to follow Step 2 below to peek at the DOM with Chrome's developer tools.
+### Easiest approach: Installing with ZXPInstaller
+Install [ZXPInstaller](http://zxpinstaller.com/), and use it to install the bundled [hanpuku extension](https://www.cs.utah.edu/~abigelow/Downloads/hanpuku/hanpuku.0.1.10.zxp).
 
-\* Okay, "easy" is a bit of an exaggeration. Adobe's add-on system is *very* broken. In practice, I've found that you have to mess with your Creative Cloud settings, and possibly completely uninstall / reinstall Illustrator itself to get it to work. Even when it does work, it can take a few minutes for extensions to show up in the Creative Cloud "Activity Stream" (the Home tab of the desktop app) after clicking "Install"... and only then can you quit / reopen Illustrator to see it in action. If you run into any of these issues, installing from source may be easier.
+### Official approach: Installing via the Adobe Add-ons Page
+In theory\*, you should be able to just install Hanpuku is via the [Adobe Add-ons](https://creative.adobe.com/addons/products/15087) page with one click.
 
-### Installing from the source code
+\* Adobe's add-on system is *very* broken. In practice, I've found that you have to mess with your Creative Cloud settings, and possibly completely uninstall / reinstall Illustrator itself to get it to work. Even when it does work, it can take a few minutes for extensions to show up in the Creative Cloud "Activity Stream" (the Home tab of the desktop app) after clicking "Install"... and only then can you quit / reopen Illustrator to see it in action. If you run into any of these issues, the ZXPInstaller way or installing from source may be easier.
+
+### Hard Core approach: Installing via the source code
 This way is a little trickier, but many users (myself included) have had problems with Adobe Add-ons. If you've tried the Add-on approach, it's a good idea to click "Remove" on the add-on page before you start, just to be safe.
 
 #### Step 1
@@ -42,7 +45,7 @@ mv ~/Downloads/hanpuku-master ~/Library/Application\ Support/Adobe/CEP/extension
 ```
 
 #### Step 2
-Illustrator won't normally load the extension unless it's cryptographically signed. The Add-on installation process should handle this for you, but if you're installing from the source code, you'll have to disable this check. You also have to do this step if you want to poke at the DOM using Chrome's developer tools.
+Illustrator won't normally load the extension unless it's cryptographically signed. The ZXP / Add-on installation routes should handle this for you, but if you're installing from the source code, you'll have to disable this check.
 
 Open `~/Library/Preferences/com.adobe.CSXS.7.plist` with a plain text editor (TextEdit *won't* do this correctly; use something like TextWrangler). To find the file in the Finder, you might need to hit `Command+Shift+G`, and paste that path.
 
