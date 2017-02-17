@@ -23,10 +23,10 @@ Install [ZXPInstaller](http://zxpinstaller.com/), and use it to install the bund
 ### Official approach: Installing via the Adobe Add-ons Page
 In theory\*, you should be able to just install Hanpuku is via the [Adobe Add-ons](https://creative.adobe.com/addons/products/15087) page with one click.
 
-\* Adobe's add-on system is *very* broken. In practice, I've found that you have to mess with your Creative Cloud settings, and possibly completely uninstall / reinstall Illustrator itself to get it to work. Even when it does work, it can take a few minutes for extensions to show up in the Creative Cloud "Activity Stream" (the Home tab of the desktop app) after clicking "Install"... and only then can you quit / reopen Illustrator to see it in action. If you run into any of these issues, the ZXPInstaller way or installing from source may be easier.
+\* Adobe's add-on system is *very* broken. In practice, I've found that you have to mess with your Creative Cloud settings, and possibly completely uninstall / reinstall Illustrator itself to get it to work. Even when it does work, it can take a few minutes for extensions to show up in the Creative Cloud "Activity Stream" (the Home tab of the desktop app) after clicking "Install"... and only then can you quit / reopen Illustrator to see it in action. If you run into any of these issues, installing from source may be easier.
 
 ### Hard Core approach: Installing via the source code
-This way is a little trickier, but many users (myself included) have had problems with Adobe Add-ons. If you've tried the Add-on approach, it's a good idea to click "Remove" on the add-on page before you start, just to be safe.
+This way is a little trickier, but many users (myself included) have had problems with Adobe Add-ons; if neither of the above two approaches work, this is your best shot. Or if you want to help with development, this is how you'll want to get set up.
 
 #### Step 1
 With Illustrator closed, open the terminal and type or paste these commands:
@@ -68,9 +68,10 @@ Add `<key>PlayerDebugMode</key>` and `<string>1</string>` so the file looks like
 You should now be able to launch Illustrator and open the Hanpuku extension window.
 
 ### Troubleshooting
-If encounter problems, please file an issue with the following information:
+If encounter problems, please file an issue! If possible, include the following information:
+- Let me know what approaches you tried to install hanpuku, and what happened
 - Include the version of Illustrator that you're running on ("Illustrator CC" -> "About Illustrator...")
-- Assuming you've done Step 2, you should be able to navigate to [http://localhost:8088](http://localhost:8088). There you should see an "index.html" link—if you click it, it will bring up Chrome's developer tools in the regular browser window. Please report any errors you see on the Console.
+- If you get far enough to see the hanpuku window (even if it's blank) try navigating to [http://localhost:8088](http://localhost:8088). There you *should* see an "index.html" link—if you click it, it will bring up Chrome's developer tools in the regular browser window. Please report any errors you see on the Console.
 
 
 See Hanpuku in action:
