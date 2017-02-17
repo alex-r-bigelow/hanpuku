@@ -16,9 +16,12 @@ the code!
 
 Installation
 ------------
+
+### Installing the Adobe Add-on
 The easiest way to install Hanpuku is via the [Adobe Add-ons](https://creative.adobe.com/addons/products/15087) page. Note that, for hard-core developers, you will probably still need to follow Step 2 below to peek at the DOM with Chrome's developer tools.
 
-If, for whatever reason, you prefer to install the bundled [ZXP extension](http://www.cs.utah.edu/~abigelow/Downloads/hanpuku/hanpuku.0.1.8.zxp) directly, Adobe's Extension Manager will likely refuse to cooperate. Instead, you'll want to follow these steps:
+### Installing from the source code
+This way is a little trickier, but many users have had problems with the Adobe Add-ons page.
 
 #### Step 1
 With Illustrator closed, open the terminal and type or paste these commands:
