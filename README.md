@@ -1,3 +1,8 @@
+# This project is no longer maintained
+**Unfortunately Adobe and D3 have changed a lot since this paper was published, and I quickly ran out of time / funding to maintain the extension. Also, I think my old university has recently deleted the space where I was hosting the extension bundles.**
+
+**This code is still up here in case anyone wants to build something similiar. Please feel free to fork / copy / paste (see LICENSE.md)!**
+
 # hanpuku #
 
 Hanpuku is an interface between d3.js and Adobe Illustrator, enabling a more flexible
